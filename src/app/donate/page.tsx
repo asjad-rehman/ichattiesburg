@@ -46,8 +46,22 @@ export default function DonatePage() {
         ))}
       </div>
 
-
-
+      {/* LaunchGood Oak Grove Project */}
+      <div style={{ background: `linear-gradient(135deg,${ICH.goldDark},${ICH.gold})`, borderRadius: 8, padding: "32px 36px", marginBottom: 32, position: "relative", overflow: "hidden", color: "#fff" }}>
+        <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.3 }} />
+        <div style={{ position: "relative", display: "flex", flexWrap: "wrap", gap: 24, alignItems: "center", justifyContent: "space-between" }}>
+          <div style={{ flex: "1 1 300px" }}>
+            <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.8)", marginBottom: 8 }}>Oak Grove Project</div>
+            <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600, marginBottom: 8 }}>Help Build Our New Masjid</h2>
+            <p style={{ fontSize: 14, color: "rgba(255,255,255,.9)", maxWidth: 500, lineHeight: 1.6 }}>
+              Support our campaign to build the Islamic Center of Oak Grove on LaunchGood. 100% of the proceeds go directly to the fundraiser.
+            </p>
+          </div>
+          <Btn variant="primary" href="https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove" style={{ background: "#fff", color: ICH.goldDark, fontWeight: 700 }}>
+            Donate on LaunchGood ↗
+          </Btn>
+        </div>
+      </div>
       {/* Zeffy Embed */}
       <div style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "20px", position: "relative" }}>
         <iframe

@@ -140,7 +140,7 @@ export default function AboutPage() {
                 </div>
               ))}
             </div>
-            <Btn variant="gold" href="/donate">♥ Support the New Masjid</Btn>
+            <Btn variant="gold" href="https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove">♥ Support the New Masjid</Btn>
           </div>
         </section>
 
