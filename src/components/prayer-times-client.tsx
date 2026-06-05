@@ -84,7 +84,6 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
 
   const prayersAll: PrayerData[] = React.useMemo(() => [
     { name: "Fajr",    key: "fajr",    h: f.h, m: f.m, display: formatTime(prayerTimes.fajr) },
-    { name: "Sunrise", key: "sunrise", h: s.h, m: s.m, display: formatTime(prayerTimes.sunrise) },
     { name: "Dhuhr",   key: "dhuhr",   h: d.h, m: d.m, display: formatTime(prayerTimes.dhuhr) },
     { name: "Asr",     key: "asr",     h: a.h, m: a.m, display: formatTime(prayerTimes.asr) },
     { name: "Maghrib", key: "maghrib", h: m.h, m: m.m, display: formatTime(prayerTimes.maghrib) },

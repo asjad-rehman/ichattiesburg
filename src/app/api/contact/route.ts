@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
 
       await transporter.sendMail({
         from: `"ICH Website" <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_EMAIL || "info@ichattiesburg.org",
+        to: process.env.CONTACT_EMAIL || "ichattiesburg@protonmail.com",
         replyTo: email,
         subject: `[ICH Contact] ${subject}`,
         text: `Name: ${name}\nEmail: ${email}\nSubject: ${subject}\n\nMessage:\n${message}`,
