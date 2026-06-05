@@ -4,20 +4,20 @@ import React, { useState } from "react";
 import Link from "next/link";
 
 export const ICH = {
-  primary:      '#6d4c41',
-  primaryDark:  '#3f2318',
-  primaryMid:   '#5a3a30',
-  primaryLight: '#8d6357',
-  gold:         '#c8a96e',
-  goldLight:    '#d9be8a',
-  goldDark:     '#9a7a3e',
-  bg:           '#faf9f6',
-  bgCard:       '#f4f0eb',
-  bgCard2:      '#ede7df',
-  text:         '#1c1a17',
-  textMuted:    '#6b6458',
-  border:       '#ddd5ca',
-  footerBg:     '#1e0e08',
+  primary:      '#145c70',
+  primaryDark:  '#0d3d4a',
+  primaryMid:   '#104b5c',
+  primaryLight: '#1f7a95',
+  gold:         '#247c6c',
+  goldLight:    '#3ba491',
+  goldDark:     '#18574a',
+  bg:           '#f4f8f9',
+  bgCard:       '#e6f0f2',
+  bgCard2:      '#d3e3e8',
+  text:         '#121d21',
+  textMuted:    '#50676e',
+  border:       '#c3d7dc',
+  footerBg:     '#08171c',
 };
 
 interface BtnProps {

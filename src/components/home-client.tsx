@@ -7,19 +7,19 @@ import { formatTime } from "@/lib/utils";
 
 // ── Mosque Hero SVG ───────────────────────────────────────────────────────────
 function MosqueHero() {
-  const dark = '#100402';
+  const dark = '#061217';
   return (
     <svg viewBox="0 0 1400 420" preserveAspectRatio="xMidYMax meet"
       style={{ position:'absolute', bottom:0, left:0, width:'100%', height:'80%', pointerEvents:'none' }}>
       <defs>
         <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#070201"/>
-          <stop offset="55%"  stopColor="#180a05"/>
-          <stop offset="100%" stopColor="#3d2010" stopOpacity=".9"/>
+          <stop offset="0%"   stopColor="#03090a"/>
+          <stop offset="55%"  stopColor="#091f26"/>
+          <stop offset="100%" stopColor="#103f4f" stopOpacity=".9"/>
         </linearGradient>
         <radialGradient id="glowG" cx="50%" cy="100%" r="55%">
-          <stop offset="0%"   stopColor="#c8a96e" stopOpacity=".18"/>
-          <stop offset="100%" stopColor="#c8a96e" stopOpacity="0"/>
+          <stop offset="0%"   stopColor="#247c6c" stopOpacity=".18"/>
+          <stop offset="100%" stopColor="#247c6c" stopOpacity="0"/>
         </radialGradient>
       </defs>
 
@@ -36,11 +36,11 @@ function MosqueHero() {
       ))}
 
       {/* Crescent moon */}
-      <circle cx="1090" cy="66" r="27" fill="#d4b96a" opacity=".92"/>
-      <circle cx="1104" cy="58" r="23" fill="#050e07"/>
+      <circle cx="1090" cy="66" r="27" fill="#3ba491" opacity=".92"/>
+      <circle cx="1104" cy="58" r="23" fill="#020709"/>
 
       {/* Horizon glow */}
-      <ellipse cx="700" cy="420" rx="680" ry="90" fill="#c8a96e" opacity=".07"/>
+      <ellipse cx="700" cy="420" rx="680" ry="90" fill="#247c6c" opacity=".07"/>
 
       {/* Left minaret */}
       <rect x="198" y="52" width="26" height="368" fill={dark}/>
@@ -79,30 +79,30 @@ function MosqueHero() {
       {/* Decorative windows in drum */}
       {[542,606,700,794,858].map((x,i) => (
         <g key={i}>
-          <rect x={x-13} y={228} width={26} height={52} fill="#0a2510" opacity=".9"/>
-          <ellipse cx={x} cy={228} rx={13} ry={10} fill="#0a2510" opacity=".9"/>
+          <rect x={x-13} y={228} width={26} height={52} fill="#09222a" opacity=".9"/>
+          <ellipse cx={x} cy={228} rx={13} ry={10} fill="#09222a" opacity=".9"/>
         </g>
       ))}
 
       {/* Arched openings in left wing */}
       {[184,284,384,460].map((x,i) => (
         <g key={i}>
-          <rect x={x-16} y={326} width={32} height={94} fill="#0a2510" opacity=".8"/>
-          <ellipse cx={x} cy={326} rx={16} ry={13} fill="#0a2510" opacity=".8"/>
+          <rect x={x-16} y={326} width={32} height={94} fill="#09222a" opacity=".8"/>
+          <ellipse cx={x} cy={326} rx={16} ry={13} fill="#09222a" opacity=".8"/>
         </g>
       ))}
 
       {/* Arched openings in right wing */}
       {[940,1016,1116,1216].map((x,i) => (
         <g key={i}>
-          <rect x={x-16} y={326} width={32} height={94} fill="#0a2510" opacity=".8"/>
-          <ellipse cx={x} cy={326} rx={16} ry={13} fill="#0a2510" opacity=".8"/>
+          <rect x={x-16} y={326} width={32} height={94} fill="#09222a" opacity=".8"/>
+          <ellipse cx={x} cy={326} rx={16} ry={13} fill="#09222a" opacity=".8"/>
         </g>
       ))}
 
       {/* Central arch entrance */}
-      <rect x="648" y="298" width="104" height="122" fill="#0a2510" opacity=".9"/>
-      <ellipse cx="700" cy="298" rx="52" ry="40" fill="#0a2510" opacity=".9"/>
+      <rect x="648" y="298" width="104" height="122" fill="#09222a" opacity=".9"/>
+      <ellipse cx="700" cy="298" rx="52" ry="40" fill="#09222a" opacity=".9"/>
     </svg>
   );
 }
@@ -211,7 +211,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
       {/* ── Hero ── */}
       <section style={{ position: "relative", minHeight: "78vh", overflow: "hidden", display: "flex", alignItems: "center" }}>
         {/* Dark gradient overlay */}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#0c0402 0%,#1a0a05 55%,#3d2010cc 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#060b0d 0%,#0c1b22 55%,#103f4fcc 100%)" }} />
         {/* Islamic star pattern overlay */}
         <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.35 }} />
         {/* Mosque silhouette */}
@@ -273,7 +273,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               return (
                 <div key={p.key} style={{
                   textAlign: "center", padding: "12px 8px", borderRadius: 4,
-                  background: isCur ? ICH.gold : isNext ? "rgba(200,169,110,.12)" : "rgba(255,255,255,.04)",
+                  background: isCur ? ICH.gold : isNext ? "rgba(36,124,108,.12)" : "rgba(255,255,255,.04)",
                   border: `1px solid ${isCur ? ICH.gold : isNext ? ICH.gold + "44" : "rgba(255,255,255,.08)"}`,
                   position: "relative", transition: "all .2s",
                 }}>
@@ -371,7 +371,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
                 textAlign: "center", padding: "24px 12px", borderRadius: 6,
                 background: isCur ? ICH.primary : isNext ? `${ICH.primary}0e` : "#fff",
                 border: `1px solid ${isCur ? ICH.primary : isNext ? ICH.primary + "44" : ICH.border}`,
-                position: "relative", boxShadow: isCur ? "0 6px 24px rgba(27,94,32,.25)" : "none",
+                position: "relative", boxShadow: isCur ? "0 6px 24px rgba(20,92,112,.25)" : "none",
                 transform: isCur ? "scale(1.04)" : "scale(1)",
                 transition: "all .2s",
               }}>
