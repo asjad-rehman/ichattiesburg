@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { LogOut, Plus, Bell, Calendar, Clock } from "lucide-react";
 import { AdminUser } from "@/lib/auth";
+import { ICH, Btn, Card } from "./ui-primitives";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
   const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer">("announcements");
@@ -12,46 +13,76 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
     window.location.href = "/admin/login";
   };
 
+  const tabButtonStyle = (tab: "announcements" | "events" | "prayer") => ({
+    padding: "8px 20px",
+    borderRadius: 4,
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: "pointer",
+    fontFamily: "Inter,sans-serif",
+    background: activeTab === tab ? ICH.primary : "transparent",
+    color: activeTab === tab ? "#fff" : ICH.textMuted,
+    border: "none",
+    transition: "all .15s",
+  });
+
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="page-enter" style={{ maxWidth: 1000, margin: "0 auto", padding: "52px 24px 80px" }}>
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 36, flexWrap: "wrap", gap: 16 }}>
         <div>
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-sm text-muted-foreground">Welcome back, {user.name}</p>
+          <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 36, fontWeight: 600, color: ICH.text }}>Admin Dashboard</h1>
+          <p style={{ fontSize: 13, color: ICH.textMuted }}>Welcome back, <strong style={{ color: ICH.text }}>{user.name}</strong></p>
         </div>
-        <button
-          onClick={logout}
-          className="flex items-center gap-2 px-4 py-2 text-sm border border-border rounded-lg hover:bg-muted transition-colors"
-        >
+        <Btn variant="outline" onClick={logout} style={{ fontSize: 13, gap: 5, padding: "8px 16px" }}>
           <LogOut className="h-4 w-4" />
           Logout
-        </button>
+        </Btn>
       </div>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-muted rounded-xl p-1 mb-8 w-fit">
+      {/* Tabs Row */}
+      <div style={{ display: "flex", gap: 8, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6, padding: 6, marginBottom: 36, width: "fit-content" }}>
         {(["announcements", "events", "prayer"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-              activeTab === tab
-                ? "bg-background shadow text-foreground"
-                : "text-muted-foreground hover:text-foreground"
-            }`}
+            style={tabButtonStyle(tab)}
           >
-            {tab === "prayer" ? "Prayer Times" : tab}
+            {tab === "prayer" ? "Prayer Times" : tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
       </div>
 
+      {/* Tab Contents */}
       {activeTab === "announcements" && <AnnouncementsTab />}
       {activeTab === "events" && <EventsTab />}
       {activeTab === "prayer" && <PrayerTimesTab />}
     </div>
   );
 }
+
+const inputStyle = {
+  width: "100%",
+  padding: "10px 14px",
+  border: `1px solid ${ICH.border}`,
+  borderRadius: 4,
+  fontSize: 14,
+  fontFamily: "Inter,sans-serif",
+  background: "#fff",
+  color: ICH.text,
+  outline: "none",
+};
+
+const labelStyle = {
+  display: "block",
+  fontSize: 11,
+  fontWeight: 700,
+  letterSpacing: ".08em",
+  textTransform: "uppercase" as const,
+  color: ICH.textMuted,
+  fontFamily: "Inter,sans-serif",
+  marginBottom: 6,
+};
 
 function AnnouncementsTab() {
   const [title, setTitle] = useState("");
@@ -68,62 +99,62 @@ function AnnouncementsTab() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <Bell className="h-5 w-5 text-primary" />
-          Announcements
-        </h2>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <Bell className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Announcements</h2>
       </div>
-      <form onSubmit={handleSave} className="bg-card border border-border rounded-xl p-6 space-y-4">
-        <h3 className="font-medium flex items-center gap-2">
+
+      <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, color: ICH.primary }}>
           <Plus className="h-4 w-4" /> New Announcement
         </h3>
+        
         <div>
-          <label className="block text-sm font-medium mb-1.5">Title</label>
+          <label style={labelStyle}>Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+            style={inputStyle}
             placeholder="Announcement title"
           />
         </div>
+        
         <div>
-          <label className="block text-sm font-medium mb-1.5">Message</label>
+          <label style={labelStyle}>Message</label>
           <textarea
             value={body}
             onChange={(e) => setBody(e.target.value)}
             required
             rows={3}
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
+            style={{ ...inputStyle, resize: "vertical" }}
             placeholder="Announcement text..."
           />
         </div>
-        <div className="flex items-center gap-4">
-          <label className="text-sm font-medium">Priority:</label>
-          <div className="flex gap-3">
+
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <label style={{ ...labelStyle, marginBottom: 0 }}>Priority:</label>
+          <div style={{ display: "flex", gap: 16 }}>
             {(["normal", "urgent"] as const).map((p) => (
-              <label key={p} className="flex items-center gap-1.5 text-sm cursor-pointer">
+              <label key={p} style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, cursor: "pointer", fontFamily: "Inter,sans-serif", color: ICH.text }}>
                 <input
                   type="radio"
                   name="priority"
                   value={p}
                   checked={priority === p}
                   onChange={() => setPriority(p)}
-                  className="accent-primary"
+                  style={{ accentColor: ICH.primary }}
                 />
-                <span className="capitalize">{p}</span>
+                <span style={{ textTransform: "capitalize" }}>{p}</span>
               </label>
             ))}
           </div>
         </div>
-        <button
-          type="submit"
-          className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90"
-        >
+
+        <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
           {saved ? "Saved!" : "Save Announcement"}
-        </button>
+        </Btn>
       </form>
     </div>
   );
@@ -143,52 +174,56 @@ function EventsTab() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold flex items-center gap-2 mb-6">
-        <Calendar className="h-5 w-5 text-primary" />
-        Events
-      </h2>
-      <form onSubmit={handleSave} className="bg-card border border-border rounded-xl p-6 space-y-4">
-        <h3 className="font-medium flex items-center gap-2"><Plus className="h-4 w-4" /> Add Event</h3>
-        <div className="grid sm:grid-cols-2 gap-4">
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <Calendar className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Events</h2>
+      </div>
+
+      <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, color: ICH.primary }}>
+          <Plus className="h-4 w-4" /> Add Event
+        </h3>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
           <div>
-            <label className="block text-sm font-medium mb-1.5">Title</label>
-            <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required
-              className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            <label style={labelStyle}>Title</label>
+            <input type="text" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required style={inputStyle} />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1.5">Category</label>
-            <select value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50">
+            <label style={labelStyle}>Category</label>
+            <select
+              value={form.category}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+              style={{ ...inputStyle, height: "40px" }}
+            >
               {["jumuah", "eid", "halaqa", "fundraiser", "construction", "community", "other"].map((c) => (
-                <option key={c} value={c} className="capitalize">{c}</option>
+                <option key={c} value={c} style={{ textTransform: "capitalize" }}>{c}</option>
               ))}
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1.5">Date</label>
-            <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required
-              className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            <label style={labelStyle}>Date</label>
+            <input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} required style={inputStyle} />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1.5">Time</label>
-            <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })}
-              className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+            <label style={labelStyle}>Time</label>
+            <input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} style={inputStyle} />
           </div>
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1.5">Location</label>
-          <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
-            placeholder="ICH Main Hall" />
+          <label style={labelStyle}>Location</label>
+          <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} style={inputStyle} placeholder="ICH Main Hall" />
         </div>
+
         <div>
-          <label className="block text-sm font-medium mb-1.5">Description</label>
-          <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} required
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none" />
+          <label style={labelStyle}>Description</label>
+          <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} required style={{ ...inputStyle, resize: "vertical" }} />
         </div>
-        <button type="submit" className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90">
+
+        <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
           {saved ? "Saved!" : "Save Event"}
-        </button>
+        </Btn>
       </form>
     </div>
   );
@@ -207,56 +242,52 @@ function PrayerTimesTab() {
 
   return (
     <div>
-      <h2 className="text-lg font-semibold flex items-center gap-2 mb-6">
-        <Clock className="h-5 w-5 text-primary" />
-        Prayer Times Override
-      </h2>
-      <p className="text-sm text-muted-foreground mb-6">
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <Clock className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Prayer Times Override</h2>
+      </div>
+      <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 20 }}>
         Override prayer times if the automatic fetch fails. Leave blank to use fetched times.
       </p>
-      <form onSubmit={handleSave} className="bg-card border border-border rounded-xl p-6 space-y-6">
+
+      <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 30 }}>
         <div>
-          <h3 className="font-medium mb-4">Daily Prayers</h3>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary, marginBottom: 16 }}>Daily Prayers</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 16 }}>
             {(["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"] as const).map((p) => (
               <div key={p}>
-                <label className="block text-sm font-medium mb-1.5 capitalize">{p}</label>
-                <input type="time" value={times[p]} onChange={(e) => setTimes({ ...times, [p]: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+                <label style={{ ...labelStyle, textTransform: "capitalize" }}>{p}</label>
+                <input type="time" value={times[p]} onChange={(e) => setTimes({ ...times, [p]: e.target.value })} style={inputStyle} />
               </div>
             ))}
           </div>
         </div>
-        <div>
-          <h3 className="font-medium mb-4">Jumuah Schedule</h3>
-          <div className="grid sm:grid-cols-2 gap-4">
+
+        <div style={{ borderTop: `1px solid ${ICH.border}`, paddingTop: 20 }}>
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary, marginBottom: 16 }}>Jumuah Schedule</h3>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Khutbah Time</label>
-              <input type="time" value={jumuah.khutbah} onChange={(e) => setJumuah({ ...jumuah, khutbah: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <label style={labelStyle}>Khutbah Time</label>
+              <input type="time" value={jumuah.khutbah} onChange={(e) => setJumuah({ ...jumuah, khutbah: e.target.value })} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Salah Time</label>
-              <input type="time" value={jumuah.salah} onChange={(e) => setJumuah({ ...jumuah, salah: e.target.value })}
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <label style={labelStyle}>Salah Time</label>
+              <input type="time" value={jumuah.salah} onChange={(e) => setJumuah({ ...jumuah, salah: e.target.value })} style={inputStyle} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Speaker</label>
-              <input type="text" value={jumuah.speaker} onChange={(e) => setJumuah({ ...jumuah, speaker: e.target.value })}
-                placeholder="Imam name"
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <label style={labelStyle}>Speaker</label>
+              <input type="text" value={jumuah.speaker} onChange={(e) => setJumuah({ ...jumuah, speaker: e.target.value })} placeholder="Imam name" style={inputStyle} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5">Topic</label>
-              <input type="text" value={jumuah.topic} onChange={(e) => setJumuah({ ...jumuah, topic: e.target.value })}
-                placeholder="Khutbah topic"
-                className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50" />
+              <label style={labelStyle}>Topic</label>
+              <input type="text" value={jumuah.topic} onChange={(e) => setJumuah({ ...jumuah, topic: e.target.value })} placeholder="Khutbah topic" style={inputStyle} />
             </div>
           </div>
         </div>
-        <button type="submit" className="px-5 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:opacity-90">
+
+        <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
           {saved ? "Saved!" : "Save Times"}
-        </button>
+        </Btn>
       </form>
     </div>
   );

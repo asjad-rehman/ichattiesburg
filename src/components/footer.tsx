@@ -1,118 +1,219 @@
+"use client";
+
+import React from "react";
 import Link from "next/link";
-import { MapPin, Phone, Mail } from "lucide-react";
+import { ICH } from "./ui-primitives";
 
 export default function Footer() {
+  const col = {
+    label: {
+      fontSize: 10,
+      fontWeight: 700,
+      letterSpacing: ".14em",
+      textTransform: "uppercase" as const,
+      color: ICH.gold,
+      marginBottom: 14,
+      fontFamily: "Inter,sans-serif",
+    },
+    link: {
+      background: "none",
+      border: "none",
+      cursor: "pointer",
+      textAlign: "left" as const,
+      padding: 0,
+      color: "rgba(255,255,255,.6)",
+      fontSize: 13.5,
+      fontFamily: "Inter,sans-serif",
+      transition: "color .15s",
+      display: "block",
+      marginBottom: 8,
+      textDecoration: "none",
+    },
+  };
+
+  const hov = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.color = "#fff";
+  };
+  const unhov = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.currentTarget.style.color = "rgba(255,255,255,.6)";
+  };
+
   return (
-    <footer className="bg-card border-t border-border mt-auto">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <footer style={{ background: ICH.footerBg, color: "#fff" }}>
+      <div
+        style={{
+          height: 2,
+          background: `linear-gradient(90deg,transparent,${ICH.gold},transparent)`,
+        }}
+      />
+      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "52px 24px 36px" }}>
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit,minmax(190px,1fr))",
+            gap: 40,
+            marginBottom: 44,
+          }}
+        >
           {/* Brand */}
-          <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-                ICH
-              </div>
-              <div>
-                <div className="font-semibold text-sm">Islamic Center</div>
-                <div className="text-xs text-muted-foreground">of Hattiesburg</div>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+          <div>
+            <img
+              src="/uploads/logo.png"
+              alt="ICH"
+              style={{
+                height: 52,
+                filter: "brightness(0) invert(1)",
+                marginBottom: 16,
+              }}
+            />
+            <p
+              style={{
+                fontSize: 13,
+                color: "rgba(255,255,255,.55)",
+                lineHeight: 1.75,
+                marginBottom: 18,
+              }}
+            >
               Serving the Muslim community of Hattiesburg, Mississippi with
               prayer, education, and community programs.
             </p>
-            <div className="text-lg font-arabic text-primary">
+            <div className="amiri" style={{ fontSize: 19, color: ICH.gold, lineHeight: 2 }}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
           </div>
 
-          {/* Quick Links */}
+          {/* Links */}
           <div>
-            <h3 className="font-semibold text-sm mb-4">Quick Links</h3>
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              {[
-                { href: "/prayer-times", label: "Prayer Times" },
-                { href: "/events", label: "Events Calendar" },
-                { href: "/donate", label: "Donate" },
-                { href: "/about", label: "About ICH" },
-                { href: "/about#oak-grove", label: "Oak Grove Project" },
-                { href: "/resources", label: "Islamic Resources" },
-              ].map((link) => (
-                <li key={link.href}>
-                  <Link
-                    href={link.href}
-                    className="hover:text-primary transition-colors"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <div style={col.label}>Quick Links</div>
+            {[
+              ["/prayer-times", "Prayer Times"],
+              ["/events", "Events Calendar"],
+              ["/donate", "Donate"],
+              ["/about", "About ICH"],
+              ["/resources", "Islamic Resources"],
+              ["/contact", "Contact"],
+            ].map(([href, label]) => (
+              <Link
+                key={href}
+                href={href}
+                style={col.link}
+                onMouseEnter={hov}
+                onMouseLeave={unhov}
+              >
+                {label}
+              </Link>
+            ))}
           </div>
 
           {/* Contact */}
           <div>
-            <h3 className="font-semibold text-sm mb-4">Contact</h3>
-            <ul className="space-y-3 text-sm text-muted-foreground">
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-primary" />
-                <span>
-                  21 Windmill Drive<br />
-                  Hattiesburg, MS 39402
-                </span>
-              </li>
-              <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-primary" />
-                <a href="tel:+16019280088" className="hover:text-primary transition-colors">
-                  (601) 928-0088
-                </a>
-              </li>
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <a href="mailto:info@ichattiesburg.org" className="hover:text-primary transition-colors">
-                  info@ichattiesburg.org
-                </a>
-              </li>
-            </ul>
+            <div style={col.label}>Contact</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+              {[
+                ["📍", "211 N 25th Avenue\nHattiesburg, MS 39401"],
+                ["✉️", "ICHattiesburg@protonmail.com"],
+              ].map(([icon, text]) => (
+                <div key={icon} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                  <span style={{ fontSize: 13, flexShrink: 0, marginTop: 2 }}>{icon}</span>
+                  <span
+                    style={{
+                      fontSize: 13,
+                      color: "rgba(255,255,255,.6)",
+                      lineHeight: 1.65,
+                      whiteSpace: "pre-line",
+                    }}
+                  >
+                    {text}
+                  </span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          {/* Social & Prayer */}
+          {/* Social */}
           <div>
-            <h3 className="font-semibold text-sm mb-4">Follow Us</h3>
-            <div className="flex gap-3 mb-6">
-              <a
-                href="https://www.facebook.com/ichattiesburg"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground transition-colors text-xs font-bold"
-                aria-label="Facebook"
-              >
-                f
-              </a>
-              <a
-                href="https://www.instagram.com/ichattiesburg"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="p-2.5 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground transition-colors text-xs font-bold"
-                aria-label="Instagram"
-              >
-                ig
-              </a>
+            <div style={col.label}>Follow Us</div>
+            <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
+              {["Facebook", "Instagram"].map((s) => (
+                <a
+                  key={s}
+                  href={`https://www.${s.toLowerCase()}.com/ichattiesburg`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    padding: "7px 14px",
+                    background: "rgba(255,255,255,.07)",
+                    color: "rgba(255,255,255,.75)",
+                    borderRadius: 3,
+                    fontSize: 12,
+                    fontWeight: 500,
+                    textDecoration: "none",
+                    border: "1px solid rgba(255,255,255,.1)",
+                    fontFamily: "Inter,sans-serif",
+                    transition: "all .15s",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,.14)";
+                    e.currentTarget.style.color = "#fff";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.background = "rgba(255,255,255,.07)";
+                    e.currentTarget.style.color = "rgba(255,255,255,.75)";
+                  }}
+                >
+                  {s}
+                </a>
+              ))}
             </div>
             <Link
               href="/admin"
-              className="text-xs text-muted-foreground hover:text-primary transition-colors"
+              style={{
+                textDecoration: "none",
+                fontSize: 11,
+                color: "rgba(255,255,255,.25)",
+                fontFamily: "Inter,sans-serif",
+                transition: "color .15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.55)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.25)")}
             >
               Admin Login
             </Link>
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-muted-foreground">
-          <p>© {new Date().getFullYear()} Islamic Center of Hattiesburg. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="/privacy" className="hover:text-primary transition-colors">Privacy Policy</Link>
-            <Link href="/sitemap.xml" className="hover:text-primary transition-colors">Sitemap</Link>
+        <div
+          style={{
+            borderTop: "1px solid rgba(255,255,255,.09)",
+            paddingTop: 22,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 10,
+          }}
+        >
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", fontFamily: "Inter,sans-serif" }}>
+            © {new Date().getFullYear()} Islamic Center of Hattiesburg. All rights reserved.
+          </p>
+          <div style={{ display: "flex", gap: 18 }}>
+            {["Privacy Policy", "Sitemap"].map((t) => (
+              <a
+                key={t}
+                href="#"
+                style={{
+                  fontSize: 12,
+                  color: "rgba(255,255,255,.35)",
+                  textDecoration: "none",
+                  fontFamily: "Inter,sans-serif",
+                  transition: "color .15s",
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.7)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.35)")}
+              >
+                {t}
+              </a>
+            ))}
           </div>
         </div>
       </div>

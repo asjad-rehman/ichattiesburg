@@ -1,181 +1,169 @@
-import type { Metadata } from "next";
-import { MapPin, Heart, BookOpen, Users, Building2 } from "lucide-react";
+import React from "react";
+import { Metadata } from "next";
+import { ICH, Btn, GoldLabel, SectionHead, Card } from "@/components/ui-primitives";
 
 export const metadata: Metadata = {
-  title: "About",
-  description: "Learn about the Islamic Center of Hattiesburg, our history, mission, and the Oak Grove masjid project.",
+  title: "About Us",
+  description: "Learn about the mission, leadership, programs, and New Masjid project at the Islamic Center of Hattiesburg.",
 };
+
+const BOARD_MEMBERS = [
+  { name: 'Abdul Karim',                  role: 'President' },
+  { name: 'Muhammad Asjad Rehman Hashmi', role: 'Vice President & Imam' },
+  { name: 'Vacant',                       role: 'Secretary' },
+  { name: 'Mohammed Kher Bni Salameh',    role: 'Treasurer' },
+  { name: 'Musa Al Hadwan',               role: 'Maintenance' },
+  { name: 'Sayed Ul Akbar Murad',         role: 'Tech Lead' },
+];
+
+const INITIATIVES = [
+  { icon: '📚', title: 'Sunday School',          time: 'Sundays 9 AM – 1 PM',              note: 'Postponed until further notice', desc: 'Islamic education for boys and girls up to age 12.' },
+  { icon: '🤝', title: 'Friday Halaqah (Brothers)', time: 'Fridays, Maghrib to Isha',         note: 'Dinner served',                  desc: 'Strengthening faith through discussion. Current read: Proofs of God and rejection of Atheism.' },
+  { icon: '🌸', title: 'Sunday Halaqah (Sisters)',  time: 'Sundays after Sunday School',      note: 'Potluck — bring a dish',         desc: 'Sisters-only gathering for Quran and Islamic discussion.' },
+  { icon: '☪️', title: 'New Reverts Program',       time: 'Friday evenings',                  note: '',                               desc: 'Spiritual development and deeper understandings of Islam for new Muslims.' },
+  { icon: '🍽️', title: 'Quarterly Family Potluck', time: 'Every quarter',                     note: '',                               desc: 'Community-wide gathering for brothers, sisters, and children.' },
+  { icon: '🏗️', title: 'New Masjid Project',        time: 'Ongoing',                          note: 'Donations needed',               desc: 'Building a new masjid with a large prayer hall, Islamic school, and community center.' },
+];
 
 export default function AboutPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
-      <div className="mb-12">
-        <h1 className="text-4xl font-bold mb-4">About ICH</h1>
-        <p className="text-xl text-muted-foreground leading-relaxed">
-          Serving the Muslim community of Hattiesburg, Mississippi with faith,
-          education, and community.
-        </p>
+    <div className="page-enter">
+      {/* Page hero */}
+      <div style={{ background: `linear-gradient(160deg,${ICH.primaryDark},${ICH.primary})`, padding: '64px 24px 56px', position: "relative", overflow: "hidden" }}>
+        <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.55 }} />
+        <div style={{ maxWidth: 800, margin: "0 auto", position: "relative" }}>
+          <GoldLabel>Islamic Center of Hattiesburg</GoldLabel>
+          <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(34px,5vw,56px)", fontWeight: 600, color: "#fff", marginBottom: 14 }}>About ICH</h1>
+          <p style={{ fontSize: "clamp(15px,1.6vw,18px)", color: "rgba(255,255,255,.75)", lineHeight: 1.8, maxWidth: 560 }}>
+            Serving the Muslim community of Hattiesburg, Mississippi with faith, education, and community.
+          </p>
+        </div>
       </div>
 
-      {/* Mission */}
-      <section className="mb-14">
-        <div className="bg-primary rounded-2xl p-8 text-primary-foreground">
-          <div className="font-arabic text-2xl mb-4 text-secondary">
-            وَتَعَاوَنُوا عَلَى الْبِرِّ وَالتَّقْوَىٰ
-          </div>
-          <p className="text-primary-foreground/80 text-sm mb-4">
-            &ldquo;And cooperate in righteousness and piety&rdquo; (Quran 5:2)
-          </p>
-          <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
-          <p className="text-primary-foreground/85 leading-relaxed">
-            The Islamic Center of Hattiesburg exists to serve Allah (SWT) by
-            serving His creation. We strive to be a spiritual home for Muslims in
-            South Mississippi, a center of Islamic learning, and a positive
-            presence in the broader Hattiesburg community.
-          </p>
-        </div>
-      </section>
-
-      {/* History */}
-      <section className="mb-14">
-        <h2 className="text-2xl font-bold mb-6">Our History</h2>
-        <div className="prose prose-neutral dark:prose-invert max-w-none text-muted-foreground space-y-4">
-          <p>
-            The Islamic Center of Hattiesburg has been a pillar of the Muslim
-            community in South Mississippi for many years. Founded by dedicated
-            community members who recognized the need for an organized Muslim
-            presence in Hattiesburg, ICH has grown from humble beginnings into a
-            vibrant center of worship and community life.
-          </p>
-          <p>
-            Over the years, ICH has served as a place of prayer, Islamic
-            education, interfaith dialogue, and community service. We have
-            welcomed Muslims from across the region and from diverse ethnic and
-            cultural backgrounds, united in faith and commitment to their
-            community.
-          </p>
-          <p>
-            Today, ICH continues to grow and expand its programs and services.
-            We are grateful to Allah (SWT) for His blessings and to the many
-            community members, donors, and volunteers who have made ICH what it
-            is today.
-          </p>
-        </div>
-      </section>
-
-      {/* What We Offer */}
-      <section className="mb-14">
-        <h2 className="text-2xl font-bold mb-8">What We Offer</h2>
-        <div className="grid sm:grid-cols-2 gap-6">
-          {[
-            {
-              icon: <Heart className="h-6 w-6" />,
-              title: "Daily Prayers",
-              desc: "Five daily prayers including Fajr, Dhuhr, Asr, Maghrib, and Isha. Jumuah held every Friday.",
-            },
-            {
-              icon: <BookOpen className="h-6 w-6" />,
-              title: "Islamic Education",
-              desc: "Quran classes for children and adults, Islamic studies, and periodic lectures.",
-            },
-            {
-              icon: <Users className="h-6 w-6" />,
-              title: "Youth Programs",
-              desc: "Weekly Islamic education and activities for children and teens to build their faith and identity.",
-            },
-            {
-              icon: <Building2 className="h-6 w-6" />,
-              title: "Community Space",
-              desc: "A welcoming space for community gatherings, events, and interfaith activities.",
-            },
-          ].map((item) => (
-            <div key={item.title} className="flex gap-4 p-5 rounded-xl bg-card border border-border">
-              <div className="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
-                {item.icon}
+      <div style={{ maxWidth: 900, margin: "0 auto", padding: "60px 24px 80px" }}>
+        {/* Mission */}
+        <section style={{ marginBottom: 60 }}>
+          <div style={{ border: `1px solid ${ICH.gold}44`, borderRadius: 8, padding: "36px 40px", background: `${ICH.gold}07`, position: "relative", overflow: "hidden" }}>
+            <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.6 }} />
+            <div style={{ position: "relative" }}>
+              <div className="amiri" style={{ fontSize: "clamp(20px,2.5vw,28px)", color: ICH.primary, marginBottom: 10, direction: "rtl", textAlign: "right", lineHeight: 1.8 }}>
+                وَاللَّهُ يَدْعُو إِلَىٰ دَارِ السَّلَامِ
               </div>
-              <div>
-                <h3 className="font-semibold mb-1">{item.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
-              </div>
+              <p style={{ fontSize: 13, color: ICH.textMuted, fontStyle: "italic", textAlign: "right", marginBottom: 24 }}>
+                "And Allah invites to the Home of Peace" — Surah Yunus, Verse 25
+              </p>
+              <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 28, fontWeight: 600, marginBottom: 12 }}>Our Mission</h2>
+              <p style={{ fontSize: 15, color: ICH.textMuted, lineHeight: 1.8 }}>
+                The Islamic Center of Hattiesburg stands as a beacon of faith and community. Our mission is to foster a vibrant and inclusive environment where Muslims of all backgrounds can come together to worship, learn, and serve. We strive to promote the principles of Islam, advance education, and provide essential services that enhance the quality of life for our community members.
+              </p>
             </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Oak Grove Project */}
-      <section id="oak-grove" className="scroll-mt-20">
-        <div className="rounded-2xl border border-secondary/40 bg-secondary/10 p-8">
-          <div className="flex items-center gap-3 mb-4">
-            <Building2 className="h-6 w-6 text-secondary" />
-            <h2 className="text-2xl font-bold">Oak Grove Masjid Project</h2>
           </div>
-          <p className="text-muted-foreground leading-relaxed mb-6">
-            ICH is currently working on an exciting new project — building a
-            dedicated masjid facility in the Oak Grove area. This project will
-            give our growing community a permanent, purpose-built home for
-            worship, education, and community programs.
-          </p>
-          <div className="grid sm:grid-cols-3 gap-4 mb-6">
-            {[
-              { label: "Status", value: "In Progress" },
-              { label: "Location", value: "Oak Grove, MS" },
-              { label: "Goal", value: "New Masjid Facility" },
-            ].map((item) => (
-              <div key={item.label} className="bg-background rounded-lg p-4 text-center border border-border">
-                <div className="text-xs text-muted-foreground uppercase tracking-wider mb-1">{item.label}</div>
-                <div className="font-semibold">{item.value}</div>
+        </section>
+
+        {/* Board */}
+        <section style={{ marginBottom: 60 }}>
+          <SectionHead label="Leadership" title="Board @ Islamic Center" />
+          <div style={{ border: `1px solid ${ICH.border}`, borderRadius: 8, overflow: "hidden" }}>
+            {BOARD_MEMBERS.map((member, i) => (
+              <div
+                key={member.name}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "16px 24px",
+                  background: i % 2 === 0 ? "#fff" : ICH.bgCard,
+                  borderBottom: i < BOARD_MEMBERS.length - 1 ? `1px solid ${ICH.border}` : "none",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                  <div style={{ width: 38, height: 38, borderRadius: "50%", background: `${ICH.primary}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: ICH.primary, fontFamily: "Cormorant Garamond,serif", flexShrink: 0 }}>
+                    {member.name === "Vacant" ? "—" : member.name.split(" ").map(w => w[0]).slice(0, 2).join("")}
+                  </div>
+                  <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: member.name === "Vacant" ? ICH.textMuted : ICH.text, fontStyle: member.name === "Vacant" ? "italic" : "normal" }}>
+                    {member.name}
+                  </span>
+                </div>
+                <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", background: `${ICH.primary}10`, padding: "4px 12px", borderRadius: 20 }}>
+                  {member.role}
+                </span>
               </div>
             ))}
           </div>
-          <p className="text-muted-foreground text-sm leading-relaxed mb-5">
-            This project is funded entirely through community donations. Every
-            contribution, large or small, brings us closer to our goal of a
-            permanent masjid for the Hattiesburg area Muslim community.
-          </p>
-          <a
-            href="/donate?category=oak-grove-project"
-            className="inline-flex items-center gap-2 px-6 py-3 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 transition-opacity"
-          >
-            <Heart className="h-4 w-4" />
-            Support the Oak Grove Project
-          </a>
-        </div>
-      </section>
+        </section>
 
-      {/* Location */}
-      <section className="mt-14">
-        <h2 className="text-2xl font-bold mb-6">Location &amp; Hours</h2>
-        <div className="grid sm:grid-cols-2 gap-6">
-          <div className="p-5 rounded-xl bg-card border border-border">
-            <div className="flex items-center gap-2 mb-3 text-primary font-medium">
-              <MapPin className="h-4 w-4" />
-              Address
+        {/* Initiatives */}
+        <section style={{ marginBottom: 60 }}>
+          <SectionHead label="Programs" title="Our Initiatives" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16 }}>
+            {INITIATIVES.map((item) => (
+              <Card key={item.title} hover style={{ position: "relative" }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start", marginBottom: 10 }}>
+                  <span style={{ fontSize: 24, flexShrink: 0 }}>{item.icon}</span>
+                  <div>
+                    <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 2 }}>{item.title}</h3>
+                    <div style={{ fontSize: 11, color: ICH.primary, fontWeight: 600, fontFamily: "Inter,sans-serif" }}>{item.time}</div>
+                  </div>
+                </div>
+                <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.65, marginBottom: item.note ? 10 : 0 }}>{item.desc}</p>
+                {item.note && (
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 11, fontWeight: 600, color: ICH.gold, fontFamily: "Inter,sans-serif" }}>
+                    <span>★</span> {item.note}
+                  </div>
+                )}
+              </Card>
+            ))}
+          </div>
+        </section>
+
+        {/* Oak Grove Project */}
+        <section id="oak-grove" style={{ scrollMarginTop: 80, marginBottom: 60 }}>
+          <div style={{ border: `2px solid ${ICH.gold}55`, borderRadius: 8, padding: "36px 40px", background: `linear-gradient(135deg,${ICH.bgCard},#fff)` }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+              <span style={{ fontSize: 24 }}>🏗️</span>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.gold, fontFamily: "Inter,sans-serif" }}>Active Project</div>
             </div>
-            <p className="text-muted-foreground text-sm">
-              21 Windmill Drive<br />
-              Hattiesburg, MS 39402
+            <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 32, fontWeight: 600, marginBottom: 16 }}>New Masjid Project</h2>
+            <p style={{ fontSize: 15, color: ICH.textMuted, lineHeight: 1.8, marginBottom: 24 }}>
+              As a growing community our current facility continues to be a challenge. We are planning to address this concern by building a new masjid that will offer a large prayer hall, an Islamic school, and a community center, insha'Allah. Please spread the word and donate wholeheartedly.
             </p>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
+              {[
+                ["Status", "In Progress"],
+                ["Location", "Hattiesburg, MS"],
+                ["Goal", "New Masjid Facility"],
+              ].map(([label, value]) => (
+                <div key={label} style={{ textAlign: "center", background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 5, padding: "14px 10px" }}>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 5 }}>{label}</div>
+                  <div style={{ fontSize: 15, fontWeight: 600, color: ICH.text }}>{value}</div>
+                </div>
+              ))}
+            </div>
+            <Btn variant="gold" href="/donate">♥ Support the New Masjid</Btn>
           </div>
-          <div className="p-5 rounded-xl bg-card border border-border">
-            <div className="font-medium mb-3 text-primary text-sm">Open For Prayers</div>
-            <p className="text-muted-foreground text-sm leading-relaxed">
-              The masjid is open for all five daily prayers. Please check the
-              prayer times page for current schedule. Special events and
-              programs may have different hours.
-            </p>
+        </section>
+
+        {/* Location */}
+        <section>
+          <SectionHead label="Visit Us" title="Location & Hours" />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16, marginBottom: 16 }}>
+            <Card>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 10 }}>📍 Address</div>
+              <p style={{ fontSize: 14, color: ICH.textMuted, lineHeight: 1.7 }}>211 N 25th Avenue<br />Hattiesburg, MS 39401</p>
+            </Card>
+            <Card>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 10 }}>🕌 Open For Prayers</div>
+              <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.7 }}>The masjid is open for all five daily prayers. Check the prayer times page for the current schedule. Special events may have different hours.</p>
+            </Card>
           </div>
-        </div>
-        <div className="mt-4 rounded-xl overflow-hidden border border-border h-64">
-          <iframe
-            src="https://www.openstreetmap.org/export/embed.html?bbox=-89.35,31.28,-89.28,31.35&layer=mapnik&marker=31.314,-89.315"
-            width="100%"
-            height="100%"
-            style={{ border: 0 }}
-            loading="lazy"
-            title="ICH Location"
-          />
-        </div>
-      </section>
+          <div style={{ borderRadius: 8, overflow: "hidden", border: `1px solid ${ICH.border}`, height: 280 }}>
+            <iframe
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-89.32,31.28,-89.28,31.32&layer=mapnik&marker=31.302,-89.301"
+              width="100%" height="100%" style={{ border: 0 }} loading="lazy" title="ICH Location"
+            />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
