@@ -194,8 +194,24 @@ export default function Footer() {
             gap: 10,
           }}
         >
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", fontFamily: "Inter,sans-serif" }}>
-            © {new Date().getFullYear()} Islamic Center of Hattiesburg. All rights reserved.
+          <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", fontFamily: "Inter,sans-serif", lineHeight: 1.6 }}>
+            © {new Date().getFullYear()} Islamic Center of Hattiesburg. All rights reserved.{" "}
+            <span style={{ margin: "0 6px" }}>|</span>{" "}
+            Developed by{" "}
+            <a
+              href="https://asjadrehman.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{
+                color: "rgba(255,255,255,.5)",
+                textDecoration: "none",
+                transition: "color .15s",
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.9)")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.5)")}
+            >
+              Muhammad Asjad Rehman Hashmi
+            </a>
           </p>
           <div style={{ display: "flex", gap: 18 }}>
             {["Privacy Policy", "Sitemap"].map((t) => (
