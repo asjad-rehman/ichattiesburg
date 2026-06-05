@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ICH, Btn, GoldLabel } from "./ui-primitives";
+import { ICH, Btn, GoldLabel, ScrollReveal } from "./ui-primitives";
 import { PrayerTimes, JumuahSchedule } from "@/lib/prayer-times";
 import { formatTime } from "@/lib/utils";
 
@@ -108,7 +108,8 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
       </div>
 
       {/* ── Live Countdown ── */}
-      <div style={{
+      <ScrollReveal>
+        <div style={{
         background: `linear-gradient(135deg,${ICH.primaryDark},${ICH.primary})`,
         borderRadius: 8, padding: "36px 40px", marginBottom: 36,
         display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 24,
@@ -131,10 +132,12 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
             "Guard strictly the prayers" — Quran 2:238
           </div>
         </div>
-      </div>
+        </div>
+      </ScrollReveal>
 
       {/* ── Prayer cards grid ── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, marginBottom: 40 }}>
+      <ScrollReveal delay={0.1}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 12, marginBottom: 40 }}>
         {prayersAll.map((p, i) => {
           const isCur = i === curIdx;
           const isNext = i === nextIdx;
@@ -202,8 +205,10 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
           </div>
         </div>
       </div>
+      </ScrollReveal>
 
       {/* Quran verse */}
+      <ScrollReveal delay={0.3}>
       <div style={{ background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", textAlign: "center" }}>
         <div className="amiri" style={{ fontSize: "clamp(22px,3vw,30px)", color: ICH.primary, marginBottom: 12, lineHeight: 1.8, direction: "rtl", textAlign: "right" }}>
           إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوقُوتًا
@@ -212,6 +217,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
           "Indeed, prayer has been decreed upon the believers a decree of specified times." — Quran 4:103
         </p>
       </div>
+      </ScrollReveal>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ICH, Btn, GoldLabel, SectionHead } from "./ui-primitives";
+import { ICH, Btn, GoldLabel, SectionHead, ScrollReveal } from "./ui-primitives";
 import { PrayerTimes, JumuahSchedule } from "@/lib/prayer-times";
 import { formatTime } from "@/lib/utils";
 
@@ -220,7 +220,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
 
         {/* Content */}
         <div style={{ position: "relative", zIndex: 10, maxWidth: 1200, margin: "0 auto", padding: "80px 24px 100px", width: "100%" }}>
-          <div style={{ maxWidth: 580 }}>
+          <ScrollReveal delay={0.1} className="max-w-[580px]">
             <div className="amiri" style={{ fontSize: "clamp(18px,2.5vw,26px)", color: ICH.accent, marginBottom: 18, direction: "rtl", textAlign: "left" }}>
               السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ
             </div>
@@ -236,7 +236,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               <Btn variant="primary" href="/donate">♥ Donate Now</Btn>
               <Btn variant="ghost-dark" href="/events">📅 Events</Btn>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
@@ -290,12 +290,46 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
         <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }`}</style>
       </section>
 
+      {/* ── About Section ── */}
+      <section style={{ padding: "100px 24px", background: ICH.bg }}>
+        <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 60, alignItems: "center" }}>
+          <ScrollReveal delay={0.1}>
+            <SectionHead label="About Us" title="Welcome to ICH" />
+            <p style={{ fontSize: 15, color: ICH.textMuted, lineHeight: 1.8, marginBottom: 20 }}>
+              The Islamic Center of Hattiesburg provides a place of worship and a community hub for Muslims in the Pine Belt area. We are committed to nurturing faith, fostering brotherhood, and engaging with our broader Hattiesburg community.
+            </p>
+            <p style={{ fontSize: 15, color: ICH.textMuted, lineHeight: 1.8, marginBottom: 32 }}>
+              We invite everyone to visit, participate in our programs, and learn more about Islam.
+            </p>
+            <Btn variant="outline" href="/about">Learn More</Btn>
+          </ScrollReveal>
+          
+          <ScrollReveal delay={0.2} y={30} className="relative">
+            {/* Visual element placeholder */}
+            <div style={{ 
+              aspectRatio: "4/3", 
+              background: `linear-gradient(135deg, ${ICH.primaryDark}, ${ICH.primary})`,
+              borderRadius: 12,
+              position: "relative",
+              overflow: "hidden",
+              boxShadow: "0 20px 40px rgba(10,50,65,0.15)"
+            }}>
+              <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
+              <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
+                <span style={{ fontSize: 54, marginBottom: 16 }}>🕌</span>
+                <span className="amiri" style={{ color: ICH.accent, fontSize: 32, fontWeight: 600 }}>إِنَّمَا يَعْمُرُ مَسَاجِدَ اللَّهِ</span>
+              </div>
+            </div>
+          </ScrollReveal>
+        </div>
+      </section>
+
       {/* ── Jumuah + About ── */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 24px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 48, alignItems: "start" }}>
 
           {/* Jumuah Card */}
-          <div style={{ background: `linear-gradient(145deg,${ICH.primaryDark},${ICH.primary})`, borderRadius: 8, padding: "36px 32px", color: "#fff", position: "relative", overflow: "hidden" }}>
+          <ScrollReveal delay={0.3} style={{ background: `linear-gradient(145deg,${ICH.primaryDark},${ICH.primary})`, borderRadius: 8, padding: "36px 32px", color: "#fff", position: "relative", overflow: "hidden" }}>
             {/* Background pattern */}
             <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
             <div style={{ position: "relative" }}>
@@ -312,10 +346,10 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
                 <Btn variant="ghost-dark" href="/prayer-times" size="sm">Full Schedule →</Btn>
               </div>
             </div>
-          </div>
+          </ScrollReveal>
 
           {/* About snippet */}
-          <div>
+          <ScrollReveal delay={0.4}>
             <SectionHead label="About Us" title="A Home for the Muslim Community"
               sub="The Islamic Center of Hattiesburg (ICH) has been a cornerstone of the Muslim community in South Mississippi for decades — a welcoming space for worship, learning, and community service." />
             <div style={{ display: "flex", flexDirection: "column", gap: 18, marginBottom: 28 }}>
@@ -337,8 +371,22 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               <Btn variant="primary" href="/about">Learn More</Btn>
               <Btn variant="outline" href="https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove">Oak Grove Project</Btn>
             </div>
-          </div>
+          </ScrollReveal>
         </div>
+      </section>
+
+      {/* ── Support the Masjid ── */}
+      <section style={{ padding: "100px 24px", background: "#f8fcfb", borderTop: `1px solid ${ICH.border}` }}>
+        <ScrollReveal delay={0.1} y={30} className="max-w-[1200px] mx-auto text-center">
+          <SectionHead label="Support Us" title="Donate & Sustain" />
+          <p style={{ maxWidth: 600, margin: "0 auto 36px", color: ICH.textMuted, lineHeight: 1.7 }}>
+            The masjid relies entirely on the generous contributions of the community to cover operating expenses and fund our programs.
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+            <Btn variant="primary" href="/donate">Support ICH Online</Btn>
+            <Btn variant="outline" href="/donate">Other Ways to Give</Btn>
+          </div>
+        </ScrollReveal>
       </section>
 
       {/* ── Donate CTA ── */}

@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { motion } from "framer-motion";
 
 import { ICH } from "@/lib/theme";
 export { ICH };
@@ -172,5 +173,32 @@ export function Tag({ children, color = 'gray' }: TagProps) {
     }}>
       {children}
     </span>
+  );
+}
+
+export function ScrollReveal({
+  children,
+  delay = 0,
+  y = 20,
+  className = "",
+  style,
+}: {
+  children: React.ReactNode;
+  delay?: number;
+  y?: number;
+  className?: string;
+  style?: React.CSSProperties;
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
+      className={className}
+      style={style}
+    >
+      {children}
+    </motion.div>
   );
 }

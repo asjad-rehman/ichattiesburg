@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import { Btn, GoldLabel, SectionHead, Card } from "@/components/ui-primitives";
+import { Btn, GoldLabel, SectionHead, Card, ScrollReveal } from "@/components/ui-primitives";
 import { ICH } from "@/lib/theme";
 
 export const metadata: Metadata = {
@@ -41,6 +41,7 @@ export default function AboutPage() {
       <div style={{ maxWidth: 900, margin: "0 auto", padding: "60px 24px 80px" }}>
         {/* Mission */}
         <section style={{ marginBottom: 60 }}>
+          <ScrollReveal>
           <div style={{ border: `1px solid ${ICH.gold}44`, borderRadius: 8, padding: "36px 40px", background: `${ICH.gold}07`, position: "relative", overflow: "hidden" }}>
             <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.6 }} />
             <div style={{ position: "relative" }}>
@@ -56,10 +57,12 @@ export default function AboutPage() {
               </p>
             </div>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* Board */}
         <section style={{ marginBottom: 60 }}>
+          <ScrollReveal delay={0.2}>
           <SectionHead label="Leadership" title="Board @ Islamic Center" />
           <div style={{ border: `1px solid ${ICH.border}`, borderRadius: 8, overflow: "hidden" }}>
             {BOARD_MEMBERS.map((member, i) => (
@@ -88,10 +91,12 @@ export default function AboutPage() {
               </div>
             ))}
           </div>
+          </ScrollReveal>
         </section>
 
         {/* Initiatives */}
         <section style={{ marginBottom: 60 }}>
+          <ScrollReveal delay={0.1}>
           <SectionHead label="Programs" title="Our Initiatives" />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16 }}>
             {INITIATIVES.map((item) => (
@@ -112,10 +117,12 @@ export default function AboutPage() {
               </Card>
             ))}
           </div>
+          </ScrollReveal>
         </section>
 
         {/* Oak Grove Project */}
         <section id="oak-grove" style={{ scrollMarginTop: 80, marginBottom: 60 }}>
+          <ScrollReveal delay={0.2}>
           <div style={{ border: `2px solid ${ICH.gold}55`, borderRadius: 8, padding: "36px 40px", background: `linear-gradient(135deg,${ICH.bgCard},#fff)` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
               <span style={{ fontSize: 24 }}>🏗️</span>
@@ -139,10 +146,12 @@ export default function AboutPage() {
             </div>
             <Btn variant="gold" href="https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove">♥ Support the New Masjid</Btn>
           </div>
+          </ScrollReveal>
         </section>
 
         {/* Location */}
         <section>
+          <ScrollReveal delay={0.3}>
           <SectionHead label="Visit Us" title="Location & Hours" />
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16, marginBottom: 16 }}>
             <Card>
@@ -160,6 +169,7 @@ export default function AboutPage() {
               width="100%" height="100%" style={{ border: 0 }} loading="lazy" title="ICH Location"
             />
           </div>
+          </ScrollReveal>
         </section>
       </div>
     </div>

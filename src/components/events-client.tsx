@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { ICH, Btn, GoldLabel, Tag } from "./ui-primitives";
+import { ICH, Btn, GoldLabel, Tag, ScrollReveal } from "./ui-primitives";
 
 export interface EventItem {
   id: string;
@@ -103,7 +103,7 @@ export default function EventsClient({ events }: EventsClientProps) {
 
       {/* Featured events */}
       {featured.length > 0 && (
-        <div style={{ marginBottom: 44 }}>
+        <ScrollReveal delay={0.1} style={{ marginBottom: 44 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.gold, fontFamily: "Inter,sans-serif", marginBottom: 14, display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ width: 18, height: 1.5, background: ICH.gold, display: "block" }} />
             Featured Events
@@ -114,7 +114,7 @@ export default function EventsClient({ events }: EventsClientProps) {
               <EventCard key={e.id} event={e} featured />
             ))}
           </div>
-        </div>
+        </ScrollReveal>
       )}
 
       {/* Category filter */}
@@ -155,28 +155,30 @@ export default function EventsClient({ events }: EventsClientProps) {
       </div>
 
       {/* All (non-featured) upcoming */}
-      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 14 }}>
-        Upcoming Events
-      </div>
-      {displayed.length > 0 ? (
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-          {displayed.map((e) => (
-            <EventCard key={e.id} event={e} />
-          ))}
+      <ScrollReveal delay={0.2}>
+        <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 14 }}>
+          Upcoming Events
         </div>
-      ) : (
-        <div style={{ textAlign: "center", padding: "60px 0", color: ICH.textMuted }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>📅</div>
-          <p style={{ fontSize: 15 }}>No upcoming events in this category.</p>
-        </div>
-      )}
+        {displayed.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {displayed.map((e) => (
+              <EventCard key={e.id} event={e} />
+            ))}
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", padding: "60px 0", color: ICH.textMuted }}>
+            <div style={{ fontSize: 40, marginBottom: 12 }}>📅</div>
+            <p style={{ fontSize: 15 }}>No upcoming events in this category.</p>
+          </div>
+        )}
+      </ScrollReveal>
 
       {/* Suggest event */}
-      <div style={{ marginTop: 48, padding: 24, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6 }}>
+      <ScrollReveal delay={0.3} style={{ marginTop: 48, padding: 24, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, marginBottom: 6 }}>Have an event to add?</h3>
         <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 14, lineHeight: 1.65 }}>Contact us to have your community event added to the ICH calendar.</p>
         <Btn variant="outline" href="/contact" size="sm">Contact Us →</Btn>
-      </div>
+      </ScrollReveal>
     </div>
   );
 }
