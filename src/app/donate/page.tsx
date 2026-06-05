@@ -73,36 +73,22 @@ export default function DonatePage() {
         ))}
       </div>
 
-      {/* Zeffy CTA */}
-      <div style={{ background: `linear-gradient(135deg,${ICH.primaryDark},${ICH.primary})`, borderRadius: 8, padding: "36px 40px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-        <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
-        <div style={{ position: "relative" }}>
-          <div style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.gold, fontFamily: "Inter,sans-serif", marginBottom: 12 }}>
-            {type === "monthly" ? "🔄 Monthly Giving" : "♥ One-Time Gift"}
-          </div>
-          <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 28, color: "#fff", marginBottom: 14 }}>
-            {type === "monthly" ? "Set Up a Monthly Donation" : "Make a One-Time Donation"}
-          </h2>
-          <p style={{ fontSize: 14, color: "rgba(255,255,255,.75)", lineHeight: 1.75, maxWidth: 460, margin: "0 auto 20px" }}>
-            {type === "monthly"
-              ? "Monthly giving provides steady support for the masjid and its programs. Cancel anytime."
-              : "Secure donation processed via Zeffy — 0% platform fees, so more goes directly to ICH."}
-          </p>
-          <p style={{ fontSize: 12, color: "rgba(255,255,255,.45)", marginBottom: 24 }}>
-            By check: payable to "Islamic Center of Hattiesburg" — 211 N 25th Ave, Hattiesburg, MS 39401
-          </p>
-          <Btn
-            href={type === "monthly" ? ZEFFY_MONTHLY : ZEFFY_ONE_TIME}
-            variant="gold"
-            size="lg"
-            style={{ fontWeight: 700 }}
-          >
-            ♥ {type === "monthly" ? "Set Up Monthly Giving" : "Donate Now via Zeffy"}
-          </Btn>
-          <p style={{ fontSize: 11, color: "rgba(255,255,255,.3)", marginTop: 14, fontFamily: "Inter,sans-serif" }}>
-            Powered by Zeffy — a free, no-fee fundraising platform
-          </p>
-        </div>
+      {/* Zeffy Embed */}
+      <div style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "20px", position: "relative" }}>
+        <iframe
+          key={type} // Force re-render on type change
+          src={`https://www.zeffy.com/embed/donation-form/${
+            type === "monthly" 
+              ? "e4338258-eef5-489e-ae60-75017200e9bc" 
+              : "ba0c6cb0-70a2-41db-95c6-9ff75a30b42c"
+          }`}
+          style={{ width: "100%", minHeight: "900px", border: "none", borderRadius: "4px" }}
+          allow="payment"
+          allowTransparency={true}
+        />
+        <p style={{ fontSize: 11, color: ICH.textMuted, marginTop: 14, fontFamily: "Inter,sans-serif", textAlign: "center" }}>
+          Powered by Zeffy — a free, no-fee fundraising platform. 100% of your donation goes to ICH.
+        </p>
       </div>
     </div>
   );
