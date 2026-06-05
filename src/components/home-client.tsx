@@ -13,14 +13,18 @@ function MosqueHero() {
       style={{ position:'absolute', bottom:0, left:0, width:'100%', height:'80%', pointerEvents:'none' }}>
       <defs>
         <linearGradient id="skyG" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stopColor="#03090a"/>
-          <stop offset="55%"  stopColor="#091f26"/>
-          <stop offset="100%" stopColor="#103f4f" stopOpacity=".9"/>
+          <stop offset="0%"   stopColor="#0d2b36"/>
+          <stop offset="55%"  stopColor="#154d60"/>
+          <stop offset="100%" stopColor="#1f7a95" stopOpacity=".9"/>
         </linearGradient>
         <radialGradient id="glowG" cx="50%" cy="100%" r="55%">
-          <stop offset="0%"   stopColor="#247c6c" stopOpacity=".18"/>
+          <stop offset="0%"   stopColor="#247c6c" stopOpacity=".3"/>
           <stop offset="100%" stopColor="#247c6c" stopOpacity="0"/>
         </radialGradient>
+        <mask id="moonMask">
+          <rect width="1400" height="420" fill="white" />
+          <circle cx="1104" cy="58" r="23" fill="black" />
+        </mask>
       </defs>
 
       {/* Sky */}
@@ -36,11 +40,10 @@ function MosqueHero() {
       ))}
 
       {/* Crescent moon */}
-      <circle cx="1090" cy="66" r="27" fill="#3ba491" opacity=".92"/>
-      <circle cx="1104" cy="58" r="23" fill="#020709"/>
+      <circle cx="1090" cy="66" r="27" fill="#3ba491" opacity=".92" mask="url(#moonMask)"/>
 
       {/* Horizon glow */}
-      <ellipse cx="700" cy="420" rx="680" ry="90" fill="#247c6c" opacity=".07"/>
+      <ellipse cx="700" cy="420" rx="680" ry="90" fill="#247c6c" opacity=".12"/>
 
       {/* Left minaret */}
       <rect x="198" y="52" width="26" height="368" fill={dark}/>
@@ -211,7 +214,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
       {/* ── Hero ── */}
       <section style={{ position: "relative", minHeight: "78vh", overflow: "hidden", display: "flex", alignItems: "center" }}>
         {/* Dark gradient overlay */}
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#060b0d 0%,#0c1b22 55%,#103f4fcc 100%)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#0d2b36 0%,#154d60 55%,#1f7a95cc 100%)" }} />
         {/* Islamic star pattern overlay */}
         <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.35 }} />
         {/* Mosque silhouette */}
