@@ -112,6 +112,14 @@ export default function ContactPage() {
               >
                 Instagram
               </a>
+              <a
+                href="https://wa.me/15714476997"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ padding: "8px 16px", background: "#25D366", color: "#fff", borderRadius: 4, fontSize: 13, fontWeight: 500, textDecoration: "none", fontFamily: "Inter,sans-serif" }}
+              >
+                WhatsApp
+              </a>
             </div>
           </Card>
         </div>

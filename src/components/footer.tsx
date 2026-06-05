@@ -136,7 +136,8 @@ export default function Footer() {
             <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
               {[
                 { name: "Facebook", url: "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr" },
-                { name: "Instagram", url: "https://www.instagram.com/ichattiesburg" }
+                { name: "Instagram", url: "https://www.instagram.com/ichattiesburg" },
+                { name: "WhatsApp", url: "https://wa.me/15714476997" }
               ].map((s) => (
                 <a
                   key={s.name}
@@ -214,10 +215,13 @@ export default function Footer() {
             </a>
           </p>
           <div style={{ display: "flex", gap: 18 }}>
-            {["Privacy Policy", "Sitemap"].map((t) => (
-              <a
-                key={t}
-                href="#"
+            {[
+              { label: "Privacy Policy", url: "/privacy" },
+              { label: "Sitemap", url: "/sitemap.xml" }
+            ].map((t) => (
+              <Link
+                key={t.label}
+                href={t.url}
                 style={{
                   fontSize: 12,
                   color: "rgba(255,255,255,.35)",
@@ -228,8 +232,8 @@ export default function Footer() {
                 onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.7)")}
                 onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,.35)")}
               >
-                {t}
-              </a>
+                {t.label}
+              </Link>
             ))}
           </div>
         </div>
