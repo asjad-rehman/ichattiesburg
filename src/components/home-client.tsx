@@ -186,16 +186,16 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
   const m = parse(prayerTimes.maghrib);
   const i = parse(prayerTimes.isha);
 
-  const prayersAll: PrayerData[] = [
+  const prayersAll: PrayerData[] = React.useMemo(() => [
     { name: "Fajr",    key: "fajr",    h: f.h, m: f.m, display: formatTime(prayerTimes.fajr) },
     { name: "Sunrise", key: "sunrise", h: s.h, m: s.m, display: formatTime(prayerTimes.sunrise) },
     { name: "Dhuhr",   key: "dhuhr",   h: d.h, m: d.m, display: formatTime(prayerTimes.dhuhr) },
     { name: "Asr",     key: "asr",     h: a.h, m: a.m, display: formatTime(prayerTimes.asr) },
     { name: "Maghrib", key: "maghrib", h: m.h, m: m.m, display: "After Adhan" },
     { name: "Isha",    key: "isha",    h: i.h, m: i.m, display: formatTime(prayerTimes.isha) },
-  ];
+  ], [prayerTimes]);
 
-  const prayers5 = prayersAll.filter((p) => p.key !== "sunrise");
+  const prayers5 = React.useMemo(() => prayersAll.filter((p) => p.key !== "sunrise"), [prayersAll]);
   const { countdown, nextName, nextIdx, curIdx } = usePrayerCountdown(prayersAll);
 
   // Formatted Jumuah shifting schedules
