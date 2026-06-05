@@ -93,10 +93,10 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
 
   const { countdown, nextName, nextIdx, curIdx } = usePrayerCountdown(prayersAll);
 
-  // Formatted Jumuah shifting schedules
+  // Formatted Jumuah schedule
   const jumuahItems = [
-    { label: "Jumuah 1", time: formatTime(jumuah.khutbah) || "12:15 PM" },
-    { label: "Jumuah 2", time: formatTime(jumuah.salah) || "1:15 PM" },
+    { label: "Khutbah", time: formatTime(jumuah.khutbah) || "1:00 PM" },
+    { label: "Salah", time: formatTime(jumuah.salah) || "1:30 PM" },
   ];
 
   return (

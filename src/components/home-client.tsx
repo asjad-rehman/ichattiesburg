@@ -198,10 +198,10 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
   const prayers5 = React.useMemo(() => prayersAll.filter((p) => p.key !== "sunrise"), [prayersAll]);
   const { countdown, nextName, nextIdx, curIdx } = usePrayerCountdown(prayersAll);
 
-  // Formatted Jumuah shifting schedules
+  // Formatted Jumuah schedule
   const jumuahItems = [
-    { label: "Jumuah 1", time: formatTime(jumuah.khutbah) || "12:15 PM" },
-    { label: "Jumuah 2", time: formatTime(jumuah.salah) || "1:15 PM" },
+    { label: "Khutbah", time: formatTime(jumuah.khutbah) || "1:00 PM" },
+    { label: "Salah", time: formatTime(jumuah.salah) || "1:30 PM" },
     { label: "Speaker", time: jumuah.speaker || "Imam (TBA)" },
     { label: "Location", time: "211 N 25th Ave" },
   ];
