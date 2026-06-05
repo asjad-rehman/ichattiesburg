@@ -10,7 +10,7 @@ const RESOURCES = [
     links: [
       { label: "Quran.com — Quran with Translation",     url: "https://quran.com" },
       { label: "Sunnah.com — Hadith Collections",        url: "https://sunnah.com" },
-      { label: "IslamQA.info — Islamic Q&A",             url: "https://islamqa.info" },
+      { label: "IslamQA.org — Islamic Q&A",             url: "https://islamqa.org" },
     ]
   },
   {
