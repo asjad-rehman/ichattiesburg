@@ -19,19 +19,24 @@ export default function ContactPage() {
     setErrorMessage("");
 
     try {
-      const res = await fetch("/api/contact", {
+      const res = await fetch("https://api.web3forms.com/submit", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify({
+          access_key: "b016e544-980f-4a68-9a76-f67ab2e775aa",
           name: form.name,
           email: form.email,
-          subject: form.subject || "General Inquiry",
+          subject: form.subject || "General Inquiry from ICH Website",
           message: form.message,
         }),
       });
 
-      if (!res.ok) {
-        throw new Error(await res.text());
+      const json = await res.json();
+      if (!res.ok || !json.success) {
+        throw new Error(json.message || "Something went wrong.");
       }
       setStatus("sent");
     } catch (err) {
