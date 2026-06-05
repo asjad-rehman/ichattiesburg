@@ -200,8 +200,8 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
 
   // Formatted Jumuah schedule
   const jumuahItems = [
-    { label: "Khutbah", time: formatTime(jumuah.khutbah) || "1:00 PM" },
-    { label: "Salah", time: formatTime(jumuah.salah) || "1:30 PM" },
+    { label: "Jumuah 1", time: formatTime(jumuah.khutbah) || "1:00 PM" },
+    { label: "Jumuah 2", time: formatTime(jumuah.salah) || "1:30 PM" },
     { label: "Speaker", time: jumuah.speaker || "Imam (TBA)" },
     { label: "Location", time: "211 N 25th Ave" },
   ];

@@ -95,8 +95,8 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
 
   // Formatted Jumuah schedule
   const jumuahItems = [
-    { label: "Khutbah", time: formatTime(jumuah.khutbah) || "1:00 PM" },
-    { label: "Salah", time: formatTime(jumuah.salah) || "1:30 PM" },
+    { label: "Jumuah 1", time: formatTime(jumuah.khutbah) || "1:00 PM" },
+    { label: "Jumuah 2", time: formatTime(jumuah.salah) || "1:30 PM" },
   ];
 
   return (
