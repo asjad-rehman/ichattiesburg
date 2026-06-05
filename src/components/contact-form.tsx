@@ -99,7 +99,7 @@ export default function ContactForm() {
           <option value="General Inquiry">General Inquiry</option>
           <option value="Prayer Times">Prayer Times</option>
           <option value="Events & Programs">Events & Programs</option>
-          <option value="Donation Inquiry">Donation Inquiry</option>
+          <option value="Donations">Donations</option>
           <option value="Oak Grove Project">Oak Grove Project</option>
           <option value="Volunteer">Volunteer</option>
           <option value="Other">Other</option>

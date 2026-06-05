@@ -33,5 +33,5 @@ export interface DonationCategory {
   label: string;
   description: string;
   icon: string;
-  zeffyFormUrl?: string;
+  stripeProductId?: string;
 }

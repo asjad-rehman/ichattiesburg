@@ -44,8 +44,8 @@ export default function ContactPage() {
                 icon: <Mail className="h-5 w-5" />,
                 label: "Email",
                 content: (
-                  <a href="mailto:ichattiesburg@protonmail.com" className="text-primary hover:underline text-sm">
-                  ichattiesburg@protonmail.com
+                  <a href="mailto:info@ichattiesburg.org" className="text-primary hover:underline text-sm">
+                    info@ichattiesburg.org
                   </a>
                 ),
               },

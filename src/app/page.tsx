@@ -218,7 +218,7 @@ export default async function HomePage() {
               (cat) => (
                 <Link
                   key={cat}
-                  href="/donate"
+                  href={`/donate?category=${cat.toLowerCase().replace(/ /g, "-")}`}
                   className="px-5 py-2.5 bg-background border border-border rounded-lg text-sm font-medium hover:border-primary hover:text-primary transition-colors"
                 >
                   {cat}

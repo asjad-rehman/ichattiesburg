@@ -56,10 +56,11 @@ CREATE TABLE prayer_times (
   UNIQUE (effective_date)
 );
 
--- Donations log (from Zeffy webhook or manual entry)
+-- Donations log (webhook data from Stripe)
 CREATE TABLE donations (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  zeffy_reference TEXT UNIQUE,
+  stripe_session_id TEXT UNIQUE,
+  stripe_payment_intent TEXT,
   amount_cents INTEGER NOT NULL,
   category TEXT,
   recurring BOOLEAN DEFAULT FALSE,

@@ -75,7 +75,7 @@ export default async function PrayerTimesPage() {
           <li>Jumuah prayers are held weekly at the masjid.</li>
           <li>
             Contact us at{" "}
-            <a href="mailto:ichattiesburg@protonmail.com" className="text-primary hover:underline">
+            <a href="mailto:info@ichattiesburg.org" className="text-primary hover:underline">
               info@ichattiesburg.org
             </a>{" "}
             for any scheduling questions.
