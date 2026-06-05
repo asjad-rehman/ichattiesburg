@@ -94,6 +94,7 @@ export default function AdminLoginForm() {
         )}
 
         <Btn
+          type="submit"
           variant="primary"
           size="lg"
           style={{ width: "100%", justifyContent: "center", marginTop: 4 }}
