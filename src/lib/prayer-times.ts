@@ -1,3 +1,5 @@
+import { memoryStore } from "@/lib/store";
+
 export interface PrayerTimes {
   fajr: string;
   sunrise: string;
@@ -60,6 +62,22 @@ export async function fetchPrayerTimes(): Promise<MasjidTimes> {
           };
         }
       }
+    }
+
+    // Apply Admin Overrides from memoryStore
+    const overrides = memoryStore.prayerOverrides;
+    if (overrides) {
+      if (overrides.fajr) prayerTimes.fajr = overrides.fajr;
+      if (overrides.sunrise) prayerTimes.sunrise = overrides.sunrise;
+      if (overrides.dhuhr) prayerTimes.dhuhr = overrides.dhuhr;
+      if (overrides.asr) prayerTimes.asr = overrides.asr;
+      if (overrides.maghrib) prayerTimes.maghrib = overrides.maghrib;
+      if (overrides.isha) prayerTimes.isha = overrides.isha;
+      
+      if (overrides.jumuah_khutbah) jumuah.khutbah = overrides.jumuah_khutbah;
+      if (overrides.jumuah_salah) jumuah.salah = overrides.jumuah_salah;
+      if (overrides.jumuah_speaker) jumuah.speaker = overrides.jumuah_speaker;
+      if (overrides.jumuah_topic) jumuah.topic = overrides.jumuah_topic;
     }
 
     return { prayerTimes, jumuah, lastUpdated: new Date().toISOString() };
