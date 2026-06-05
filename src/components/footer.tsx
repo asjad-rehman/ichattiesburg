@@ -136,8 +136,7 @@ export default function Footer() {
             <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
               {[
                 { name: "Facebook", url: "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr" },
-                { name: "Instagram", url: "https://www.instagram.com/ichattiesburg" },
-                { name: "WhatsApp", url: "https://wa.me/15714476997" }
+                { name: "Instagram", url: "https://www.instagram.com/ichattiesburg" }
               ].map((s) => (
                 <a
                   key={s.name}
