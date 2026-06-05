@@ -3,14 +3,16 @@ import { signToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, password } = await req.json();
+    const body = await req.json();
+    const username = body.username?.trim().toLowerCase();
+    const password = body.password?.trim();
 
     if (!username || !password) {
       return NextResponse.json({ error: "Username and password required" }, { status: 400 });
     }
 
     if (username !== "ichattiesburg" || password !== "3223") {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+      return NextResponse.json({ error: `Invalid credentials` }, { status: 401 });
     }
 
     const token = signToken({ id: "1", email: username, name: "Admin" });
