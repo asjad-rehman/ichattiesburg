@@ -10,13 +10,13 @@ export interface AdminUser {
 }
 
 export function signToken(user: AdminUser): string {
-  // Simple bulletproof token for the hardcoded admin
-  return Buffer.from(JSON.stringify(user)).toString("base64");
+  // Simple bulletproof token using standard web APIs
+  return btoa(JSON.stringify(user));
 }
 
 export function verifyToken(token: string): AdminUser | null {
   try {
-    const decoded = Buffer.from(token, "base64").toString("utf-8");
+    const decoded = atob(token);
     return JSON.parse(decoded) as AdminUser;
   } catch {
     return null;
