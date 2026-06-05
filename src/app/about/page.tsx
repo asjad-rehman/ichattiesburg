@@ -1,6 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
-import { ICH, Btn, GoldLabel, SectionHead, Card } from "@/components/ui-primitives";
+import { Btn, GoldLabel, SectionHead, Card } from "@/components/ui-primitives";
+import { ICH } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -158,7 +159,7 @@ export default function AboutPage() {
           </div>
           <div style={{ borderRadius: 8, overflow: "hidden", border: `1px solid ${ICH.border}`, height: 280 }}>
             <iframe
-              src="https://www.openstreetmap.org/export/embed.html?bbox=-89.32,31.28,-89.28,31.32&layer=mapnik&marker=31.302,-89.301"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=-89.335,31.315,-89.315,31.335&layer=mapnik&marker=31.32686,-89.32768"
               width="100%" height="100%" style={{ border: 0 }} loading="lazy" title="ICH Location"
             />
           </div>

@@ -3,22 +3,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
 
-export const ICH = {
-  primary:      '#145c70',
-  primaryDark:  '#0d3d4a',
-  primaryMid:   '#104b5c',
-  primaryLight: '#1f7a95',
-  gold:         '#247c6c',
-  goldLight:    '#3ba491',
-  goldDark:     '#18574a',
-  bg:           '#f4f8f9',
-  bgCard:       '#e6f0f2',
-  bgCard2:      '#d3e3e8',
-  text:         '#121d21',
-  textMuted:    '#50676e',
-  border:       '#c3d7dc',
-  footerBg:     '#08171c',
-};
+import { ICH } from "@/lib/theme";
+export { ICH };
+
 
 interface BtnProps {
   children: React.ReactNode;
