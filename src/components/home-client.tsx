@@ -220,12 +220,12 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
         {/* Content */}
         <div style={{ position: "relative", zIndex: 10, maxWidth: 1200, margin: "0 auto", padding: "80px 24px 100px", width: "100%" }}>
           <div style={{ maxWidth: 580 }}>
-            <div className="amiri" style={{ fontSize: "clamp(18px,2.5vw,26px)", color: ICH.gold, marginBottom: 18, direction: "rtl", textAlign: "left" }}>
+            <div className="amiri" style={{ fontSize: "clamp(18px,2.5vw,26px)", color: ICH.accent, marginBottom: 18, direction: "rtl", textAlign: "left" }}>
               السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ
             </div>
             <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontWeight: 600, fontSize: "clamp(40px,6vw,72px)", color: "#fff", lineHeight: 1.1, marginBottom: 20 }}>
               Islamic Center<br />
-              <span style={{ color: ICH.gold }}>of Hattiesburg</span>
+              <span style={{ color: ICH.accent }}>of Hattiesburg</span>
             </h1>
             <p style={{ fontSize: "clamp(15px,1.6vw,18px)", color: "rgba(255,255,255,.78)", lineHeight: 1.8, marginBottom: 36, maxWidth: 460 }}>
               Serving the Muslim community of Hattiesburg, Mississippi with daily prayers, Islamic education, and community programs since our founding. All are welcome.
@@ -240,25 +240,25 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
       </section>
 
       {/* ── Prayer Times Strip ── */}
-      <section style={{ background: ICH.primaryDark, borderTop: `2px solid ${ICH.gold}33`, borderBottom: `1px solid ${ICH.gold}22` }}>
+      <section style={{ background: ICH.primaryDark, borderTop: `2px solid ${ICH.accent}33`, borderBottom: `1px solid ${ICH.accent}22` }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 24px" }}>
           {/* Countdown bar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
-            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.gold, fontFamily: "Inter,sans-serif" }}>
+            <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.accent, fontFamily: "Inter,sans-serif" }}>
               Today's Prayer Times
             </div>
             {nextName && (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: ICH.gold, animation: "pulse 1.4s ease-in-out infinite" }} />
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: ICH.accent, animation: "pulse 1.4s ease-in-out infinite" }} />
                 <span style={{ fontSize: 12, color: "rgba(255,255,255,.6)", fontFamily: "Inter,sans-serif" }}>
                   Next: <strong style={{ color: "rgba(255,255,255,.9)" }}>{nextName}</strong> in
                 </span>
-                <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, color: ICH.gold, fontWeight: 600, letterSpacing: ".04em" }}>
+                <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, color: ICH.accent, fontWeight: 600, letterSpacing: ".04em" }}>
                   {countdown}
                 </span>
               </div>
             )}
-            <Btn variant="outline" href="/prayer-times" style={{ border: `1px solid ${ICH.gold}44`, color: ICH.gold, padding: "4px 12px", borderRadius: 3, fontSize: 12, height: "auto" }}>
+            <Btn variant="outline" href="/prayer-times" style={{ border: `1px solid ${ICH.accent}44`, color: ICH.accent, padding: "4px 12px", borderRadius: 3, fontSize: 12, height: "auto" }}>
               Full Schedule →
             </Btn>
           </div>
@@ -273,11 +273,11 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               return (
                 <div key={p.key} style={{
                   textAlign: "center", padding: "12px 8px", borderRadius: 4,
-                  background: isCur ? ICH.gold : isNext ? "rgba(36,124,108,.12)" : "rgba(255,255,255,.04)",
-                  border: `1px solid ${isCur ? ICH.gold : isNext ? ICH.gold + "44" : "rgba(255,255,255,.08)"}`,
+                  background: isCur ? ICH.accent : isNext ? "rgba(36,124,108,.12)" : "rgba(255,255,255,.04)",
+                  border: `1px solid ${isCur ? ICH.accent : isNext ? ICH.accent + "44" : "rgba(255,255,255,.08)"}`,
                   position: "relative", transition: "all .2s",
                 }}>
-                  {isCur && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: ICH.primaryDark, color: ICH.gold, fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, border: `1px solid ${ICH.gold}`, fontFamily: "Inter,sans-serif", letterSpacing: ".06em" }}>NOW</div>}
+                  {isCur && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: ICH.primaryDark, color: ICH.accent, fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, border: `1px solid ${ICH.accent}`, fontFamily: "Inter,sans-serif", letterSpacing: ".06em" }}>NOW</div>}
                   {isNext && !isCur && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: ICH.primaryDark, color: "rgba(255,255,255,.7)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, border: "1px solid rgba(255,255,255,.2)", fontFamily: "Inter,sans-serif" }}>NEXT</div>}
                   <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: isCur ? ICH.primaryDark : "rgba(255,255,255,.5)", marginBottom: 5, fontFamily: "Inter,sans-serif" }}>{p.name}</div>
                   <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: p.display === "After Adhan" ? 13 : 20, fontWeight: 600, color: isCur ? ICH.primaryDark : "#fff" }}>{p.display}</div>
@@ -298,7 +298,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
             {/* Background pattern */}
             <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
             <div style={{ position: "relative" }}>
-              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.gold, marginBottom: 6, fontFamily: "Inter,sans-serif" }}>Every Friday</div>
+              <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.accent, marginBottom: 6, fontFamily: "Inter,sans-serif" }}>Every Friday</div>
               <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 34, fontWeight: 600, color: "#fff", marginBottom: 24 }}>Jumuah Prayer</h2>
               <div style={{ borderTop: `1px solid rgba(255,255,255,.12)`, marginBottom: 16 }} />
               {jumuahItems.map(({ label, time }) => (
@@ -375,7 +375,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
                 transform: isCur ? "scale(1.04)" : "scale(1)",
                 transition: "all .2s",
               }}>
-                {isCur && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: ICH.gold, color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 10, fontFamily: "Inter,sans-serif", letterSpacing: ".06em" }}>NOW</div>}
+                {isCur && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: ICH.accent, color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 10, fontFamily: "Inter,sans-serif", letterSpacing: ".06em" }}>NOW</div>}
                 {isNext && !isCur && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: ICH.bgCard2, color: ICH.primary, fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 10, border: `1px solid ${ICH.primary}33`, fontFamily: "Inter,sans-serif" }}>NEXT</div>}
                 <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.7)" : ICH.textMuted, marginBottom: 8, fontFamily: "Inter,sans-serif" }}>{p.name}</div>
                 <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: p.display === "After Adhan" ? 15 : 24, fontWeight: 600, color: isCur ? "#fff" : ICH.text }}>{p.display}</div>

@@ -6,6 +6,7 @@ export const ICH = {
   gold:         '#247c6c',
   goldLight:    '#3ba491',
   goldDark:     '#18574a',
+  accent:       '#5ce1cb', // Bright cyan for dark backgrounds
   bg:           '#f4f8f9',
   bgCard:       '#e6f0f2',
   bgCard2:      '#d3e3e8',

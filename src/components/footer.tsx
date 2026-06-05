@@ -11,7 +11,7 @@ export default function Footer() {
       fontWeight: 700,
       letterSpacing: ".14em",
       textTransform: "uppercase" as const,
-      color: ICH.gold,
+      color: ICH.accent,
       marginBottom: 14,
       fontFamily: "Inter,sans-serif",
     },
@@ -43,7 +43,7 @@ export default function Footer() {
       <div
         style={{
           height: 2,
-          background: `linear-gradient(90deg,transparent,${ICH.gold},transparent)`,
+          background: `linear-gradient(90deg,transparent,${ICH.accent},transparent)`,
         }}
       />
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "52px 24px 36px" }}>
@@ -77,7 +77,7 @@ export default function Footer() {
               Serving the Muslim community of Hattiesburg, Mississippi with
               prayer, education, and community programs.
             </p>
-            <div className="amiri" style={{ fontSize: 19, color: ICH.gold, lineHeight: 2 }}>
+            <div className="amiri" style={{ fontSize: 19, color: ICH.accent, lineHeight: 2 }}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
           </div>
