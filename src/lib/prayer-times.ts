@@ -26,20 +26,41 @@ const GITHUB_RAW_BASE =
 
 export async function fetchPrayerTimes(): Promise<MasjidTimes> {
   try {
-    const [timesRes, jumuahRes] = await Promise.all([
-      fetch(`${GITHUB_RAW_BASE}/prayer-times.json`, {
-        next: { revalidate: 3600 },
-      }),
-      fetch(`${GITHUB_RAW_BASE}/jumuah.json`, { next: { revalidate: 3600 } }),
+    const [baseRes, jamaatRes] = await Promise.all([
+      fetch(`${GITHUB_RAW_BASE}/prayer-times.json`, { next: { revalidate: 3600 } }),
+      fetch(`https://masjid-times.vercel.app/api/jamaat`, { next: { revalidate: 60 } })
     ]);
 
-    const prayerTimes: PrayerTimes = timesRes.ok
-      ? await timesRes.json()
-      : getFallbackTimes();
-
-    const jumuah: JumuahSchedule = jumuahRes.ok
-      ? await jumuahRes.json()
-      : getFallbackJumuah();
+    const baseTimes: PrayerTimes = baseRes.ok ? await baseRes.json() : getFallbackTimes();
+    
+    let prayerTimes = { ...baseTimes };
+    let jumuah = getFallbackJumuah();
+    
+    if (jamaatRes.ok) {
+      const jamaatData = await jamaatRes.json();
+      if (jamaatData?.ok && jamaatData?.data) {
+        const d = jamaatData.data;
+        prayerTimes = {
+          ...prayerTimes,
+          fajr: d.fajr || prayerTimes.fajr,
+          dhuhr: d.dhuhr || prayerTimes.dhuhr,
+          asr: d.asr || prayerTimes.asr,
+          maghrib: d.maghrib || prayerTimes.maghrib,
+          isha: d.isha || prayerTimes.isha,
+        };
+        
+        if (d.jummah && Array.isArray(d.jummah) && d.jummah.length > 0) {
+          const j1 = d.jummah[0];
+          const j2 = d.jummah.length > 1 ? d.jummah[1] : null;
+          jumuah = {
+            khutbah: j1?.khutbah || "13:15",
+            salah: j2?.khutbah || "14:15",
+            speaker: "Imam",
+            topic: "TBA",
+          };
+        }
+      }
+    }
 
     return { prayerTimes, jumuah, lastUpdated: new Date().toISOString() };
   } catch {
