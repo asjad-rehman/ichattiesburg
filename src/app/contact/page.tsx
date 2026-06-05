@@ -200,7 +200,7 @@ export default function ContactPage() {
                   </div>
                 )}
 
-                <Btn variant="primary" size="lg" style={{ width: "100%", justifyContent: "center" }}>
+                <Btn variant="primary" size="lg" type="submit" style={{ width: "100%", justifyContent: "center" }}>
                   {status === "sending" ? "⏳ Sending…" : "✉️ Send Message"}
                 </Btn>
               </div>

@@ -56,16 +56,16 @@ function getFallbackTimes(): PrayerTimes {
     fajr: "5:30",
     sunrise: "6:52",
     dhuhr: "12:30",
-    asr: "3:45",
-    maghrib: "6:48",
-    isha: "8:15",
+    asr: "15:45",
+    maghrib: "18:48",
+    isha: "20:15",
   };
 }
 
 function getFallbackJumuah(): JumuahSchedule {
   return {
-    khutbah: "1:00",
-    salah: "1:30",
+    khutbah: "13:00",
+    salah: "13:30",
     speaker: "Imam",
     topic: "TBA",
   };
