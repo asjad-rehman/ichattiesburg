@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import { AlertCircle } from "lucide-react";
+import { ICH, Btn } from "./ui-primitives";
 
 export default function AdminLoginForm() {
   const router = useRouter();
@@ -31,45 +31,76 @@ export default function AdminLoginForm() {
     }
   };
 
+  const labelStyle = {
+    display: "block",
+    fontSize: 11,
+    fontWeight: 700,
+    letterSpacing: ".08em",
+    textTransform: "uppercase" as const,
+    color: ICH.textMuted,
+    fontFamily: "Inter,sans-serif",
+    marginBottom: 5,
+  };
+
+  const inputStyle = {
+    width: "100%",
+    padding: "10px 14px",
+    border: `1px solid ${ICH.border}`,
+    borderRadius: 4,
+    fontSize: 14,
+    fontFamily: "Inter,sans-serif",
+    outline: "none",
+  };
+
   return (
-    <form onSubmit={handleSubmit} className="bg-card border border-border rounded-2xl p-6 space-y-4">
-      <div>
-        <label className="block text-sm font-medium mb-1.5" htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-          placeholder="admin@ichattiesburg.org"
-        />
+    <div style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "40px 36px" }}>
+      <div style={{ textAlign: "center", marginBottom: 28 }}>
+        <img src="/uploads/logo.png" alt="ICH" style={{ height: 48, marginBottom: 16, marginLeft: "auto", marginRight: "auto" }} />
+        <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600 }}>Admin Login</h1>
+        <p style={{ fontSize: 13, color: ICH.textMuted, marginTop: 4 }}>Restricted access — ICH staff only</p>
       </div>
-      <div>
-        <label className="block text-sm font-medium mb-1.5" htmlFor="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          required
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-lg border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary"
-          placeholder="••••••••"
-        />
-      </div>
-      {error && (
-        <div className="flex items-center gap-2 text-red-600 text-sm bg-red-50 dark:bg-red-950/30 p-3 rounded-lg">
-          <AlertCircle className="h-4 w-4 shrink-0" />
-          {error}
+
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        <div>
+          <label style={labelStyle} htmlFor="email">Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="admin@ichattiesburg.org"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            style={inputStyle}
+          />
         </div>
-      )}
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:opacity-90 disabled:opacity-60"
-      >
-        {loading ? "Signing in..." : "Sign In"}
-      </button>
-    </form>
+        
+        <div>
+          <label style={labelStyle} htmlFor="password">Password</label>
+          <input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={inputStyle}
+          />
+        </div>
+
+        {error && (
+          <div style={{ fontSize: 13, color: "#9a2b2b", background: "#fdf3f3", border: "1px solid #f5caca", padding: "10px 14px", borderRadius: 4 }}>
+            ⚠️ {error}
+          </div>
+        )}
+
+        <Btn
+          variant="primary"
+          size="lg"
+          style={{ width: "100%", justifyContent: "center", marginTop: 4 }}
+        >
+          {loading ? "Signing In..." : "Sign In"}
+        </Btn>
+      </form>
+    </div>
   );
 }

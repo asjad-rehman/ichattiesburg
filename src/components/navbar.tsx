@@ -1,116 +1,219 @@
 "use client";
 
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu, X, Moon, Sun, Heart } from "lucide-react";
-import { useTheme } from "next-themes";
-import { cn } from "@/lib/utils";
-
-const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/prayer-times", label: "Prayer Times" },
-  { href: "/events", label: "Events" },
-  { href: "/about", label: "About" },
-  { href: "/resources", label: "Resources" },
-  { href: "/contact", label: "Contact" },
-];
+import { ICH } from "./ui-primitives";
 
 export default function Navbar() {
+  const [open, setOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const pathname = usePathname();
-  const { theme, setTheme } = useTheme();
-  const [mobileOpen, setMobileOpen] = useState(false);
+
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 24);
+    window.addEventListener("scroll", fn, { passive: true });
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
+
+  const links = [
+    { id: "/", label: "Home" },
+    { id: "/prayer-times", label: "Prayer Times" },
+    { id: "/events", label: "Events" },
+    { id: "/about", label: "About" },
+    { id: "/resources", label: "Resources" },
+    { id: "/contact", label: "Contact" },
+  ];
+
+  const isActive = (id: string) => {
+    if (id === "/") {
+      return pathname === "/";
+    }
+    return pathname.startsWith(id);
+  };
 
   return (
-    <header className="sticky top-0 z-50 bg-background/90 backdrop-blur border-b border-border">
-      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" aria-label="Main navigation">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 rounded-full bg-primary flex items-center justify-center text-primary-foreground font-bold text-sm">
-              ICH
-            </div>
-            <div className="hidden sm:block">
-              <div className="font-semibold text-sm leading-tight">Islamic Center</div>
-              <div className="text-xs text-muted-foreground leading-tight">of Hattiesburg</div>
-            </div>
+    <header
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 200,
+        background: scrolled ? "rgba(250,249,246,.97)" : "rgba(250,249,246,.99)",
+        backdropFilter: "blur(14px)",
+        borderBottom: `1px solid ${scrolled ? ICH.border : "transparent"}`,
+        boxShadow: scrolled ? "0 1px 10px rgba(0,0,0,.07)" : "none",
+        transition: "all .3s",
+      }}
+    >
+      <div
+        style={{
+          maxWidth: 1200,
+          margin: "0 auto",
+          padding: "0 24px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          height: 66,
+        }}
+      >
+        {/* Logo */}
+        <Link href="/" style={{ cursor: "pointer", flexShrink: 0 }} aria-label="Home">
+          <img
+            src="/uploads/logo.png"
+            alt="Islamic Center of Hattiesburg"
+            style={{ height: 46, width: "auto", display: "block" }}
+          />
+        </Link>
+
+        {/* Desktop nav */}
+        <nav
+          className="desktop-nav"
+          aria-label="Main"
+          style={{ display: "flex", alignItems: "center", gap: 2 }}
+        >
+          {links.map((l) => {
+            const active = isActive(l.id);
+            return (
+              <Link
+                key={l.id}
+                href={l.id}
+                style={{
+                  padding: "7px 12px",
+                  background: active ? `${ICH.primary}14` : "transparent",
+                  color: active ? ICH.primary : ICH.textMuted,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Inter,sans-serif",
+                  fontSize: 13.5,
+                  fontWeight: active ? 500 : 400,
+                  borderRadius: 4,
+                  transition: "all .15s",
+                  textDecoration: "none",
+                }}
+                onMouseEnter={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.color = ICH.text;
+                    e.currentTarget.style.background = "rgba(0,0,0,.04)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!active) {
+                    e.currentTarget.style.color = ICH.textMuted;
+                    e.currentTarget.style.background = "transparent";
+                  }
+                }}
+              >
+                {l.label}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Right actions */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <Link
+            href="/donate"
+            style={{
+              padding: "8px 20px",
+              background: ICH.gold,
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: 3,
+              fontFamily: "Inter,sans-serif",
+              fontSize: 13,
+              fontWeight: 600,
+              letterSpacing: ".02em",
+              transition: "background .15s",
+              textDecoration: "none",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.background = ICH.goldDark)}
+            onMouseLeave={(e) => (e.currentTarget.style.background = ICH.gold)}
+          >
+            ♥ Donate
           </Link>
 
-          {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-                  pathname === link.href
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-
-          {/* Right actions */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-              className="p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              aria-label="Toggle dark mode"
-            >
-              <Sun className="h-4 w-4 dark:hidden" />
-              <Moon className="h-4 w-4 hidden dark:block" />
-            </button>
-            <Link
-              href="/donate"
-              className="hidden sm:flex items-center gap-1.5 px-4 py-2 bg-secondary text-secondary-foreground rounded-md text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              <Heart className="h-4 w-4" />
-              Donate
-            </Link>
-            <button
-              className="md:hidden p-2 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted"
-              onClick={() => setMobileOpen(!mobileOpen)}
-              aria-label="Toggle menu"
-              aria-expanded={mobileOpen}
-            >
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
+          <button
+            className="mobile-btn"
+            onClick={() => setOpen(!open)}
+            style={{
+              display: "none",
+              padding: 8,
+              background: "transparent",
+              border: "none",
+              cursor: "pointer",
+              color: ICH.text,
+              fontSize: 20,
+              lineHeight: 1,
+            }}
+          >
+            {open ? "✕" : "☰"}
+          </button>
         </div>
+      </div>
 
-        {/* Mobile menu */}
-        {mobileOpen && (
-          <div className="md:hidden border-t border-border py-3 space-y-1">
-            {navLinks.map((link) => (
+      {/* Mobile menu */}
+      {open && (
+        <div
+          className="mobile-menu"
+          style={{
+            borderTop: `1px solid ${ICH.border}`,
+            background: ICH.bg,
+            padding: "10px 16px 14px",
+          }}
+        >
+          {links.map((l) => {
+            const active = isActive(l.id);
+            return (
               <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  "block px-4 py-2.5 rounded-md text-sm font-medium transition-colors",
-                  pathname === link.href
-                    ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
+                key={l.id}
+                href={l.id}
+                onClick={() => setOpen(false)}
+                style={{
+                  display: "block",
+                  width: "100%",
+                  textAlign: "left",
+                  padding: "10px 12px",
+                  background: active ? `${ICH.primary}14` : "transparent",
+                  color: active ? ICH.primary : ICH.text,
+                  border: "none",
+                  cursor: "pointer",
+                  fontFamily: "Inter,sans-serif",
+                  fontSize: 15,
+                  fontWeight: active ? 500 : 400,
+                  borderRadius: 4,
+                  marginBottom: 2,
+                  textDecoration: "none",
+                }}
               >
-                {link.label}
+                {l.label}
               </Link>
-            ))}
-            <Link
-              href="/donate"
-              onClick={() => setMobileOpen(false)}
-              className="flex items-center gap-1.5 mx-4 mt-2 px-4 py-2.5 bg-secondary text-secondary-foreground rounded-md text-sm font-medium"
-            >
-              <Heart className="h-4 w-4" />
-              Donate Now
-            </Link>
-          </div>
-        )}
-      </nav>
+            );
+          })}
+          <Link
+            href="/donate"
+            onClick={() => setOpen(false)}
+            style={{
+              display: "block",
+              textAlign: "center",
+              marginTop: 8,
+              width: "100%",
+              padding: "11px 12px",
+              background: ICH.gold,
+              color: "#fff",
+              border: "none",
+              cursor: "pointer",
+              borderRadius: 4,
+              fontFamily: "Inter,sans-serif",
+              fontSize: 14,
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            ♥ Donate Now
+          </Link>
+        </div>
+      )}
     </header>
   );
 }
