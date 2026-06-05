@@ -117,15 +117,15 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
       }}>
         <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
         <div style={{ position: "relative" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.gold, fontFamily: "Inter,sans-serif", marginBottom: 8 }}>Next Prayer</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.accent, fontFamily: "Inter,sans-serif", marginBottom: 8 }}>Next Prayer</div>
           <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(24px,3vw,36px)", fontWeight: 600, color: "#fff" }}>{nextName}</div>
         </div>
         <div style={{ position: "relative", textAlign: "center" }}>
-          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.55)", fontFamily: "Inter,sans-serif", marginBottom: 6 }}>Time Remaining</div>
-          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(40px,6vw,68px)", fontWeight: 600, color: ICH.gold, letterSpacing: ".05em", lineHeight: 1 }}>{countdown}</div>
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".1em", textTransform: "uppercase", color: "rgba(255,255,255,.65)", fontFamily: "Inter,sans-serif", marginBottom: 6 }}>Time Remaining</div>
+          <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(40px,6vw,68px)", fontWeight: 600, color: ICH.accent, letterSpacing: ".05em", lineHeight: 1 }}>{countdown}</div>
         </div>
         <div style={{ position: "relative", textAlign: "right" }}>
-          <div className="amiri" style={{ fontSize: 22, color: ICH.gold, marginBottom: 6 }}>
+          <div className="amiri" style={{ fontSize: 22, color: ICH.accent, marginBottom: 6 }}>
             حَافِظُوا عَلَى الصَّلَوَاتِ
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", fontFamily: "Inter,sans-serif", fontStyle: "italic" }}>

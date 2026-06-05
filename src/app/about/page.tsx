@@ -70,6 +70,8 @@ export default function AboutPage() {
                 key={member.name}
                 style={{
                   display: "flex",
+                  flexWrap: "wrap",
+                  gap: 12,
                   justifyContent: "space-between",
                   alignItems: "center",
                   padding: "16px 24px",
@@ -85,7 +87,7 @@ export default function AboutPage() {
                     {member.name}
                   </span>
                 </div>
-                <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", background: `${ICH.primary}10`, padding: "4px 12px", borderRadius: 20 }}>
+                <span style={{ fontSize: 12, fontWeight: 600, letterSpacing: ".06em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", background: `${ICH.primary}10`, padding: "4px 12px", borderRadius: 20, whiteSpace: "nowrap" }}>
                   {member.role}
                 </span>
               </div>
