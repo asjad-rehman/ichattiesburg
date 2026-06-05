@@ -69,8 +69,8 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-primary" />
-                <a href="mailto:info@ichattiesburg.org" className="hover:text-primary transition-colors">
-                  info@ichattiesburg.org
+                <a href="mailto:ichattiesburg@protonmail.com" className="hover:text-primary transition-colors">
+                  ichattiesburg@protonmail.com
                 </a>
               </li>
             </ul>
