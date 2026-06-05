@@ -64,8 +64,8 @@ function getFallbackTimes(): PrayerTimes {
 
 function getFallbackJumuah(): JumuahSchedule {
   return {
-    khutbah: "13:00",
-    salah: "13:30",
+    khutbah: "13:15",
+    salah: "14:15",
     speaker: "Imam",
     topic: "TBA",
   };
