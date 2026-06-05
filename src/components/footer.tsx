@@ -110,21 +110,25 @@ export default function Footer() {
             <div style={col.label}>Contact</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
               {[
-                ["📍", "211 N 25th Avenue\nHattiesburg, MS 39401"],
-                ["✉️", "ICHattiesburg@protonmail.com"],
-              ].map(([icon, text]) => (
+                { icon: "📍", text: "211 N 25th Avenue\nHattiesburg, MS 39401", href: "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401" },
+                { icon: "✉️", text: "ICHattiesburg@protonmail.com", href: "mailto:ICHattiesburg@protonmail.com" },
+              ].map(({ icon, text, href }) => (
                 <div key={icon} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <span style={{ fontSize: 13, flexShrink: 0, marginTop: 2 }}>{icon}</span>
-                  <span
-                    style={{
-                      fontSize: 13,
-                      color: "rgba(255,255,255,.6)",
-                      lineHeight: 1.65,
-                      whiteSpace: "pre-line",
-                    }}
-                  >
-                    {text}
-                  </span>
+                  <a href={href} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                    <span
+                      style={{
+                        fontSize: 13,
+                        color: "rgba(255,255,255,.7)",
+                        lineHeight: 1.65,
+                        whiteSpace: "pre-line",
+                        textDecoration: "underline",
+                        textUnderlineOffset: "3px"
+                      }}
+                    >
+                      {text}
+                    </span>
+                  </a>
                 </div>
               ))}
             </div>

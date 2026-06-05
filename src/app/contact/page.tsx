@@ -82,9 +82,9 @@ export default function ContactPage() {
         <div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
             {[
-              { icon: "📍", label: "Address",      content: "211 N 25th Avenue\nHattiesburg, MS 39401" },
-              { icon: "✉️", label: "Email",         content: "ICHattiesburg@protonmail.com" },
-              { icon: "🕌", label: "Prayer Times", content: "Open for all five daily prayers.\nSee prayer times page for schedule." },
+              { icon: "📍", label: "Address",      content: "211 N 25th Avenue\nHattiesburg, MS 39401", href: "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401" },
+              { icon: "✉️", label: "Email",         content: "ICHattiesburg@protonmail.com", href: "mailto:ICHattiesburg@protonmail.com" },
+              { icon: "🕌", label: "Prayer Times", content: "Open for all five daily prayers.\nSee prayer times page for schedule.", href: "/prayer-times" },
             ].map((item) => (
               <Card key={item.label} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "16px 18px" }}>
                 <div style={{ width: 40, height: 40, borderRadius: 6, background: `${ICH.primary}12`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, flexShrink: 0 }}>
@@ -92,7 +92,13 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 3 }}>{item.label}</div>
-                  <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.65, whiteSpace: "pre-line" }}>{item.content}</p>
+                  {item.href ? (
+                    <a href={item.href} target={item.href.startsWith("http") ? "_blank" : undefined} rel={item.href.startsWith("http") ? "noopener noreferrer" : undefined} style={{ textDecoration: "none" }}>
+                      <p style={{ fontSize: 13, color: ICH.primary, lineHeight: 1.65, whiteSpace: "pre-line", textDecoration: "underline", textUnderlineOffset: "3px" }}>{item.content}</p>
+                    </a>
+                  ) : (
+                    <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.65, whiteSpace: "pre-line" }}>{item.content}</p>
+                  )}
                 </div>
               </Card>
             ))}

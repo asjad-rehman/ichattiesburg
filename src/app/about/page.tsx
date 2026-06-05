@@ -158,7 +158,9 @@ export default function AboutPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 16, marginBottom: 16 }}>
             <Card>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 10 }}>📍 Address</div>
-              <p style={{ fontSize: 14, color: ICH.textMuted, lineHeight: 1.7 }}>211 N 25th Avenue<br />Hattiesburg, MS 39401</p>
+              <a href="https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401" target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }}>
+                <p style={{ fontSize: 14, color: ICH.primary, lineHeight: 1.7, textDecoration: "underline", textUnderlineOffset: "3px" }}>211 N 25th Avenue<br />Hattiesburg, MS 39401</p>
+              </a>
             </Card>
             <Card>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 10 }}>🕌 Open For Prayers</div>

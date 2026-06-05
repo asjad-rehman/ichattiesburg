@@ -182,7 +182,12 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
               <span style={{ fontSize: 14, fontWeight: 500, textAlign: "right", maxWidth: "60%" }}>{jumuah.topic}</span>
             </div>
           )}
-          <p style={{ fontSize: 13, color: ICH.textMuted, marginTop: 16, lineHeight: 1.7 }}>All are welcome. Located at 211 N 25th Avenue, Hattiesburg, MS 39401.</p>
+          <p style={{ fontSize: 13, color: ICH.textMuted, marginTop: 16, lineHeight: 1.7 }}>
+            All are welcome. Located at{" "}
+            <a href="https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401" target="_blank" rel="noopener noreferrer" style={{ color: ICH.primary, textDecoration: "underline", textUnderlineOffset: "2px" }}>
+              211 N 25th Avenue, Hattiesburg, MS 39401
+            </a>.
+          </p>
         </div>
 
         <div style={{ border: `1px solid ${ICH.border}`, borderRadius: 8, padding: 28, background: "#fff" }}>
