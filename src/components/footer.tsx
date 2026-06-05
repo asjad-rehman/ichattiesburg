@@ -134,23 +134,24 @@ export default function Footer() {
           <div>
             <div style={col.label}>Follow Us</div>
             <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-              {["Facebook", "Instagram"].map((s) => (
+              {[
+                { name: "Facebook", url: "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr" },
+                { name: "Instagram", url: "https://www.instagram.com/ichattiesburg" }
+              ].map((s) => (
                 <a
-                  key={s}
-                  href={`https://www.${s.toLowerCase()}.com/ichattiesburg`}
+                  key={s.name}
+                  href={s.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   style={{
                     padding: "7px 14px",
                     background: "rgba(255,255,255,.07)",
-                    color: "rgba(255,255,255,.75)",
-                    borderRadius: 3,
-                    fontSize: 12,
+                    borderRadius: 4,
+                    color: "rgba(255,255,255,.9)",
+                    fontSize: 13,
+                    fontFamily: "Inter,sans-serif",
                     fontWeight: 500,
                     textDecoration: "none",
-                    border: "1px solid rgba(255,255,255,.1)",
-                    fontFamily: "Inter,sans-serif",
-                    transition: "all .15s",
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.background = "rgba(255,255,255,.14)";
@@ -158,10 +159,10 @@ export default function Footer() {
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.background = "rgba(255,255,255,.07)";
-                    e.currentTarget.style.color = "rgba(255,255,255,.75)";
+                    e.currentTarget.style.color = "rgba(255,255,255,.9)";
                   }}
                 >
-                  {s}
+                  {s.name}
                 </a>
               ))}
             </div>

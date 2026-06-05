@@ -43,8 +43,8 @@ async function getEvents(): Promise<EventItem[]> {
   return [
     {
       id: "1",
-      title: "Jummah Prayers",
-      description: "Weekly Friday congregational prayer and khutbah. All are welcome.",
+      title: "Jumuah Prayers",
+      description: "Weekly Friday congregational prayer and khutbah. All are welcome. (Recurring every week)",
       date: nextDay(now, 5).toISOString().split("T")[0],
       time: "13:00",
       endTime: "14:00",
@@ -55,7 +55,7 @@ async function getEvents(): Promise<EventItem[]> {
     {
       id: "2",
       title: "Friday Halaqah",
-      description: "Weekly gathering and discussion every Friday from Maghreb to Isha.",
+      description: "Weekly gathering and discussion every Friday from Maghreb to Isha. (Recurring every week)",
       date: nextDay(now, 5).toISOString().split("T")[0],
       time: "19:00",
       endTime: "20:30",
@@ -66,7 +66,7 @@ async function getEvents(): Promise<EventItem[]> {
     {
       id: "3",
       title: "Sunday School",
-      description: "Islamic education and activities for the youth.",
+      description: "Islamic education and activities for the youth. (Recurring every week - Currently off for summer)",
       date: nextDay(now, 0).toISOString().split("T")[0],
       time: "10:00",
       endTime: "13:00",

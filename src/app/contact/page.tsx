@@ -97,7 +97,7 @@ export default function ContactPage() {
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 12 }}>Social Media</div>
             <div style={{ display: "flex", gap: 10 }}>
               <a
-                href="https://www.facebook.com/ichattiesburg"
+                href="https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ padding: "8px 16px", background: "#1877F2", color: "#fff", borderRadius: 4, fontSize: 13, fontWeight: 500, textDecoration: "none", fontFamily: "Inter,sans-serif" }}

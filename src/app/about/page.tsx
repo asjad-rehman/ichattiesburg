@@ -18,9 +18,9 @@ const BOARD_MEMBERS = [
 ];
 
 const INITIATIVES = [
-  { icon: '📚', title: 'Sunday School',          time: 'Sundays 10 AM – 1 PM',              note: '', desc: 'Islamic education for the youth.' },
-  { icon: '🤝', title: 'Friday Halaqah',         time: 'Fridays, Maghreb to Isha',          note: '', desc: 'Weekly gathering and discussion for the community.' },
-  { icon: '🕌', title: 'Jummah Prayers',         time: 'Fridays 1:00 PM',                   note: '', desc: 'Weekly Friday congregational prayer and khutbah. All are welcome.' },
+  { icon: '🕌', title: 'Jumuah Prayers',         time: 'Fridays (Recurring every week)',    note: '', desc: 'Weekly Friday congregational prayer and khutbah.' },
+  { icon: '📖', title: 'Friday Halaqah',         time: 'Fridays Maghreb to Isha',           note: 'Recurring every week', desc: 'Weekly gathering and discussion.' },
+  { icon: '📚', title: 'Sunday School',          time: 'Sundays 10 AM – 1 PM',              note: 'Recurring every week (Currently off for summer)', desc: 'Islamic education for the youth.' },
 ];
 
 export default function AboutPage() {

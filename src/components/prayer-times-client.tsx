@@ -173,10 +173,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
               <span style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600 }}>{j.time}</span>
             </div>
           ))}
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${ICH.border}` }}>
-            <span style={{ fontSize: 13, color: ICH.textMuted }}>Speaker</span>
-            <span style={{ fontSize: 14, fontWeight: 500 }}>{jumuah.speaker || "Imam (TBA)"}</span>
-          </div>
+
           {jumuah.topic && jumuah.topic !== "TBA" && (
             <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: `1px solid ${ICH.border}` }}>
               <span style={{ fontSize: 13, color: ICH.textMuted }}>Topic</span>
