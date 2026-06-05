@@ -46,32 +46,7 @@ export default function DonatePage() {
         ))}
       </div>
 
-      {/* Categories */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 36 }}>
-        {[
-          { title: "General Sadaqah", desc: "Day-to-day masjid operations",  icon: "🕌" },
-          { title: "Zakat",           desc: "Fulfill your obligatory zakat", icon: "🤲" },
-          { title: "New Masjid",      desc: "Build our permanent facility",  icon: "🏗️" },
-          { title: "Quran Programs",  desc: "Islamic education for all ages",icon: "📖" },
-        ].map((cat) => (
-          <div
-            key={cat.title}
-            style={{ padding: "18px 14px", background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 6, cursor: "pointer", transition: "all .18s", textAlign: "center" }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = ICH.gold;
-              e.currentTarget.style.boxShadow = "0 4px 16px rgba(200,169,110,.15)";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = ICH.border;
-              e.currentTarget.style.boxShadow = "none";
-            }}
-          >
-            <div style={{ fontSize: 26, marginBottom: 8 }}>{cat.icon}</div>
-            <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 17, fontWeight: 600, marginBottom: 3 }}>{cat.title}</div>
-            <div style={{ fontSize: 11, color: ICH.textMuted, lineHeight: 1.55 }}>{cat.desc}</div>
-          </div>
-        ))}
-      </div>
+
 
       {/* Zeffy Embed */}
       <div style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "20px", position: "relative" }}>
