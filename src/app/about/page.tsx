@@ -18,12 +18,9 @@ const BOARD_MEMBERS = [
 ];
 
 const INITIATIVES = [
-  { icon: '📚', title: 'Sunday School',          time: 'Sundays 9 AM – 1 PM',              note: 'Postponed until further notice', desc: 'Islamic education for boys and girls up to age 12.' },
-  { icon: '🤝', title: 'Friday Halaqah (Brothers)', time: 'Fridays, Maghrib to Isha',         note: 'Dinner served',                  desc: 'Strengthening faith through discussion. Current read: Proofs of God and rejection of Atheism.' },
-  { icon: '🌸', title: 'Sunday Halaqah (Sisters)',  time: 'Sundays after Sunday School',      note: 'Potluck — bring a dish',         desc: 'Sisters-only gathering for Quran and Islamic discussion.' },
-  { icon: '☪️', title: 'New Reverts Program',       time: 'Friday evenings',                  note: '',                               desc: 'Spiritual development and deeper understandings of Islam for new Muslims.' },
-  { icon: '🍽️', title: 'Quarterly Family Potluck', time: 'Every quarter',                     note: '',                               desc: 'Community-wide gathering for brothers, sisters, and children.' },
-  { icon: '🏗️', title: 'New Masjid Project',        time: 'Ongoing',                          note: 'Donations needed',               desc: 'Building a new masjid with a large prayer hall, Islamic school, and community center.' },
+  { icon: '📚', title: 'Sunday School',          time: 'Sundays 10 AM – 1 PM',              note: '', desc: 'Islamic education for the youth.' },
+  { icon: '🤝', title: 'Friday Halaqah',         time: 'Fridays, Maghreb to Isha',          note: '', desc: 'Weekly gathering and discussion for the community.' },
+  { icon: '🕌', title: 'Jummah Prayers',         time: 'Fridays 1:00 PM',                   note: '', desc: 'Weekly Friday congregational prayer and khutbah. All are welcome.' },
 ];
 
 export default function AboutPage() {
