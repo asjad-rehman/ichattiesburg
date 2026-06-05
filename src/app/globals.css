@@ -103,3 +103,13 @@ p {
   outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
+
+/* Responsive helpers */
+@media (max-width: 768px) {
+  .desktop-nav  { display: none !important; }
+  .mobile-btn   { display: flex !important; }
+}
+@media (min-width: 769px) {
+  .mobile-btn   { display: none !important; }
+  .mobile-menu  { display: none !important; }
+}
