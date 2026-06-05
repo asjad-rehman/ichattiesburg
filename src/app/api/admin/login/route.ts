@@ -1,32 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { comparePassword, signToken } from "@/lib/auth";
+import { signToken } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { email, password } = await req.json();
+    const { username, password } = await req.json();
 
-    if (!email || !password) {
-      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+    if (!username || !password) {
+      return NextResponse.json({ error: "Username and password required" }, { status: 400 });
     }
 
-    // In production, look up user from DB. Use env var credentials for MVP.
-    const adminEmail = process.env.ADMIN_EMAIL;
-    const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH;
-
-    if (!adminEmail || !adminPasswordHash) {
-      return NextResponse.json({ error: "Admin not configured" }, { status: 503 });
-    }
-
-    if (email !== adminEmail) {
+    if (username !== "ichattiesburg" || password !== "3223") {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    const valid = await comparePassword(password, adminPasswordHash);
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
-    }
-
-    const token = signToken({ id: "1", email, name: "Admin" });
+    const token = signToken({ id: "1", email: username, name: "Admin" });
 
     const response = NextResponse.json({ success: true });
     response.cookies.set("admin_token", token, {

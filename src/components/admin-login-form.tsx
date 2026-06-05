@@ -6,7 +6,7 @@ import { ICH, Btn } from "./ui-primitives";
 
 export default function AdminLoginForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ export default function AdminLoginForm() {
       const res = await fetch("/api/admin/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Login failed");
@@ -62,14 +62,14 @@ export default function AdminLoginForm() {
 
       <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
-          <label style={labelStyle} htmlFor="email">Email</label>
+          <label style={labelStyle} htmlFor="username">Username</label>
           <input
-            id="email"
-            type="email"
-            placeholder="admin@ichattiesburg.org"
+            id="username"
+            type="text"
+            placeholder="ichattiesburg"
             required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
             style={inputStyle}
           />
         </div>
