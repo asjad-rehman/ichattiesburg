@@ -315,7 +315,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               overflow: "hidden",
               boxShadow: "0 20px 40px rgba(10,50,65,0.15)"
             }}>
-              <img src="/masjid.jpg" alt="Islamic Center of Hattiesburg" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} />
+              <img src="/ich.jpeg" alt="Islamic Center of Hattiesburg" style={{ width: "100%", height: "100%", objectFit: "cover", position: "absolute", inset: 0 }} />
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(6,18,23,0.85) 0%, rgba(6,18,23,0.3) 50%, rgba(6,18,23,0.1) 100%)" }} />
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
                 <span className="arabic-text" style={{ color: "#fff", fontSize: "clamp(28px, 4vw, 36px)", fontWeight: 600, textAlign: "center", textShadow: "0 2px 12px rgba(0,0,0,0.6)", marginTop: "auto", marginBottom: 30 }}>إِنَّمَا يَعْمُرُ مَسَاجِدَ اللَّهِ</span>
