@@ -14,7 +14,7 @@ export default function DonatePage() {
       <div style={{ marginBottom: 40 }}>
         <GoldLabel>Support ICH</GoldLabel>
         <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(32px,5vw,52px)", fontWeight: 600, marginBottom: 12 }}>Donate</h1>
-        <div className="amiri" style={{ fontSize: 22, color: ICH.primary, marginBottom: 8, direction: "rtl", lineHeight: 1.9, textAlign: "right" }}>
+        <div className="arabic-text" style={{ fontSize: 22, color: ICH.primary, marginBottom: 8, direction: "rtl", lineHeight: 1.9, textAlign: "right" }}>
           مَّن ذَا الَّذِي يُقْرِضُ اللَّهَ قَرْضًا حَسَنًا
         </div>
         <p style={{ fontSize: 13, color: ICH.textMuted, fontStyle: "italic", marginBottom: 16 }}>"Who is it that would loan Allah a goodly loan?" — Quran 2:245</p>

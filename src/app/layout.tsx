@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Inter, Amiri, Cormorant_Garamond } from "next/font/google";
+import { Inter, Noto_Naskh_Arabic, Cormorant_Garamond } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const amiri = Amiri({
-  subsets: ["arabic", "latin"],
-  weight: ["400", "700"],
-  variable: "--font-amiri",
+const notoNaskh = Noto_Naskh_Arabic({
+  subsets: ["arabic"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-arabic-naskh",
 });
 const cormorant = Cormorant_Garamond({
   subsets: ["latin"],
@@ -66,7 +66,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${amiri.variable} ${cormorant.variable} font-sans antialiased`}>
+      <body className={`${inter.variable} ${notoNaskh.variable} ${cormorant.variable} font-sans antialiased`}>
         <div className="min-h-screen flex flex-col bg-background text-foreground">
           <Navbar />
           <main className="flex-1">{children}</main>

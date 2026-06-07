@@ -45,7 +45,7 @@ export default function AboutPage() {
           <div style={{ border: `1px solid ${ICH.gold}44`, borderRadius: 8, padding: "36px 40px", background: `${ICH.gold}07`, position: "relative", overflow: "hidden" }}>
             <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.6 }} />
             <div style={{ position: "relative" }}>
-              <div className="amiri" style={{ fontSize: "clamp(20px,2.5vw,28px)", color: ICH.primary, marginBottom: 10, direction: "rtl", textAlign: "right", lineHeight: 1.8 }}>
+              <div className="arabic-text" style={{ fontSize: "clamp(20px,2.5vw,28px)", color: ICH.primary, marginBottom: 10, direction: "rtl", textAlign: "right", lineHeight: 1.8 }}>
                 وَاللَّهُ يَدْعُو إِلَىٰ دَارِ السَّلَامِ
               </div>
               <p style={{ fontSize: 13, color: ICH.textMuted, fontStyle: "italic", textAlign: "right", marginBottom: 24 }}>

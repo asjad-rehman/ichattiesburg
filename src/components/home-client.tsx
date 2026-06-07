@@ -191,13 +191,14 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
 
   const prayersAll: PrayerData[] = React.useMemo(() => [
     { name: "Fajr",    key: "fajr",    h: f.h, m: f.m, display: formatTime(prayerTimes.fajr) },
+    { name: "Sunrise", key: "sunrise", h: s.h, m: s.m, display: formatTime(prayerTimes.sunrise) },
     { name: "Dhuhr",   key: "dhuhr",   h: d.h, m: d.m, display: formatTime(prayerTimes.dhuhr) },
     { name: "Asr",     key: "asr",     h: a.h, m: a.m, display: formatTime(prayerTimes.asr) },
     { name: "Maghrib", key: "maghrib", h: m.h, m: m.m, display: "After Adhan" },
     { name: "Isha",    key: "isha",    h: i.h, m: i.m, display: formatTime(prayerTimes.isha) },
   ], [prayerTimes]);
 
-  const prayers5 = prayersAll;
+  const prayers5 = prayersAll.filter(p => p.key !== "sunrise");
   const { countdown, nextName, nextIdx, curIdx } = usePrayerCountdown(prayersAll);
 
   // Formatted Jumuah schedule
@@ -221,7 +222,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
         {/* Content */}
         <div style={{ position: "relative", zIndex: 10, maxWidth: 1200, margin: "0 auto", padding: "80px 24px 100px", width: "100%" }}>
           <ScrollReveal delay={0.1} className="max-w-[580px]">
-            <div className="amiri" style={{ fontSize: "clamp(18px,2.5vw,26px)", color: ICH.accent, marginBottom: 18, direction: "rtl", textAlign: "left" }}>
+            <div className="arabic-text" style={{ fontSize: "clamp(18px,2.5vw,26px)", color: ICH.accent, marginBottom: 18, direction: "rtl", textAlign: "left" }}>
               السَّلَامُ عَلَيْكُمْ وَرَحْمَةُ اللهِ وَبَرَكَاتُهُ
             </div>
             <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontWeight: 600, fontSize: "clamp(40px,6vw,72px)", color: "#fff", lineHeight: 1.1, marginBottom: 20 }}>
@@ -317,7 +318,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
               <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column" }}>
                 <span style={{ fontSize: 54, marginBottom: 16 }}>🕌</span>
-                <span className="amiri" style={{ color: ICH.accent, fontSize: 32, fontWeight: 600 }}>إِنَّمَا يَعْمُرُ مَسَاجِدَ اللَّهِ</span>
+                <span className="arabic-text" style={{ color: ICH.accent, fontSize: 32, fontWeight: 600 }}>إِنَّمَا يَعْمُرُ مَسَاجِدَ اللَّهِ</span>
               </div>
             </div>
           </ScrollReveal>

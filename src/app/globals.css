@@ -43,7 +43,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   --font-sans: var(--font-inter);
-  --font-arabic: var(--font-amiri);
+  --font-arabic: var(--font-arabic-naskh);
   --font-serif: var(--font-cormorant);
 }
 
@@ -63,7 +63,7 @@ h1, h2, h3, h4, h5 {
   letter-spacing: -.01em;
 }
 
-.amiri {
+.arabic-text {
   font-family: var(--font-arabic), serif;
 }
 

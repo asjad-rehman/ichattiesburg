@@ -77,7 +77,7 @@ export default function Footer() {
               Serving the Muslim community of Hattiesburg, Mississippi with
               prayer, education, and community programs.
             </p>
-            <div className="amiri" style={{ fontSize: 19, color: ICH.accent, lineHeight: 2 }}>
+            <div className="arabic-text" style={{ fontSize: 19, color: ICH.accent, lineHeight: 2 }}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
           </div>

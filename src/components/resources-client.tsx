@@ -52,7 +52,7 @@ export default function ResourcesClient() {
       </div>
 
       <div style={{ background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "28px 32px", textAlign: "center", marginBottom: 44 }}>
-        <div className="amiri" style={{ fontSize: "clamp(20px,2.8vw,28px)", color: ICH.primary, marginBottom: 10, direction: "rtl", lineHeight: 1.8, textAlign: "right" }}>
+        <div className="arabic-text" style={{ fontSize: "clamp(20px,2.8vw,28px)", color: ICH.primary, marginBottom: 10, direction: "rtl", lineHeight: 1.8, textAlign: "right" }}>
           اقْرَأْ بِاسْمِ رَبِّكَ الَّذِي خَلَقَ
         </div>
         <p style={{ fontSize: 13, color: ICH.textMuted, fontStyle: "italic" }}>"Read in the name of your Lord who created." — Quran 96:1</p>

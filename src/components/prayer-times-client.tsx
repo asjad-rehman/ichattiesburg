@@ -84,6 +84,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
 
   const prayersAll: PrayerData[] = React.useMemo(() => [
     { name: "Fajr",    key: "fajr",    h: f.h, m: f.m, display: formatTime(prayerTimes.fajr) },
+    { name: "Sunrise", key: "sunrise", h: s.h, m: s.m, display: formatTime(prayerTimes.sunrise) },
     { name: "Dhuhr",   key: "dhuhr",   h: d.h, m: d.m, display: formatTime(prayerTimes.dhuhr) },
     { name: "Asr",     key: "asr",     h: a.h, m: a.m, display: formatTime(prayerTimes.asr) },
     { name: "Maghrib", key: "maghrib", h: m.h, m: m.m, display: formatTime(prayerTimes.maghrib) },
@@ -117,7 +118,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
       }}>
         <div className="geo-bg" style={{ position: "absolute", inset: 0, opacity: 0.5 }} />
         <div style={{ position: "relative" }}>
-          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.accent, fontFamily: "Inter,sans-serif", marginBottom: 8 }}>Next Prayer</div>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.accent, fontFamily: "Inter,sans-serif", marginBottom: 8 }}>Up Next</div>
           <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(24px,3vw,36px)", fontWeight: 600, color: "#fff" }}>{nextName}</div>
         </div>
         <div style={{ position: "relative", textAlign: "center" }}>
@@ -125,7 +126,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
           <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(40px,6vw,68px)", fontWeight: 600, color: ICH.accent, letterSpacing: ".05em", lineHeight: 1 }}>{countdown}</div>
         </div>
         <div style={{ position: "relative", textAlign: "right" }}>
-          <div className="amiri" style={{ fontSize: 22, color: ICH.accent, marginBottom: 6 }}>
+          <div className="arabic-text" style={{ fontSize: 22, color: ICH.accent, marginBottom: 6 }}>
             حَافِظُوا عَلَى الصَّلَوَاتِ
           </div>
           <div style={{ fontSize: 12, color: "rgba(255,255,255,.5)", fontFamily: "Inter,sans-serif", fontStyle: "italic" }}>
@@ -215,7 +216,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
       {/* Quran verse */}
       <ScrollReveal delay={0.3}>
       <div style={{ background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", textAlign: "center" }}>
-        <div className="amiri" style={{ fontSize: "clamp(22px,3vw,30px)", color: ICH.primary, marginBottom: 12, lineHeight: 1.8, direction: "rtl", textAlign: "right" }}>
+        <div className="arabic-text" style={{ fontSize: "clamp(22px,3vw,30px)", color: ICH.primary, marginBottom: 12, lineHeight: 1.8, direction: "rtl", textAlign: "right" }}>
           إِنَّ الصَّلَاةَ كَانَتْ عَلَى الْمُؤْمِنِينَ كِتَابًا مَّوقُوتًا
         </div>
         <p style={{ fontSize: 14, color: ICH.textMuted, fontStyle: "italic" }}>
