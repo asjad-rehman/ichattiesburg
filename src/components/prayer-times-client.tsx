@@ -196,7 +196,6 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
               "Prayer times are set according to the moonsighting committee.",
-              "Iqama times may differ from the adhan times shown above.",
               "Please arrive a few minutes early to pray sunnah.",
               "Check the announcements banner for any changes to the schedule.",
             ].map((note, i) => (
