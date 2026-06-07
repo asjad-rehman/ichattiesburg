@@ -179,7 +179,7 @@ export function Tag({ children, color = 'gray' }: TagProps) {
 export function ScrollReveal({
   children,
   delay = 0,
-  y = 20,
+  y = 40,
   className = "",
   style,
 }: {
@@ -191,10 +191,16 @@ export function ScrollReveal({
 }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1], delay }}
+      initial={{ opacity: 0, y, filter: "blur(12px)", scale: 0.96 }}
+      whileInView={{ opacity: 1, y: 0, filter: "blur(0px)", scale: 1 }}
+      viewport={{ once: true, margin: "-100px" }}
+      transition={{ 
+        duration: 1.2, 
+        ease: [0.16, 1, 0.3, 1],
+        delay,
+        filter: { duration: 0.8, ease: "easeOut" },
+        scale: { duration: 1.0, ease: [0.16, 1, 0.3, 1] }
+      }}
       className={className}
       style={style}
     >
