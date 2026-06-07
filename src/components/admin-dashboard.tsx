@@ -1,19 +1,19 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LogOut, Plus, Bell, Calendar, Clock, Trash2 } from "lucide-react";
+import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users } from "lucide-react";
 import { AdminUser } from "@/lib/auth";
 import { ICH, Btn, Card } from "./ui-primitives";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
-  const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer">("announcements");
+  const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board">("announcements");
 
   const logout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     window.location.href = "/admin/login";
   };
 
-  const tabButtonStyle = (tab: "announcements" | "events" | "prayer") => ({
+  const tabButtonStyle = (tab: "announcements" | "events" | "prayer" | "board") => ({
     padding: "8px 20px",
     borderRadius: 4,
     fontSize: 13,
@@ -42,7 +42,7 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
 
       {/* Tabs Row */}
       <div style={{ display: "flex", gap: 8, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6, padding: 6, marginBottom: 36, width: "fit-content" }}>
-        {(["announcements", "events", "prayer"] as const).map((tab) => (
+        {(["announcements", "events", "prayer", "board"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -57,6 +57,7 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
       {activeTab === "announcements" && <AnnouncementsTab />}
       {activeTab === "events" && <EventsTab />}
       {activeTab === "prayer" && <PrayerTimesTab />}
+      {activeTab === "board" && <BoardTab />}
     </div>
   );
 }
@@ -89,6 +90,7 @@ function AnnouncementsTab() {
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [priority, setPriority] = useState<"normal" | "urgent">("normal");
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
@@ -99,18 +101,35 @@ function AnnouncementsTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const isEdit = !!editingId;
     const res = await fetch("/api/admin/announcements", {
-      method: "POST",
+      method: isEdit ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body, priority }),
+      body: JSON.stringify(isEdit ? { id: editingId, title, body, priority } : { title, body, priority }),
     });
     if (res.ok) {
       const data = await res.json();
-      setAnnouncements(prev => [data.announcement, ...prev]);
-      setTitle(""); setBody(""); setPriority("normal");
+      if (isEdit) {
+        setAnnouncements(prev => prev.map(a => a.id === editingId ? data.announcement : a));
+      } else {
+        setAnnouncements(prev => [data.announcement, ...prev]);
+      }
+      setTitle(""); setBody(""); setPriority("normal"); setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     }
+  };
+
+  const handleEdit = (a: any) => {
+    setEditingId(a.id);
+    setTitle(a.title);
+    setBody(a.body);
+    setPriority(a.priority || "normal");
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setTitle(""); setBody(""); setPriority("normal");
   };
 
   const handleDelete = async (id: string) => {
@@ -132,7 +151,7 @@ function AnnouncementsTab() {
         {/* Form */}
         <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20, height: "fit-content" }}>
           <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, color: ICH.primary }}>
-            <Plus className="h-4 w-4" /> New Announcement
+            {editingId ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />} {editingId ? "Edit Announcement" : "New Announcement"}
           </h3>
           
           <div>
@@ -178,9 +197,16 @@ function AnnouncementsTab() {
             </div>
           </div>
 
-          <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
-            {saved ? "Saved!" : "Save Announcement"}
-          </Btn>
+          <div style={{ display: "flex", gap: 12 }}>
+            <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
+              {saved ? "Saved!" : (editingId ? "Update Announcement" : "Save Announcement")}
+            </Btn>
+            {editingId && (
+              <Btn variant="outline" onClick={cancelEdit} style={{ width: "fit-content" }}>
+                Cancel Edit
+              </Btn>
+            )}
+          </div>
         </form>
 
         {/* List */}
@@ -201,9 +227,14 @@ function AnnouncementsTab() {
                   </h4>
                   <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.6 }}>{a.body}</p>
                 </div>
-                <button onClick={() => handleDelete(a.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button type="button" onClick={() => handleEdit(a)} style={{ background: "none", border: "none", color: ICH.primary, cursor: "pointer", padding: 4 }}>
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(a.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -216,6 +247,7 @@ function AnnouncementsTab() {
 function EventsTab() {
   const [events, setEvents] = useState<any[]>([]);
   const [saved, setSaved] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", description: "", date: "", time: "", location: "", category: "community",
   });
@@ -228,18 +260,34 @@ function EventsTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    const isEdit = !!editingId;
     const res = await fetch("/api/admin/events", {
-      method: "POST",
+      method: isEdit ? "PUT" : "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, featured: false }),
+      body: JSON.stringify({ ...form, id: editingId, featured: false }),
     });
     if (res.ok) {
       const data = await res.json();
-      setEvents(prev => [...prev, data.event].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      if (isEdit) {
+        setEvents(prev => prev.map(ev => ev.id === editingId ? data.event : ev).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      } else {
+        setEvents(prev => [...prev, data.event].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+      }
       setForm({ title: "", description: "", date: "", time: "", location: "", category: "community" });
+      setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
     }
+  };
+
+  const handleEdit = (a: any) => {
+    setEditingId(a.id);
+    setForm({ title: a.title, description: a.description, date: a.date, time: a.time || "", location: a.location || "", category: a.category || "community" });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm({ title: "", description: "", date: "", time: "", location: "", category: "community" });
   };
 
   const handleDelete = async (id: string) => {
@@ -261,7 +309,7 @@ function EventsTab() {
         {/* Form */}
         <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20, height: "fit-content" }}>
           <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, color: ICH.primary }}>
-            <Plus className="h-4 w-4" /> Add Event
+            {editingId ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />} {editingId ? "Edit Event" : "Add Event"}
           </h3>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
@@ -301,9 +349,16 @@ function EventsTab() {
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} required style={{ ...inputStyle, resize: "vertical" }} />
           </div>
 
-          <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
-            {saved ? "Saved!" : "Save Event"}
-          </Btn>
+          <div style={{ display: "flex", gap: 12 }}>
+            <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
+              {saved ? "Saved!" : (editingId ? "Update Event" : "Save Event")}
+            </Btn>
+            {editingId && (
+              <Btn variant="outline" onClick={cancelEdit} style={{ width: "fit-content" }}>
+                Cancel Edit
+              </Btn>
+            )}
+          </div>
         </form>
 
         {/* List */}
@@ -325,9 +380,14 @@ function EventsTab() {
                   <div style={{ fontSize: 12, color: ICH.primary, fontWeight: 600, marginBottom: 4 }}>{a.date} {a.time && `at ${a.time}`}</div>
                   <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.6 }}>{a.description}</p>
                 </div>
-                <button onClick={() => handleDelete(a.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
-                  <Trash2 className="h-4 w-4" />
-                </button>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button type="button" onClick={() => handleEdit(a)} style={{ background: "none", border: "none", color: ICH.primary, cursor: "pointer", padding: 4 }}>
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(a.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -434,6 +494,129 @@ function PrayerTimesTab() {
           {saved ? "Saved!" : "Save Times"}
         </Btn>
       </form>
+    </div>
+  );
+}
+
+function BoardTab() {
+  const [board, setBoard] = useState<any[]>([]);
+  const [saved, setSaved] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState({ name: "", role: "" });
+
+  useEffect(() => {
+    fetch("/api/admin/board")
+      .then(r => r.json())
+      .then(d => setBoard(d.board || []));
+  }, []);
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const isEdit = !!editingId;
+    const res = await fetch("/api/admin/board", {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ...form, id: editingId }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (isEdit) {
+        setBoard(prev => prev.map(b => b.id === editingId ? data.member : b));
+      } else {
+        setBoard(prev => [...prev, data.member]);
+      }
+      setForm({ name: "", role: "" });
+      setEditingId(null);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    }
+  };
+
+  const handleEdit = (b: any) => {
+    setEditingId(b.id);
+    setForm({ name: b.name, role: b.role });
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setForm({ name: "", role: "" });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete board member?")) return;
+    const res = await fetch(`/api/admin/board?id=${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setBoard(prev => prev.filter(b => b.id !== id));
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <Users className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Board Members</h2>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+        {/* Form */}
+        <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20, height: "fit-content" }}>
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, color: ICH.primary }}>
+            {editingId ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />} {editingId ? "Edit Member" : "Add Member"}
+          </h3>
+
+          <div>
+            <label style={labelStyle}>Name</label>
+            <input type="text" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} required style={inputStyle} placeholder="John Doe" />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Role</label>
+            <input type="text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} required style={inputStyle} placeholder="President" />
+          </div>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
+              {saved ? "Saved!" : (editingId ? "Update Member" : "Save Member")}
+            </Btn>
+            {editingId && (
+              <Btn variant="outline" onClick={cancelEdit} style={{ width: "fit-content" }}>
+                Cancel Edit
+              </Btn>
+            )}
+          </div>
+        </form>
+
+        {/* List */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.textMuted, marginBottom: 8 }}>
+            Current Board
+          </h3>
+          {board.length === 0 ? (
+            <div style={{ padding: 24, textAlign: "center", color: ICH.textMuted, border: `1px dashed ${ICH.border}`, borderRadius: 8 }}>
+              No board members
+            </div>
+          ) : board.map(b => (
+            <div key={b.id} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 6, padding: "16px 20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                <div>
+                  <h4 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.text, marginBottom: 4 }}>
+                    {b.name}
+                  </h4>
+                  <p style={{ fontSize: 13, color: ICH.primary, fontWeight: 600 }}>{b.role}</p>
+                </div>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button type="button" onClick={() => handleEdit(b)} style={{ background: "none", border: "none", color: ICH.primary, cursor: "pointer", padding: 4 }}>
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(b.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

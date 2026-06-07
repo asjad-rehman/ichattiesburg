@@ -18,6 +18,12 @@ export interface Announcement {
   created_at: string;
 }
 
+export interface BoardMember {
+  id: string;
+  name: string;
+  role: string;
+}
+
 export interface PrayerOverrides {
   fajr?: string;
   sunrise?: string;
@@ -35,6 +41,7 @@ export interface PrayerOverrides {
 export const memoryStore = {
   events: [] as EventItem[],
   announcements: [] as Announcement[],
+  board: [] as BoardMember[],
   prayerOverrides: {} as PrayerOverrides,
 };
 
@@ -53,6 +60,15 @@ memoryStore.announcements.push({
   priority: "normal",
   created_at: new Date().toISOString(),
 });
+
+memoryStore.board.push(
+  { id: "b1", name: 'Abdul Karim',                  role: 'President' },
+  { id: "b2", name: 'Muhammad Asjad Rehman Hashmi', role: 'Vice President & Imam' },
+  { id: "b3", name: 'Vacant',                       role: 'Secretary' },
+  { id: "b4", name: 'Mohammed Kher Bni Salameh',    role: 'Treasurer' },
+  { id: "b5", name: 'Musa Al Hadwan',               role: 'Maintenance' },
+  { id: "b6", name: 'Sayed Ul Akbar Murad',         role: 'Tech Lead' }
+);
 
 memoryStore.events.push(
   {
