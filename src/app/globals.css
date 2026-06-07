@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Madina';
+  src: url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --background: #f4f8f9;
   --foreground: #121d21;
@@ -64,7 +72,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .arabic-text {
-  font-family: var(--font-arabic), serif;
+  font-family: 'Madina', var(--font-arabic), serif;
 }
 
 /* Geometric Islamic star tile */
