@@ -2,8 +2,24 @@
 
 @font-face {
   font-family: 'Madina';
-  src: url('https://verses.quran.foundation/fonts/quran/hafs/uthmanic_hafs/UthmanicHafs1Ver18.woff2') format('woff2');
-  font-weight: normal;
+  src: url('/fonts/UthmanicHafs.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Madina';
+  src: url('/fonts/UthmanicHafs.woff2') format('woff2');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Madina';
+  src: url('/fonts/UthmanicHafs.woff2') format('woff2');
+  font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
