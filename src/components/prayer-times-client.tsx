@@ -195,7 +195,7 @@ export default function PrayerTimesClient({ prayerTimes, jumuah }: PrayerTimesCl
           <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600, marginBottom: 14 }}>Notes on Prayer Times</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             {[
-              "Prayer times are calculated for Hattiesburg, MS using the ISNA method.",
+              "Prayer times are set according to the moonsighting committee.",
               "Iqama times may differ from the adhan times shown above.",
               "Please arrive a few minutes early to pray sunnah.",
               "Check the announcements banner for any changes to the schedule.",
