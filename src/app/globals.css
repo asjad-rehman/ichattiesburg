@@ -67,7 +67,7 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-border: var(--border);
   --font-sans: var(--font-inter);
-  --font-arabic: var(--font-arabic-naskh);
+  --font-arabic: "Madina", serif;
   --font-serif: var(--font-cormorant);
 }
 
@@ -88,7 +88,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .arabic-text {
-  font-family: 'Madina', var(--font-arabic), serif;
+  font-family: "Madina", serif !important;
 }
 
 /* Geometric Islamic star tile */
