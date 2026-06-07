@@ -13,6 +13,7 @@ export interface EventItem {
   location?: string;
   category: "jumuah" | "eid" | "halaqa" | "fundraiser" | "construction" | "community" | "other" | string;
   featured: boolean;
+  recurring?: boolean;
 }
 
 const CAT_COLORS: Record<string, "green" | "yellow" | "blue" | "purple" | "orange" | "teal" | "gray"> = {
@@ -67,7 +68,7 @@ function EventCard({ event, featured }: { event: EventItem; featured?: boolean }
       <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.65, marginBottom: 14 }}>{event.description}</p>
       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
         {[
-          ["📅", fmtDate(event.date)],
+          ["📅", fmtDate(event.date) + (event.recurring ? " (Every Week)" : "")],
           ...(timeDisplay ? [["🕐", timeDisplay]] : []),
           ...(event.location ? [["📍", event.location]] : []),
         ].map(([icon, text]) => (

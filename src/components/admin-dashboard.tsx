@@ -249,7 +249,7 @@ function EventsTab() {
   const [saved, setSaved] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
-    title: "", description: "", date: "", time: "", location: "", category: "community",
+    title: "", description: "", date: "", time: "", location: "", category: "community", recurring: false,
   });
 
   useEffect(() => {
@@ -273,7 +273,7 @@ function EventsTab() {
       } else {
         setEvents(prev => [...prev, data.event].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
       }
-      setForm({ title: "", description: "", date: "", time: "", location: "", category: "community" });
+      setForm({ title: "", description: "", date: "", time: "", location: "", category: "community", recurring: false });
       setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
@@ -282,12 +282,12 @@ function EventsTab() {
 
   const handleEdit = (a: any) => {
     setEditingId(a.id);
-    setForm({ title: a.title, description: a.description, date: a.date, time: a.time || "", location: a.location || "", category: a.category || "community" });
+    setForm({ title: a.title, description: a.description, date: a.date, time: a.time || "", location: a.location || "", category: a.category || "community", recurring: a.recurring || false });
   };
 
   const cancelEdit = () => {
     setEditingId(null);
-    setForm({ title: "", description: "", date: "", time: "", location: "", category: "community" });
+    setForm({ title: "", description: "", date: "", time: "", location: "", category: "community", recurring: false });
   };
 
   const handleDelete = async (id: string) => {
@@ -339,6 +339,11 @@ function EventsTab() {
             </div>
           </div>
 
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <input type="checkbox" id="recurring" checked={form.recurring} onChange={(e) => setForm({ ...form, recurring: e.target.checked })} style={{ width: 18, height: 18 }} />
+            <label htmlFor="recurring" style={{ fontSize: 15, fontWeight: 600, color: ICH.text }}>Recurring Every Week</label>
+          </div>
+
           <div>
             <label style={labelStyle}>Location</label>
             <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} style={inputStyle} placeholder="ICH Main Hall" />
@@ -376,6 +381,8 @@ function EventsTab() {
                 <div>
                   <h4 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.text, marginBottom: 4 }}>
                     {a.title}
+                    {a.featured && <span style={{ fontSize: 10, background: ICH.gold, color: "#fff", padding: "2px 6px", borderRadius: 4, marginLeft: 6, verticalAlign: "middle" }}>Featured</span>}
+                    {a.recurring && <span style={{ fontSize: 10, background: ICH.primary, color: "#fff", padding: "2px 6px", borderRadius: 4, marginLeft: 6, verticalAlign: "middle" }}>Weekly</span>}
                   </h4>
                   <div style={{ fontSize: 12, color: ICH.primary, fontWeight: 600, marginBottom: 4 }}>{a.date} {a.time && `at ${a.time}`}</div>
                   <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.6 }}>{a.description}</p>

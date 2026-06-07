@@ -8,6 +8,7 @@ export interface EventItem {
   location?: string;
   category: string;
   featured: boolean;
+  recurring?: boolean;
 }
 
 export interface Announcement {
@@ -81,6 +82,7 @@ memoryStore.events.push(
     location: "Islamic Center of Hattiesburg",
     category: "jumuah",
     featured: true,
+    recurring: true,
   },
   {
     id: "e2",
@@ -92,6 +94,7 @@ memoryStore.events.push(
     location: "ICH Main Hall",
     category: "halaqa",
     featured: true,
+    recurring: true,
   },
   {
     id: "e3",
@@ -103,5 +106,6 @@ memoryStore.events.push(
     location: "ICH Classrooms",
     category: "community",
     featured: true,
+    recurring: true,
   }
 );
