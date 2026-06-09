@@ -2,7 +2,7 @@ import React from "react";
 import { Metadata } from "next";
 import { Btn, GoldLabel, SectionHead, Card, ScrollReveal } from "@/components/ui-primitives";
 import { ICH } from "@/lib/theme";
-import { memoryStore } from "@/lib/store";
+import { store } from "@/lib/store";
 
 export const metadata: Metadata = {
   title: "About Us",
@@ -17,7 +17,9 @@ const INITIATIVES = [
   { icon: '📚', title: 'Sunday School',          time: 'Sundays 10 AM – 1 PM',              note: 'Recurring every week (Currently off for summer)', desc: 'Islamic education for the youth.' },
 ];
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const board = await store.getBoard();
+
   return (
     <div className="page-enter">
       {/* Page hero */}
@@ -59,7 +61,7 @@ export default function AboutPage() {
           <ScrollReveal delay={0.2}>
           <SectionHead label="Leadership" title="Board @ Islamic Center" />
           <div style={{ border: `1px solid ${ICH.border}`, borderRadius: 8, overflow: "hidden" }}>
-            {memoryStore.board.map((member, i) => (
+            {board.map((member, i) => (
               <div
                 key={member.name}
                 style={{
@@ -70,7 +72,7 @@ export default function AboutPage() {
                   alignItems: "center",
                   padding: "16px 24px",
                   background: i % 2 === 0 ? "#fff" : ICH.bgCard,
-                  borderBottom: i < memoryStore.board.length - 1 ? `1px solid ${ICH.border}` : "none",
+                  borderBottom: i < board.length - 1 ? `1px solid ${ICH.border}` : "none",
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 14 }}>

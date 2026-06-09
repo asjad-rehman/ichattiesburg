@@ -4,5 +4,10 @@ import { store } from "@/lib/store";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ announcements: store.getAnnouncements() });
+  try {
+    const announcements = await store.getAnnouncements();
+    return NextResponse.json({ announcements });
+  } catch {
+    return NextResponse.json({ error: "Failed to fetch announcements" }, { status: 500 });
+  }
 }

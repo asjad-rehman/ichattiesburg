@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import { memoryStore } from "@/lib/store";
+import { store } from "@/lib/store";
 import EventsClient, { EventItem } from "@/components/events-client";
 
 export const metadata: Metadata = {
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 async function getEvents(): Promise<EventItem[]> {
-  const events = memoryStore.events.map(e => ({ ...e })); // Deep copy to avoid mutating store on render
+  const rawEvents = await store.getEvents();
+  const events = rawEvents.map(e => ({ ...e })); // Deep copy to avoid mutating store on render
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
