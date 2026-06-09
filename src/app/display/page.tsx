@@ -141,7 +141,7 @@ export default function DisplayPage() {
         {/* Header */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-5">
-            <Image src="/ich.jpeg" alt={masjid.name} width={280} height={140} className="object-contain max-h-[70px] md:max-h-[100px] w-auto" priority />
+            <Image src="/uploads/logo.png" alt={masjid.name} width={280} height={140} className="object-contain max-h-[70px] md:max-h-[100px] w-auto" priority />
             <div className="text-[clamp(13px,1.3vw,20px)] text-[#2b2216]/50 whitespace-nowrap italic">{formatDate(now)}</div>
           </div>
           <div className="bg-[#2b2216] text-[#f5f0e8] px-8 py-3 text-center" style={{ clipPath: "polygon(4% 0%, 96% 0%, 100% 100%, 0% 100%)" }}>

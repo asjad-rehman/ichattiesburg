@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import { LenisProvider } from "@/components/lenis-provider";
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const cormorant = Cormorant_Garamond({
@@ -55,21 +56,29 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") ?? "";
+  const isDisplay = pathname === "/display" || pathname.startsWith("/display/");
+
   return (
     <html lang="en">
       <body className={`${inter.variable} ${cormorant.variable} font-sans antialiased`}>
-        <LenisProvider>
-          <div className="min-h-screen flex flex-col bg-background text-foreground">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-        </LenisProvider>
+        {isDisplay ? (
+          children
+        ) : (
+          <LenisProvider>
+            <div className="min-h-screen flex flex-col bg-background text-foreground">
+              <Navbar />
+              <main className="flex-1">{children}</main>
+              <Footer />
+            </div>
+          </LenisProvider>
+        )}
       </body>
     </html>
   );
