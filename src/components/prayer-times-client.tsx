@@ -147,8 +147,8 @@ export default function PrayerTimesClient({ prayerTimes, jamaatTimes, jumuah }: 
 
                 {p.jamaat && (
                   <div style={{ marginTop: 8, paddingTop: 8, borderTop: `1px solid ${isCur ? "rgba(255,255,255,.2)" : ICH.border}` }}>
-                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.5)" : ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 2 }}>Jamaat</div>
-                    <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: isCur ? ICH.accent : ICH.goldDark }}>{p.jamaat}</div>
+                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.75)" : ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 2 }}>Jamaat</div>
+                    <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: isCur ? "#fff" : ICH.goldDark }}>{p.jamaat}</div>
                   </div>
                 )}
               </div>

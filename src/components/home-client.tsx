@@ -316,7 +316,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes }: HomeClientProps
                   {iqama && (
                     <div style={{ marginTop: 4, paddingTop: 4, borderTop: `1px solid ${isCur ? "rgba(0,0,0,.15)" : "rgba(255,255,255,.12)"}` }}>
                       <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: isCur ? ICH.primaryDark : "rgba(255,255,255,.45)", fontFamily: "Inter,sans-serif", marginBottom: 1 }}>Iqama</div>
-                      <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: iqama === "After Adhan" ? 10 : 14, fontWeight: 600, color: isCur ? ICH.primaryDark : ICH.accent }}>{iqama}</div>
+                      <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: iqama === "After Adhan" ? 10 : 14, fontWeight: 600, color: isCur ? ICH.primaryDark : "#fff" }}>{iqama}</div>
                     </div>
                   )}
                 </div>
