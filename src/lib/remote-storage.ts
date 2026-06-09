@@ -20,6 +20,19 @@ const GH_OWNER = "asjad-rehman";
 const GH_REPO = "ichattiesburg";
 const GH_BRANCH = "main";
 
+// Support common naming conventions for the GitHub token
+const getGitHubToken = () => process.env.GITHUB_TOKEN || process.env.GH_TOKEN || process.env.GITHUB_PAT;
+
+// Log detected configurations to help trace deployment settings in Vercel console
+if (typeof window === "undefined") {
+  const token = getGitHubToken();
+  if (!hasRedis && !token) {
+    console.warn("[remote-storage] WARNING: Neither Redis/KV nor GitHub Token environment variables are configured. Changes will NOT persist across serverless instances.");
+  } else {
+    console.log(`[remote-storage] Active storage engines: ${hasRedis ? "[Redis/KV] " : ""}${token ? "[GitHub Contents API]" : ""}`);
+  }
+}
+
 /**
  * Reads data from:
  * 1. Redis (if available)
@@ -44,7 +57,7 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
   }
 
   // 2. Try GitHub API Contents (bypasses raw.githubusercontent.com caching)
-  const token = process.env.GITHUB_TOKEN;
+  const token = getGitHubToken();
   if (token) {
     const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/public/${name}.json`;
     try {
@@ -117,8 +130,8 @@ export async function remoteWrite<T>(name: string, data: T): Promise<void> {
     console.warn(`[remote-storage] /tmp write failed for ${name}:`, e);
   }
 
-  // 3. Commit to GitHub (fire-and-forget, async in background)
-  const token = process.env.GITHUB_TOKEN;
+  // 3. Commit to GitHub (await so write failures propagate to the UI)
+  const token = getGitHubToken();
   if (token) {
     const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/public/${name}.json`;
     const headers = {
@@ -128,34 +141,33 @@ export async function remoteWrite<T>(name: string, data: T): Promise<void> {
       "X-GitHub-Api-Version": "2022-11-28",
     };
 
-    (async () => {
-      try {
-        const shaRes = await fetch(url, { headers, cache: "no-store" });
-        let sha: string | undefined;
-        if (shaRes.ok) {
-          const body = await shaRes.json() as { sha: string };
-          sha = body.sha;
-        }
-        
-        const contentB64 = Buffer.from(JSON.stringify(data, null, 2)).toString("base64");
-        const putRes = await fetch(url, {
-          method: "PUT",
-          headers,
-          body: JSON.stringify({
-            message: `chore: update ${name} via admin dashboard`,
-            content: contentB64,
-            sha,
-            branch: GH_BRANCH,
-          }),
-        });
-        
-        if (!putRes.ok) {
-          const errBody = await putRes.json().catch(() => ({}));
-          console.error(`[remote-storage] GitHub PUT failed for ${name}:`, putRes.status, errBody);
-        }
-      } catch (e) {
-        console.error(`[remote-storage] GitHub write error for ${name}:`, e);
+    try {
+      const shaRes = await fetch(url, { headers, cache: "no-store" });
+      let sha: string | undefined;
+      if (shaRes.ok) {
+        const body = await shaRes.json() as { sha: string };
+        sha = body.sha;
       }
-    })();
+      
+      const contentB64 = Buffer.from(JSON.stringify(data, null, 2)).toString("base64");
+      const putRes = await fetch(url, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          message: `chore: update ${name} via admin dashboard`,
+          content: contentB64,
+          sha,
+          branch: GH_BRANCH,
+        }),
+      });
+      
+      if (!putRes.ok) {
+        const errBody = await putRes.json().catch(() => ({}));
+        throw new Error(`GitHub PUT failed for ${name} (${putRes.status}): ${JSON.stringify(errBody)}`);
+      }
+    } catch (e: any) {
+      console.error(`[remote-storage] GitHub write error for ${name}:`, e);
+      throw e;
+    }
   }
 }
