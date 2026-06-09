@@ -89,10 +89,12 @@ export async function saveJamaatTimes(data: JamaatTimes): Promise<void> {
   if (!isValid(data)) throw new Error("Invalid jamaat payload");
   data.updatedAt = new Date().toISOString();
 
+  let redisSuccess = false;
   const redis = getRedis();
   if (redis) {
     try {
       await redis.set(REDIS_KEY, data);
+      redisSuccess = true;
     } catch (e) {
       console.error("Redis write error:", e);
     }
@@ -106,6 +108,9 @@ export async function saveJamaatTimes(data: JamaatTimes): Promise<void> {
       [JSON.stringify(data)]
     );
   } catch (e) {
-    if (!hasRedis) console.error("DB write error:", e);
+    console.error("DB write error:", e);
+    if (!redisSuccess) {
+      throw e;
+    }
   }
 }
