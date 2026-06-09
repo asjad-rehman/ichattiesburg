@@ -38,7 +38,14 @@ CREATE TABLE events (
   created_by UUID REFERENCES admin_users(id)
 );
 
--- Prayer times overrides (fallback if GitHub fetch fails)
+-- Jamaat (congregation) times — singleton row, admin-managed
+CREATE TABLE jamaat_times (
+  id INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
+  data JSONB NOT NULL DEFAULT '{"fajr":"05:30","dhuhr":"12:35","asr":"16:15","maghrib":"17:55","isha":"19:30","jummah":[{"khutbah":"12:45","salah":"13:15"},{"khutbah":"13:15","salah":"13:45"}]}',
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Legacy prayer times table (kept for historical reference)
 CREATE TABLE prayer_times (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   effective_date DATE NOT NULL,

@@ -10,6 +10,6 @@ export const metadata: Metadata = {
 export const revalidate = 3600;
 
 export default async function PrayerTimesPage() {
-  const { prayerTimes, jumuah } = await fetchPrayerTimes();
-  return <PrayerTimesClient prayerTimes={prayerTimes} jumuah={jumuah} />;
+  const { prayerTimes, jamaatTimes, jumuah } = await fetchPrayerTimes();
+  return <PrayerTimesClient prayerTimes={prayerTimes} jamaatTimes={jamaatTimes} jumuah={jumuah} />;
 }
