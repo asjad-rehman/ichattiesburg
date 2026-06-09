@@ -7,7 +7,12 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatTime(time: string): string {
   if (!time) return "";
-  const [hours, minutes] = time.split(":").map(Number);
+  if (time.includes("AM") || time.includes("PM")) return time;
+  if (!time.includes(":")) return time;
+  const parts = time.split(":");
+  const hours = Number(parts[0]);
+  const minutes = Number(parts[1]);
+  if (isNaN(hours) || isNaN(minutes)) return time;
   const period = hours >= 12 ? "PM" : "AM";
   const h = hours % 12 || 12;
   return `${h}:${minutes.toString().padStart(2, "0")} ${period}`;
