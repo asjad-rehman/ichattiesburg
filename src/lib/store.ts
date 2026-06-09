@@ -25,25 +25,11 @@ export interface BoardMember {
   role: string;
 }
 
-export interface PrayerOverrides {
-  fajr?: string;
-  sunrise?: string;
-  dhuhr?: string;
-  asr?: string;
-  maghrib?: string;
-  isha?: string;
-  jumuah_khutbah?: string;
-  jumuah_salah?: string;
-  jumuah_speaker?: string;
-  jumuah_topic?: string;
-}
-
 // Global in-memory store
 export const memoryStore = {
   events: [] as EventItem[],
   announcements: [] as Announcement[],
   board: [] as BoardMember[],
-  prayerOverrides: {} as PrayerOverrides,
 };
 
 // Seed some initial data so it looks populated on cold start

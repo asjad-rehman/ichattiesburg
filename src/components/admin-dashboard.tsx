@@ -404,47 +404,32 @@ function EventsTab() {
   );
 }
 
+type JummahSlot = { khutbah: string; salah: string };
+
 function PrayerTimesTab() {
-  const [times, setTimes] = useState({ fajr: "", sunrise: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
-  const [jumuah, setJumuah] = useState({ khutbah: "", salah: "", speaker: "", topic: "" });
+  const PRAYER_KEYS = ["fajr", "dhuhr", "asr", "maghrib", "isha"] as const;
+  const [times, setTimes] = useState<Record<typeof PRAYER_KEYS[number], string>>({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
+  const [jummah, setJummah] = useState<JummahSlot[]>([{ khutbah: "", salah: "" }]);
   const [saved, setSaved] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/prayer-times")
+    fetch("/api/jamaat")
       .then(r => r.json())
       .then(d => {
-        if (d.overrides) {
-          const overrides = d.overrides;
-          setTimes({
-            fajr: overrides.fajr || "",
-            sunrise: overrides.sunrise || "",
-            dhuhr: overrides.dhuhr || "",
-            asr: overrides.asr || "",
-            maghrib: overrides.maghrib || "",
-            isha: overrides.isha || "",
-          });
-          setJumuah({
-            khutbah: overrides.jumuah_khutbah || "",
-            salah: overrides.jumuah_salah || "",
-            speaker: overrides.jumuah_speaker || "",
-            topic: overrides.jumuah_topic || "",
-          });
+        if (d.data) {
+          const data = d.data;
+          setTimes({ fajr: data.fajr || "", dhuhr: data.dhuhr || "", asr: data.asr || "", maghrib: data.maghrib || "", isha: data.isha || "" });
+          if (Array.isArray(data.jummah) && data.jummah.length) setJummah(data.jummah);
         }
       });
   }, []);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/admin/prayer-times", {
+    const res = await fetch("/api/jamaat/update", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        ...times, 
-        jumuah_khutbah: jumuah.khutbah,
-        jumuah_salah: jumuah.salah,
-        jumuah_speaker: jumuah.speaker,
-        jumuah_topic: jumuah.topic
-      }),
+      body: JSON.stringify({ data: { ...times, jummah } }),
     });
     if (res.ok) {
       setSaved(true);
@@ -452,21 +437,27 @@ function PrayerTimesTab() {
     }
   };
 
+  const updateSlot = (i: number, field: keyof JummahSlot, value: string) => {
+    const next = [...jummah];
+    next[i] = { ...next[i], [field]: value };
+    setJummah(next);
+  };
+
   return (
     <div>
       <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
         <Clock className="h-5 w-5" style={{ color: ICH.primary }} />
-        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Prayer Times Override</h2>
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Jamaat Times</h2>
       </div>
       <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 20 }}>
-        Override prayer times if the automatic fetch fails. Leave blank to use fetched times.
+        Set congregation (jamaat) times. Adhan times are calculated automatically from the sun&apos;s position.
       </p>
 
       <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 30 }}>
         <div>
-          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary, marginBottom: 16 }}>Daily Prayers</h3>
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary, marginBottom: 16 }}>Daily Jamaat Times</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 16 }}>
-            {(["fajr", "sunrise", "dhuhr", "asr", "maghrib", "isha"] as const).map((p) => (
+            {PRAYER_KEYS.map((p) => (
               <div key={p}>
                 <label style={{ ...labelStyle, textTransform: "capitalize" }}>{p}</label>
                 <input type="time" value={times[p]} onChange={(e) => setTimes({ ...times, [p]: e.target.value })} style={inputStyle} />
@@ -476,24 +467,33 @@ function PrayerTimesTab() {
         </div>
 
         <div style={{ borderTop: `1px solid ${ICH.border}`, paddingTop: 20 }}>
-          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary, marginBottom: 16 }}>Jumuah Schedule</h3>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: 16 }}>
-            <div>
-              <label style={labelStyle}>Khutbah Time</label>
-              <input type="time" value={jumuah.khutbah} onChange={(e) => setJumuah({ ...jumuah, khutbah: e.target.value })} style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Salah Time</label>
-              <input type="time" value={jumuah.salah} onChange={(e) => setJumuah({ ...jumuah, salah: e.target.value })} style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Speaker</label>
-              <input type="text" value={jumuah.speaker} onChange={(e) => setJumuah({ ...jumuah, speaker: e.target.value })} placeholder="Imam name" style={inputStyle} />
-            </div>
-            <div>
-              <label style={labelStyle}>Topic</label>
-              <input type="text" value={jumuah.topic} onChange={(e) => setJumuah({ ...jumuah, topic: e.target.value })} placeholder="Khutbah topic" style={inputStyle} />
-            </div>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+            <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary }}>Jumuah Slots</h3>
+            <button type="button" onClick={() => setJummah([...jummah, { khutbah: "", salah: "" }])} style={{ fontSize: 12, padding: "6px 14px", borderRadius: 4, border: `1px solid ${ICH.border}`, background: "#fff", cursor: "pointer", color: ICH.primary, fontFamily: "Inter,sans-serif", fontWeight: 600 }}>
+              + Add Slot
+            </button>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {jummah.map((slot, i) => (
+              <div key={i} style={{ background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6, padding: "20px 24px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+                  <span style={{ fontSize: 12, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif" }}>Jummah {i + 1}</span>
+                  {jummah.length > 1 && (
+                    <button type="button" onClick={() => setJummah(jummah.filter((_, j) => j !== i))} style={{ fontSize: 11, color: "#e53935", background: "none", border: "none", cursor: "pointer", fontFamily: "Inter,sans-serif" }}>Remove</button>
+                  )}
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+                  <div>
+                    <label style={labelStyle}>Khutbah</label>
+                    <input type="time" value={slot.khutbah} onChange={(e) => updateSlot(i, "khutbah", e.target.value)} style={inputStyle} />
+                  </div>
+                  <div>
+                    <label style={labelStyle}>Salah</label>
+                    <input type="time" value={slot.salah} onChange={(e) => updateSlot(i, "salah", e.target.value)} style={inputStyle} />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import { memoryStore } from "@/lib/store";
+import { getJamaatTimes, saveJamaatTimes } from "@/lib/jamaat";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ overrides: memoryStore.prayerOverrides });
+  const data = await getJamaatTimes();
+  return NextResponse.json({ data });
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    memoryStore.prayerOverrides = {
-      ...memoryStore.prayerOverrides,
-      ...data,
-    };
-    return NextResponse.json({ success: true, overrides: memoryStore.prayerOverrides });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update prayer times" }, { status: 500 });
+    const body = await req.json();
+    await saveJamaatTimes(body);
+    return NextResponse.json({ ok: true });
+  } catch {
+    return NextResponse.json({ error: "Failed to update" }, { status: 500 });
   }
 }
