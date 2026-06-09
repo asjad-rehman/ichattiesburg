@@ -411,6 +411,7 @@ function PrayerTimesTab() {
   const [times, setTimes] = useState<Record<typeof PRAYER_KEYS[number], string>>({ fajr: "", dhuhr: "", asr: "", maghrib: "", isha: "" });
   const [jummah, setJummah] = useState<JummahSlot[]>([{ khutbah: "", salah: "" }]);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   useEffect(() => {
     fetch("/api/jamaat")
@@ -426,14 +427,22 @@ function PrayerTimesTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
-    const res = await fetch("/api/jamaat/update", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ data: { ...times, jummah } }),
-    });
-    if (res.ok) {
-      setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+    setSaveError("");
+    try {
+      const res = await fetch("/api/jamaat/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ data: { ...times, jummah } }),
+      });
+      const json = await res.json();
+      if (res.ok && json.ok) {
+        setSaved(true);
+        setTimeout(() => setSaved(false), 3000);
+      } else {
+        setSaveError(json.error || `Server error (${res.status})`);
+      }
+    } catch (err: unknown) {
+      setSaveError(err instanceof Error ? err.message : "Network error");
     }
   };
 
@@ -497,9 +506,21 @@ function PrayerTimesTab() {
           </div>
         </div>
 
-        <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
-          {saved ? "Saved!" : "Save Times"}
-        </Btn>
+        <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+          <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
+            {saved ? "✓ Saved!" : "Save Times"}
+          </Btn>
+          {saved && (
+            <span style={{ fontSize: 13, color: "#2e7d32", fontFamily: "Inter,sans-serif" }}>
+              Times updated — changes live on the site immediately.
+            </span>
+          )}
+          {saveError && (
+            <span style={{ fontSize: 13, color: "#c62828", fontFamily: "Inter,sans-serif", maxWidth: 400 }}>
+              ⚠ {saveError}
+            </span>
+          )}
+        </div>
       </form>
     </div>
   );

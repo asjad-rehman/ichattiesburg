@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { ICH, Btn, GoldLabel, SectionHead, ScrollReveal } from "./ui-primitives";
-import { PrayerTimes, JumuahSchedule } from "@/lib/prayer-times";
+import { PrayerTimes } from "@/lib/prayer-times";
 import { JamaatTimes } from "@/lib/jamaat";
 import { fmt12From24 } from "@/lib/time";
 
@@ -174,7 +174,6 @@ function usePrayerCountdown(prayers: PrayerData[]) {
 interface HomeClientProps {
   prayerTimes: PrayerTimes;
   jamaatTimes: JamaatTimes;
-  jumuah: JumuahSchedule;
 }
 
 // Parse a 24h "HH:MM" string → { h, m }
@@ -184,7 +183,7 @@ function parse24(timeStr: string) {
   return { h: isNaN(h) ? 0 : h, m: isNaN(m) ? 0 : m };
 }
 
-export default function HomeClient({ prayerTimes, jamaatTimes, jumuah }: HomeClientProps) {
+export default function HomeClient({ prayerTimes, jamaatTimes }: HomeClientProps) {
   // prayerTimes are already formatted 12h strings (from server)
   // jamaatTimes are 24h "HH:MM" strings from storage
   // For countdown we need numeric h/m from the ADHAN times (prayerTimes)
