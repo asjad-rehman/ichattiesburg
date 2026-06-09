@@ -40,17 +40,23 @@ const DEFAULTS: JamaatTimes = {
   ],
 };
 
-// ── In-process cache ──────────────────────────────────────────────────────────
+// ── In-process TTL cache ──────────────────────────────────────────────────────
 let _mem: JamaatTimes | null = null;
+let _memExpiry = 0;
 
 // ── Public API ────────────────────────────────────────────────────────────────
-export async function getJamaatTimes(): Promise<JamaatTimes> {
-  // 1. In-process cache (fastest path)
-  if (_mem && isValidJamaatTimes(_mem)) return { ..._mem };
+export async function getJamaatTimes(bypassCache = false): Promise<JamaatTimes> {
+  const now = Date.now();
+  
+  // 1. In-process cache check (only if not bypassed and within TTL)
+  if (!bypassCache && _mem && isValidJamaatTimes(_mem) && now < _memExpiry) {
+    return { ..._mem };
+  }
 
   // 2. Fetch from remote/fallback storage
   const times = await remoteRead<JamaatTimes>("jamaat", DEFAULTS);
   _mem = times;
+  _memExpiry = now + 10000; // Cache for 10 seconds
   return { ..._mem };
 }
 
@@ -58,8 +64,9 @@ export async function saveJamaatTimes(data: JamaatTimes): Promise<void> {
   if (!isValidJamaatTimes(data)) throw new Error("Invalid jamaat payload");
   const payload: JamaatTimes = { ...data, updatedAt: new Date().toISOString() };
 
-  // 1. Update memory cache
+  // 1. Update memory cache and push expiry forward
   _mem = payload;
+  _memExpiry = Date.now() + 10000;
 
   // 2. Write to storage
   await remoteWrite<JamaatTimes>("jamaat", payload);

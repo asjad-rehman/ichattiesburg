@@ -4,7 +4,7 @@ import { getJamaatTimes, saveJamaatTimes } from "@/lib/jamaat";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  const data = await getJamaatTimes();
+  const data = await getJamaatTimes(true);
   return NextResponse.json({ data });
 }
 

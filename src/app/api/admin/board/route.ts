@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const board = await store.getBoard();
+    const board = await store.getBoard(true);
     return NextResponse.json({ board });
   } catch {
     return NextResponse.json({ error: "Failed to fetch board" }, { status: 500 });
