@@ -7,7 +7,7 @@ export const metadata: Metadata = {
   description: "Daily prayer times and Jumuah schedule for the Islamic Center of Hattiesburg.",
 };
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function PrayerTimesPage() {
   const { prayerTimes, jamaatTimes, jumuah } = await fetchPrayerTimes();

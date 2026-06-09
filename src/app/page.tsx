@@ -1,9 +1,9 @@
 import { fetchPrayerTimes } from "@/lib/prayer-times";
 import HomeClient from "@/components/home-client";
 
-export const revalidate = 3600;
+export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const { prayerTimes, jumuah } = await fetchPrayerTimes();
-  return <HomeClient prayerTimes={prayerTimes} jumuah={jumuah} />;
+  const { prayerTimes, jamaatTimes, jumuah } = await fetchPrayerTimes();
+  return <HomeClient prayerTimes={prayerTimes} jamaatTimes={jamaatTimes} jumuah={jumuah} />;
 }

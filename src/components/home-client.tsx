@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import { ICH, Btn, GoldLabel, SectionHead, ScrollReveal } from "./ui-primitives";
 import { PrayerTimes, JumuahSchedule } from "@/lib/prayer-times";
-import { formatTime } from "@/lib/utils";
+import { JamaatTimes } from "@/lib/jamaat";
+import { fmt12From24 } from "@/lib/time";
 
 // ── Mosque Hero SVG ───────────────────────────────────────────────────────────
 function MosqueHero() {
@@ -172,39 +173,68 @@ function usePrayerCountdown(prayers: PrayerData[]) {
 
 interface HomeClientProps {
   prayerTimes: PrayerTimes;
+  jamaatTimes: JamaatTimes;
   jumuah: JumuahSchedule;
 }
 
-export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
-  // Parse fetched times dynamically
-  const parse = (timeStr: string) => {
-    const [h, m] = timeStr.split(":").map(Number);
-    return { h: h || 0, m: m || 0 };
+// Parse a 24h "HH:MM" string → { h, m }
+function parse24(timeStr: string) {
+  if (!timeStr || !timeStr.includes(":")) return { h: 0, m: 0 };
+  const [h, m] = timeStr.split(":").map(Number);
+  return { h: isNaN(h) ? 0 : h, m: isNaN(m) ? 0 : m };
+}
+
+export default function HomeClient({ prayerTimes, jamaatTimes, jumuah }: HomeClientProps) {
+  // prayerTimes are already formatted 12h strings (from server)
+  // jamaatTimes are 24h "HH:MM" strings from storage
+  // For countdown we need numeric h/m from the ADHAN times (prayerTimes)
+  // prayerTimes come pre-formatted as "HH:MM AM/PM" – parse them back to 24h for countdown
+  const parseDisplay = (s: string) => {
+    const clean = s.replace(/\s?(AM|PM)/i, "").trim();
+    const [h, m] = clean.split(":").map(Number);
+    const isPM = /PM/i.test(s);
+    const isAM = /AM/i.test(s);
+    let hour = h || 0;
+    if (isPM && hour < 12) hour += 12;
+    if (isAM && hour === 12) hour = 0;
+    return { h: hour, m: m || 0 };
   };
 
-  const f = parse(prayerTimes.fajr);
-  const s = parse(prayerTimes.sunrise);
-  const d = parse(prayerTimes.dhuhr);
-  const a = parse(prayerTimes.asr);
-  const m = parse(prayerTimes.maghrib);
-  const i = parse(prayerTimes.isha);
+  const f = parseDisplay(prayerTimes.fajr);
+  const s = parseDisplay(prayerTimes.sunrise);
+  const d = parseDisplay(prayerTimes.dhuhr);
+  const a = parseDisplay(prayerTimes.asr);
+  const mg = parseDisplay(prayerTimes.maghrib);
+  const i = parseDisplay(prayerTimes.isha);
 
   const prayersAll: PrayerData[] = React.useMemo(() => [
-    { name: "Fajr",    key: "fajr",    h: f.h, m: f.m, display: formatTime(prayerTimes.fajr) },
-    { name: "Sunrise", key: "sunrise", h: s.h, m: s.m, display: formatTime(prayerTimes.sunrise) },
-    { name: "Dhuhr",   key: "dhuhr",   h: d.h, m: d.m, display: formatTime(prayerTimes.dhuhr) },
-    { name: "Asr",     key: "asr",     h: a.h, m: a.m, display: formatTime(prayerTimes.asr) },
-    { name: "Maghrib", key: "maghrib", h: m.h, m: m.m, display: "After Adhan" },
-    { name: "Isha",    key: "isha",    h: i.h, m: i.m, display: formatTime(prayerTimes.isha) },
+    { name: "Fajr",    key: "fajr",    h: f.h,  m: f.m,  display: prayerTimes.fajr },
+    { name: "Sunrise", key: "sunrise", h: s.h,  m: s.m,  display: prayerTimes.sunrise },
+    { name: "Dhuhr",   key: "dhuhr",   h: d.h,  m: d.m,  display: prayerTimes.dhuhr },
+    { name: "Asr",     key: "asr",     h: a.h,  m: a.m,  display: prayerTimes.asr },
+    { name: "Maghrib", key: "maghrib", h: mg.h, m: mg.m, display: prayerTimes.maghrib },
+    { name: "Isha",    key: "isha",    h: i.h,  m: i.m,  display: prayerTimes.isha },
   ], [prayerTimes]);
+
+  // Jamaat (Iqama) times formatted to 12h
+  const jamaatDisplay: Record<string, string> = React.useMemo(() => ({
+    fajr:    fmt12From24(jamaatTimes.fajr),
+    dhuhr:   fmt12From24(jamaatTimes.dhuhr),
+    asr:     fmt12From24(jamaatTimes.asr),
+    maghrib: "After Adhan",
+    isha:    fmt12From24(jamaatTimes.isha),
+  }), [jamaatTimes]);
 
   const prayers5 = prayersAll.filter(p => p.key !== "sunrise");
   const { countdown, nextName, nextIdx, curIdx } = usePrayerCountdown(prayersAll);
 
-  // Formatted Jumuah schedule
-  const jumuahItems = [
-    { label: "Jumuah 1", time: formatTime(jumuah.khutbah) || "1:00 PM" },
-    { label: "Jumuah 2", time: formatTime(jumuah.salah) || "1:30 PM" },
+  // Formatted Jumuah schedule – from jamaatTimes
+  const jumuahItems = jamaatTimes.jummah.map((slot, idx) => ({
+    label: idx === 0 ? "Jumuah 1" : "Jumuah 2",
+    time: `${fmt12From24(slot.khutbah)} / ${fmt12From24(slot.salah)}`,
+  }));
+  const jumuahDisplay = [
+    ...jumuahItems,
     { label: "Location", time: "211 N 25th Ave" },
   ];
 
@@ -272,6 +302,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               const realIdx = prayers5Idxs[i];
               const isCur = realIdx === curIdx;
               const isNext = realIdx === nextIdx;
+              const iqama = jamaatDisplay[p.key];
               return (
                 <div key={p.key} style={{
                   textAlign: "center", padding: "12px 8px", borderRadius: 4,
@@ -281,8 +312,14 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
                 }}>
                   {isCur && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: ICH.primaryDark, color: ICH.accent, fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, border: `1px solid ${ICH.accent}`, fontFamily: "Inter,sans-serif", letterSpacing: ".06em" }}>NOW</div>}
                   {isNext && !isCur && <div style={{ position: "absolute", top: -9, left: "50%", transform: "translateX(-50%)", background: ICH.primaryDark, color: "rgba(255,255,255,.7)", fontSize: 9, fontWeight: 700, padding: "2px 7px", borderRadius: 10, border: "1px solid rgba(255,255,255,.2)", fontFamily: "Inter,sans-serif" }}>NEXT</div>}
-                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: isCur ? ICH.primaryDark : "rgba(255,255,255,.5)", marginBottom: 5, fontFamily: "Inter,sans-serif" }}>{p.name}</div>
-                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: p.display === "After Adhan" ? 13 : 20, fontWeight: 600, color: isCur ? ICH.primaryDark : "#fff" }}>{p.display}</div>
+                  <div style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".08em", textTransform: "uppercase", color: isCur ? ICH.primaryDark : "rgba(255,255,255,.5)", marginBottom: 3, fontFamily: "Inter,sans-serif" }}>{p.name}</div>
+                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 17, fontWeight: 600, color: isCur ? ICH.primaryDark : "#fff" }}>{p.display}</div>
+                  {iqama && (
+                    <div style={{ marginTop: 4, paddingTop: 4, borderTop: `1px solid ${isCur ? "rgba(0,0,0,.15)" : "rgba(255,255,255,.12)"}` }}>
+                      <div style={{ fontSize: 8, fontWeight: 700, letterSpacing: ".07em", textTransform: "uppercase", color: isCur ? ICH.primaryDark : "rgba(255,255,255,.45)", fontFamily: "Inter,sans-serif", marginBottom: 1 }}>Iqama</div>
+                      <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: iqama === "After Adhan" ? 10 : 14, fontWeight: 600, color: isCur ? ICH.primaryDark : ICH.accent }}>{iqama}</div>
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -337,7 +374,7 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: ICH.accent, marginBottom: 6, fontFamily: "Inter,sans-serif" }}>Every Friday</div>
               <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 34, fontWeight: 600, color: "#fff", marginBottom: 24 }}>Jumuah Prayer</h2>
               <div style={{ borderTop: `1px solid rgba(255,255,255,.12)`, marginBottom: 16 }} />
-              {jumuahItems.map(({ label, time }) => (
+              {jumuahDisplay.map(({ label, time }) => (
                 <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,.1)" }}>
                   <span style={{ fontSize: 13, color: "rgba(255,255,255,.65)" }}>{label}</span>
                   <span style={{ fontSize: 14, fontWeight: 500, color: "#fff" }}>{time}</span>
@@ -413,9 +450,10 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 24px" }}>
         <SectionHead label="Prayer Times" title="Daily Prayer Schedule" sub="Hattiesburg, Mississippi — times updated regularly" center />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12 }}>
-          {prayersAll.map((p, i) => {
-            const isCur = i === curIdx;
-            const isNext = i === nextIdx;
+          {prayersAll.map((p, idx) => {
+            const isCur = idx === curIdx;
+            const isNext = idx === nextIdx;
+            const iqama = jamaatDisplay[p.key];
             return (
               <div key={p.key} style={{
                 textAlign: "center", padding: "24px 12px", borderRadius: 6,
@@ -427,8 +465,17 @@ export default function HomeClient({ prayerTimes, jumuah }: HomeClientProps) {
               }}>
                 {isCur && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: ICH.accent, color: "#fff", fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 10, fontFamily: "Inter,sans-serif", letterSpacing: ".06em" }}>NOW</div>}
                 {isNext && !isCur && <div style={{ position: "absolute", top: -10, left: "50%", transform: "translateX(-50%)", background: ICH.bgCard2, color: ICH.primary, fontSize: 9, fontWeight: 700, padding: "2px 8px", borderRadius: 10, border: `1px solid ${ICH.primary}33`, fontFamily: "Inter,sans-serif" }}>NEXT</div>}
-                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.7)" : ICH.textMuted, marginBottom: 8, fontFamily: "Inter,sans-serif" }}>{p.name}</div>
-                <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: p.display === "After Adhan" ? 15 : 24, fontWeight: 600, color: isCur ? "#fff" : ICH.text }}>{p.display}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.7)" : ICH.textMuted, marginBottom: 6, fontFamily: "Inter,sans-serif" }}>{p.name}</div>
+                <div style={{ marginBottom: 2 }}>
+                  <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: ".07em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.5)" : ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 1 }}>Adhan</div>
+                  <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600, color: isCur ? "#fff" : ICH.text }}>{p.display}</div>
+                </div>
+                {iqama && (
+                  <div style={{ marginTop: 6, paddingTop: 6, borderTop: `1px solid ${isCur ? "rgba(255,255,255,.2)" : ICH.border}` }}>
+                    <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: ".07em", textTransform: "uppercase", color: isCur ? "rgba(255,255,255,.5)" : ICH.textMuted, fontFamily: "Inter,sans-serif", marginBottom: 1 }}>Iqama</div>
+                    <div style={{ fontFamily: "Cormorant Garamond,serif", fontSize: iqama === "After Adhan" ? 13 : 19, fontWeight: 600, color: isCur ? ICH.accent : ICH.goldDark }}>{iqama}</div>
+                  </div>
+                )}
               </div>
             );
           })}
