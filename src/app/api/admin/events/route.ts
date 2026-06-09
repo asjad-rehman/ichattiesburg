@@ -1,36 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { memoryStore } from "@/lib/store";
-import { randomUUID } from "crypto";
+import { store } from "@/lib/store";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ events: memoryStore.events });
+  return NextResponse.json({ events: store.getEvents() });
 }
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
-    const newEvent = {
-      ...data,
-      id: randomUUID(),
-    };
-    memoryStore.events.push(newEvent);
-    // Sort events by date
-    memoryStore.events.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-    return NextResponse.json({ success: true, event: newEvent });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create event" }, { status: 500 });
+    if (!data.title || !data.date) return NextResponse.json({ error: "title and date required" }, { status: 400 });
+    const event = store.addEvent({ featured: false, category: "community", ...data });
+    return NextResponse.json({ success: true, event });
+  } catch {
+    return NextResponse.json({ error: "Failed to add event" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { id, ...updates } = await req.json();
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    const event = store.updateEvent(id, updates);
+    if (!event) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ success: true, event });
+  } catch {
+    return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    
-    memoryStore.events = memoryStore.events.filter(e => e.id !== id);
+    const id = new URL(req.url).searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    store.deleteEvent(id);
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete event" }, { status: 500 });
   }
 }

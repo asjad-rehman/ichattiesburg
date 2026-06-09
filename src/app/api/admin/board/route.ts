@@ -1,50 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { memoryStore } from "@/lib/store";
-import { randomUUID } from "crypto";
+import { store } from "@/lib/store";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ board: memoryStore.board });
-}
-
-export async function PUT(req: NextRequest) {
-  try {
-    const data = await req.json();
-    const { id, ...updates } = data;
-    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    
-    const index = memoryStore.board.findIndex((b: any) => b.id === id);
-    if (index === -1) return NextResponse.json({ error: "Not found" }, { status: 404 });
-
-    memoryStore.board[index] = { ...memoryStore.board[index], ...updates };
-    return NextResponse.json({ success: true, member: memoryStore.board[index] });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to update board member" }, { status: 500 });
-  }
+  return NextResponse.json({ board: store.getBoard() });
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const newMember = {
-      ...data,
-      id: randomUUID(),
-    };
-    memoryStore.board.push(newMember);
-    return NextResponse.json({ success: true, member: newMember });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create board member" }, { status: 500 });
+    const { name, role } = await req.json();
+    if (!name || !role) return NextResponse.json({ error: "name and role required" }, { status: 400 });
+    const member = store.addBoardMember({ name, role });
+    return NextResponse.json({ success: true, member });
+  } catch {
+    return NextResponse.json({ error: "Failed to add board member" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { id, ...updates } = await req.json();
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    const member = store.updateBoardMember(id, updates);
+    if (!member) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ success: true, member });
+  } catch {
+    return NextResponse.json({ error: "Failed to update board member" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    
-    memoryStore.board = memoryStore.board.filter(b => b.id !== id);
+    const id = new URL(req.url).searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    store.deleteBoardMember(id);
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete board member" }, { status: 500 });
   }
 }

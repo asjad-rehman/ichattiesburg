@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
-import { memoryStore } from "@/lib/store";
+import { store } from "@/lib/store";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ announcements: memoryStore.announcements });
+  return NextResponse.json({ announcements: store.getAnnouncements() });
 }

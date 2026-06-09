@@ -1,36 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
-import { memoryStore } from "@/lib/store";
-import { randomUUID } from "crypto";
+import { store } from "@/lib/store";
+
+export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json({ announcements: memoryStore.announcements });
+  return NextResponse.json({ announcements: store.getAnnouncements() });
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const data = await req.json();
-    const newAnnouncement = {
-      ...data,
-      id: randomUUID(),
-      created_at: new Date().toISOString(),
-    };
-    // Add to top of list
-    memoryStore.announcements.unshift(newAnnouncement);
-    return NextResponse.json({ success: true, announcement: newAnnouncement });
-  } catch (error) {
-    return NextResponse.json({ error: "Failed to create announcement" }, { status: 500 });
+    const { title, body, priority = "normal" } = await req.json();
+    if (!title || !body) return NextResponse.json({ error: "title and body required" }, { status: 400 });
+    const announcement = store.addAnnouncement({ title, body, priority });
+    return NextResponse.json({ success: true, announcement });
+  } catch {
+    return NextResponse.json({ error: "Failed to add announcement" }, { status: 500 });
+  }
+}
+
+export async function PUT(req: NextRequest) {
+  try {
+    const { id, ...updates } = await req.json();
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    const announcement = store.updateAnnouncement(id, updates);
+    if (!announcement) return NextResponse.json({ error: "Not found" }, { status: 404 });
+    return NextResponse.json({ success: true, announcement });
+  } catch {
+    return NextResponse.json({ error: "Failed to update announcement" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: NextRequest) {
   try {
-    const { searchParams } = new URL(req.url);
-    const id = searchParams.get("id");
-    if (!id) return NextResponse.json({ error: "ID required" }, { status: 400 });
-    
-    memoryStore.announcements = memoryStore.announcements.filter(a => a.id !== id);
+    const id = new URL(req.url).searchParams.get("id");
+    if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
+    store.deleteAnnouncement(id);
     return NextResponse.json({ success: true });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Failed to delete announcement" }, { status: 500 });
   }
 }
