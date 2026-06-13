@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users } from "lucide-react";
 import { AdminUser } from "@/lib/auth";
 import { ICH, Btn, Card } from "./ui-primitives";
+import { parseLocalDate } from "@/lib/utils";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
   const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board">("announcements");
@@ -269,9 +270,9 @@ function EventsTab() {
     if (res.ok) {
       const data = await res.json();
       if (isEdit) {
-        setEvents(prev => prev.map(ev => ev.id === editingId ? data.event : ev).sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+        setEvents(prev => prev.map(ev => ev.id === editingId ? data.event : ev).sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime()));
       } else {
-        setEvents(prev => [...prev, data.event].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()));
+        setEvents(prev => [...prev, data.event].sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime()));
       }
       setForm({ title: "", description: "", date: "", time: "", location: "", category: "community", recurring: false });
       setEditingId(null);

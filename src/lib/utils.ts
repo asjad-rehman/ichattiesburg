@@ -18,8 +18,16 @@ export function formatTime(time: string): string {
   return `${h}:${minutes.toString().padStart(2, "0")} ${period}`;
 }
 
+// Parses a "YYYY-MM-DD" date-only string as local time, avoiding the
+// UTC-midnight off-by-one-day shift that `new Date(dateStr)` causes.
+export function parseLocalDate(date: Date | string): Date {
+  if (typeof date !== "string") return date;
+  const [year, month, day] = date.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
 export function formatDate(date: Date | string): string {
-  const d = typeof date === "string" ? new Date(date) : date;
+  const d = parseLocalDate(date);
   return d.toLocaleDateString("en-US", {
     weekday: "long",
     year: "numeric",
