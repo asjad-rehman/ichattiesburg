@@ -1,5 +1,6 @@
 import { randomUUID } from "crypto";
 import { remoteRead, remoteWrite } from "./remote-storage";
+import { parseLocalDate } from "./utils";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 export interface EventItem {
@@ -104,7 +105,7 @@ export const store = {
     const current = await _events.get(true);
     const item: EventItem = { ...data, id: randomUUID() };
     const items = [...current, item].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+      (a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime()
     );
     await _events.save(items);
     return item;
@@ -113,7 +114,7 @@ export const store = {
     const current = await _events.get(true);
     const items = current
       .map(e => e.id === id ? { ...e, ...data } : e)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      .sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime());
     await _events.save(items);
     return items.find(e => e.id === id) ?? null;
   },

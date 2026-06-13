@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { ICH, Btn, GoldLabel, Tag, ScrollReveal } from "./ui-primitives";
+import { parseLocalDate } from "@/lib/utils";
 
 export interface EventItem {
   id: string;
@@ -27,7 +28,7 @@ const CAT_COLORS: Record<string, "green" | "yellow" | "blue" | "purple" | "orang
 };
 
 function fmtDate(dStr: string) {
-  const d = new Date(dStr);
+  const d = parseLocalDate(dStr);
   return d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" });
 }
 
