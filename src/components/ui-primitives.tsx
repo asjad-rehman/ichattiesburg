@@ -16,9 +16,10 @@ interface BtnProps {
   style?: React.CSSProperties;
   size?: 'sm' | 'md' | 'lg';
   type?: "submit" | "button" | "reset";
+  disabled?: boolean;
 }
 
-export function Btn({ children, variant = 'primary', onClick, href, style = {}, size = 'md', type = 'button' }: BtnProps) {
+export function Btn({ children, variant = 'primary', onClick, href, style = {}, size = 'md', type = 'button', disabled = false }: BtnProps) {
   const pad = size === 'sm' ? '7px 16px' : size === 'lg' ? '13px 30px' : '10px 22px';
   const fs  = size === 'sm' ? 13 : size === 'lg' ? 15 : 14;
   const base: React.CSSProperties = {
@@ -36,6 +37,8 @@ export function Btn({ children, variant = 'primary', onClick, href, style = {}, 
     transition: 'all .18s ease',
     letterSpacing: '.015em',
     whiteSpace: 'nowrap',
+    opacity: disabled ? 0.6 : 1,
+    pointerEvents: disabled ? 'none' : 'auto',
   };
   const variants = {
     primary:      { background: ICH.primary,     color: '#fff' },
@@ -73,7 +76,7 @@ export function Btn({ children, variant = 'primary', onClick, href, style = {}, 
   }
 
   return (
-    <button type={type} onClick={onClick} style={finalStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave}>
+    <button type={type} onClick={onClick} style={finalStyle} onMouseEnter={handleMouseEnter} onMouseLeave={handleMouseLeave} disabled={disabled}>
       {children}
     </button>
   );
