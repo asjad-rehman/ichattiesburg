@@ -652,41 +652,37 @@ function BoardTab() {
 }
 
 function ResourcesTab() {
-  const [resources, setResources] = useState<any>({ restaurants: null, meatSupply: null });
-  const [uploading, setUploading] = useState<string | null>(null);
+  const [resources, setResources] = useState<any>({ restaurants: "", meatSupply: "" });
+  const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/resources")
       .then(r => r.json())
-      .then(d => setResources(d.resources || { restaurants: null, meatSupply: null }));
+      .then(d => setResources(d.resources || { restaurants: "", meatSupply: "" }));
   }, []);
 
-  const handleUpload = async (type: "restaurants" | "meatSupply", file: File | null) => {
-    if (!file) return;
-    setUploading(type);
+  const handleSave = async (type: "restaurants" | "meatSupply") => {
+    setSaving(type);
     setMessage("");
-
-    const formData = new FormData();
-    formData.append("type", type);
-    formData.append("file", file);
 
     try {
       const res = await fetch("/api/admin/resources", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ [type]: resources[type] }),
       });
       const data = await res.json();
       if (res.ok) {
         setResources(data.resources);
-        setMessage(`${type === "restaurants" ? "Restaurants" : "Meat Supply"} file uploaded successfully!`);
+        setMessage(`${type === "restaurants" ? "Restaurants" : "Meat Supply"} updated successfully!`);
       } else {
         setMessage(`Error: ${data.error}`);
       }
     } catch (err: any) {
       setMessage(`Error: ${err.message}`);
     } finally {
-      setUploading(null);
+      setSaving(null);
       setTimeout(() => setMessage(""), 4000);
     }
   };
@@ -698,7 +694,7 @@ function ResourcesTab() {
         <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Halal Resources</h2>
       </div>
       <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 20 }}>
-        Upload PDF or Image files to share Halal Restaurants and Meat Supply lists with the community.
+        Manage text content for Halal Restaurants and Meat Supply lists.
       </p>
 
       {message && (
@@ -715,27 +711,26 @@ function ResourcesTab() {
             Halal Restaurants
           </h3>
           
-          {resources.restaurants && (
-            <div style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 10 }}>
-              Current file: <a href={resources.restaurants.url} target="_blank" rel="noreferrer" style={{ color: ICH.primary, textDecoration: "underline" }}>{resources.restaurants.filename}</a>
-            </div>
-          )}
-
           <div>
-            <label style={labelStyle}>Upload New File</label>
-            <input 
-              type="file" 
-              accept="image/*,application/pdf"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleUpload("restaurants", e.target.files[0]);
-                }
-              }}
-              style={{ ...inputStyle, padding: "8px" }}
-              disabled={uploading === "restaurants"}
+            <label style={labelStyle}>Content</label>
+            <textarea 
+              rows={8}
+              value={resources.restaurants || ""}
+              onChange={(e) => setResources({ ...resources, restaurants: e.target.value })}
+              style={{ ...inputStyle, resize: "vertical" }}
+              placeholder="List local restaurants here..."
+              disabled={saving === "restaurants"}
             />
           </div>
-          {uploading === "restaurants" && <span style={{ fontSize: 12, color: ICH.gold }}>Uploading...</span>}
+          
+          <Btn 
+            onClick={() => handleSave("restaurants")} 
+            variant="primary" 
+            style={{ width: "fit-content" }}
+            disabled={saving === "restaurants"}
+          >
+            {saving === "restaurants" ? "Saving..." : "Save Restaurants"}
+          </Btn>
         </div>
 
         {/* Meat Supply Form */}
@@ -744,27 +739,26 @@ function ResourcesTab() {
             Halal Meat Supply
           </h3>
           
-          {resources.meatSupply && (
-            <div style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 10 }}>
-              Current file: <a href={resources.meatSupply.url} target="_blank" rel="noreferrer" style={{ color: ICH.primary, textDecoration: "underline" }}>{resources.meatSupply.filename}</a>
-            </div>
-          )}
-
           <div>
-            <label style={labelStyle}>Upload New File</label>
-            <input 
-              type="file" 
-              accept="image/*,application/pdf"
-              onChange={(e) => {
-                if (e.target.files && e.target.files[0]) {
-                  handleUpload("meatSupply", e.target.files[0]);
-                }
-              }}
-              style={{ ...inputStyle, padding: "8px" }}
-              disabled={uploading === "meatSupply"}
+            <label style={labelStyle}>Content</label>
+            <textarea 
+              rows={8}
+              value={resources.meatSupply || ""}
+              onChange={(e) => setResources({ ...resources, meatSupply: e.target.value })}
+              style={{ ...inputStyle, resize: "vertical" }}
+              placeholder="List meat supply sources here..."
+              disabled={saving === "meatSupply"}
             />
           </div>
-          {uploading === "meatSupply" && <span style={{ fontSize: 12, color: ICH.gold }}>Uploading...</span>}
+          
+          <Btn 
+            onClick={() => handleSave("meatSupply")} 
+            variant="primary" 
+            style={{ width: "fit-content" }}
+            disabled={saving === "meatSupply"}
+          >
+            {saving === "meatSupply" ? "Saving..." : "Save Meat Supply"}
+          </Btn>
         </div>
 
       </div>

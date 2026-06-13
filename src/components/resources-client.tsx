@@ -69,6 +69,29 @@ export default function ResourcesClient() {
         <p style={{ fontSize: 13, color: ICH.textMuted, fontStyle: "italic" }}>"Read in the name of your Lord who created." — Quran 96:1</p>
       </div>
 
+      <div style={{ marginBottom: 44 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+          <span style={{ fontSize: 24 }}>🍽️</span>
+          <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 28, fontWeight: 600, color: ICH.text }}>Local Halal Sources</h2>
+        </div>
+        
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16 }}>
+          <Card hover>
+            <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: 13, fontWeight: 700, color: ICH.primary, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".05em" }}>Restaurants</h3>
+            <div style={{ fontSize: 14, color: ICH.textMuted, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+              {halalResources?.restaurants || "No list provided yet."}
+            </div>
+          </Card>
+
+          <Card hover>
+            <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: 13, fontWeight: 700, color: ICH.primary, marginBottom: 12, textTransform: "uppercase", letterSpacing: ".05em" }}>Meat Supply</h3>
+            <div style={{ fontSize: 14, color: ICH.textMuted, whiteSpace: "pre-wrap", lineHeight: 1.6 }}>
+              {halalResources?.meatSupply || "No list provided yet."}
+            </div>
+          </Card>
+        </div>
+      </div>
+
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 16, marginBottom: 36 }}>
         {RESOURCES.map((group) => (
           <Card key={group.category} hover>
@@ -94,51 +117,6 @@ export default function ResourcesClient() {
             </div>
           </Card>
         ))}
-
-        {/* Halal Resources Dynamic Card */}
-        <Card hover>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-            <span style={{ fontSize: 20 }}>🍽️</span>
-            <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: ICH.primary }}>Local Halal Sources</h3>
-          </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-            {/* Restaurants */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: ICH.text, marginBottom: 4, textTransform: "uppercase", letterSpacing: ".05em" }}>Restaurants</h4>
-              {halalResources?.restaurants ? (
-                <a
-                  href={halalResources.restaurants.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, color: ICH.primary, textDecoration: "underline", transition: "color .15s", lineHeight: 1.55 }}
-                >
-                  <span style={{ flexShrink: 0, marginTop: 1, color: ICH.gold, textDecoration: "none" }}>↓</span>
-                  {halalResources.restaurants.filename}
-                </a>
-              ) : (
-                <span style={{ fontSize: 13, color: ICH.textMuted }}>No list uploaded yet.</span>
-              )}
-            </div>
-
-            {/* Meat Supply */}
-            <div>
-              <h4 style={{ fontSize: 13, fontWeight: 700, color: ICH.text, marginBottom: 4, textTransform: "uppercase", letterSpacing: ".05em" }}>Meat Supply</h4>
-              {halalResources?.meatSupply ? (
-                <a
-                  href={halalResources.meatSupply.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, color: ICH.primary, textDecoration: "underline", transition: "color .15s", lineHeight: 1.55 }}
-                >
-                  <span style={{ flexShrink: 0, marginTop: 1, color: ICH.gold, textDecoration: "none" }}>↓</span>
-                  {halalResources.meatSupply.filename}
-                </a>
-              ) : (
-                <span style={{ fontSize: 13, color: ICH.textMuted }}>No list uploaded yet.</span>
-              )}
-            </div>
-          </div>
-        </Card>
       </div>
 
       <div style={{ padding: 24, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6 }}>

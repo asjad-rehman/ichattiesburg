@@ -32,8 +32,8 @@ export interface BoardMember {
 
 export interface HalalResourcesItem {
   id: "main";
-  restaurants: { filename: string; url: string } | null;
-  meatSupply: { filename: string; url: string } | null;
+  restaurants: string | null;
+  meatSupply: string | null;
 }
 
 
