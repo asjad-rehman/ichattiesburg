@@ -83,7 +83,7 @@ export async function fetchPrayerTimes(): Promise<MasjidTimes> {
   const j2 = jamaat.jummah[1];
   const jumuah: JumuahSchedule = {
     khutbah: j1.khutbah,
-    salah:   j2 ? j2.khutbah : j1.salah,
+    salah:   j2 ? j2.salah : j1.salah,
     speaker: "Imam",
     topic:   "TBA",
   };

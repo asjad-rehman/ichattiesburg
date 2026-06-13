@@ -4,7 +4,8 @@ import React, { useState, useEffect } from "react";
 import { ICH, Btn, GoldLabel, ScrollReveal } from "./ui-primitives";
 import { PrayerTimes, JumuahSchedule } from "@/lib/prayer-times";
 import { JamaatTimes } from "@/lib/jamaat";
-import { fmt12From24 } from "@/lib/time";
+import { fmt12From24, zonedParts } from "@/lib/time";
+import { masjid } from "@/config/masjid";
 
 interface PrayerData {
   name: string;
@@ -30,7 +31,8 @@ function usePrayerCountdown(prayers: { name: string; display: string }[]) {
   useEffect(() => {
     const tick = () => {
       const now = new Date();
-      const nowMs = (now.getHours() * 3600 + now.getMinutes() * 60 + now.getSeconds()) * 1000;
+      const zp = zonedParts(now, masjid.timezone);
+      const nowMs = (zp.hour * 3600 + zp.minute * 60 + zp.second) * 1000;
 
       let curIdx = -1;
       for (let i = 0; i < prayers.length; i++) {
@@ -41,12 +43,11 @@ function usePrayerCountdown(prayers: { name: string; display: string }[]) {
       const nextIdx = curIdx === prayers.length - 1 ? 0 : curIdx + 1;
       const next = prayers[nextIdx];
       const { h, m } = parseHM(next.display);
+      const targetMs = (h * 3600 + m * 60) * 1000;
 
-      let target = new Date();
-      target.setHours(h, m, 0, 0);
-      if (target <= now) target.setDate(target.getDate() + 1);
+      let diff = targetMs - nowMs;
+      if (diff <= 0) diff += 24 * 3600 * 1000;
 
-      const diff = target.getTime() - now.getTime();
       const hh = Math.floor(diff / 3600000);
       const mm = Math.floor((diff % 3600000) / 60000);
       const ss = Math.floor((diff % 60000) / 1000);
