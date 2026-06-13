@@ -171,3 +171,70 @@ export async function remoteWrite<T>(name: string, data: T): Promise<void> {
     }
   }
 }
+
+/**
+ * Writes binary/base64 file to:
+ * 1. Local /tmp/<name>
+ * 2. GitHub API (public/uploads/<name>)
+ */
+export async function remoteWriteFile(name: string, contentB64: string): Promise<void> {
+  const tmpPath = `/tmp/ichattiesburg-${name.replace(/\//g, "-")}`;
+
+  // Try /tmp write
+  try {
+    writeFileSync(tmpPath, Buffer.from(contentB64, "base64"));
+  } catch (e) {
+    console.warn(`[remote-storage] /tmp write failed for ${name}:`, e);
+  }
+
+  // Try local public folder write (for dev environments)
+  try {
+    const publicPath = join(process.cwd(), "public", "uploads", name);
+    // ensure dir exists
+    const dir = join(process.cwd(), "public", "uploads");
+    if (!existsSync(dir)) {
+      import("fs").then(fs => fs.mkdirSync(dir, { recursive: true }));
+    }
+    writeFileSync(publicPath, Buffer.from(contentB64, "base64"));
+  } catch (e) {}
+
+  const token = getGitHubToken();
+  if (token) {
+    const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/public/uploads/${name}`;
+    const headers = {
+      Authorization: `Bearer ${token}`,
+      Accept: "application/vnd.github+json",
+      "Content-Type": "application/json",
+      "X-GitHub-Api-Version": "2022-11-28",
+    };
+
+    try {
+      const shaRes = await fetch(url, { headers, cache: "no-store" });
+      let sha: string | undefined;
+      if (shaRes.ok) {
+        const body = await shaRes.json() as { sha: string };
+        sha = body.sha;
+      }
+      
+      const putRes = await fetch(url, {
+        method: "PUT",
+        headers,
+        body: JSON.stringify({
+          message: `chore: upload ${name} via admin dashboard`,
+          content: contentB64,
+          sha,
+          branch: GH_BRANCH,
+        }),
+      });
+      
+      if (!putRes.ok) {
+        const errBody = await putRes.json().catch(() => ({}));
+        throw new Error(`GitHub PUT failed for ${name} (${putRes.status}): ${JSON.stringify(errBody)}`);
+      }
+    } catch (e: any) {
+      console.error(`[remote-storage] GitHub write error for file ${name}:`, e);
+      throw e;
+    }
+  }
+}
+

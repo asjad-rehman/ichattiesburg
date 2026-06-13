@@ -30,6 +30,13 @@ export interface BoardMember {
   role: string;
 }
 
+export interface HalalResourcesItem {
+  id: "main";
+  restaurants: { filename: string; url: string } | null;
+  meatSupply: { filename: string; url: string } | null;
+}
+
+
 // ── Collection factory ────────────────────────────────────────────────────────
 function makeCollection<T extends { id: string }>(name: string, seed: T[]) {
   let _mem: T[] | null = null;
@@ -57,6 +64,7 @@ function makeCollection<T extends { id: string }>(name: string, seed: T[]) {
 const _board         = makeCollection<BoardMember>("board", []);
 const _announcements = makeCollection<Announcement>("announcements", []);
 const _events        = makeCollection<EventItem>("events", []);
+const _halal         = makeCollection<HalalResourcesItem>("halal_resources", [{ id: "main", restaurants: null, meatSupply: null }]);
 
 // ── Public store API ──────────────────────────────────────────────────────────
 export const store = {
@@ -122,10 +130,19 @@ export const store = {
     const current = await _events.get(true);
     await _events.save(current.filter(e => e.id !== id));
   },
+  // Halal Resources
+  getHalalResources: async (bypassCache = false) => (await _halal.get(bypassCache))[0],
+  updateHalalResources: async (data: Partial<Omit<HalalResourcesItem, "id">>) => {
+    const current = (await _halal.get(true))[0];
+    const updated = { ...current, ...data };
+    await _halal.save([updated]);
+    return updated;
+  },
 };
 
 export const memoryStore = {
   get board()         { return store.getBoard(); },
   get announcements() { return store.getAnnouncements(); },
   get events()        { return store.getEvents(); },
+  get halalResources() { return store.getHalalResources(); },
 };

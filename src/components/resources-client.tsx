@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { ICH, Btn, GoldLabel, Card } from "./ui-primitives";
 
 const RESOURCES = [
@@ -43,6 +43,17 @@ const RESOURCES = [
 ];
 
 export default function ResourcesClient() {
+  const [halalResources, setHalalResources] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/resources")
+      .then(r => r.json())
+      .then(d => {
+        if (d.resources) setHalalResources(d.resources);
+      })
+      .catch(console.error);
+  }, []);
+
   return (
     <div className="page-enter" style={{ maxWidth: 900, margin: "0 auto", padding: "52px 24px 80px" }}>
       <div style={{ marginBottom: 44 }}>
@@ -83,6 +94,51 @@ export default function ResourcesClient() {
             </div>
           </Card>
         ))}
+
+        {/* Halal Resources Dynamic Card */}
+        <Card hover>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+            <span style={{ fontSize: 20 }}>🍽️</span>
+            <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 20, fontWeight: 600, color: ICH.primary }}>Local Halal Sources</h3>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+            {/* Restaurants */}
+            <div>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: ICH.text, marginBottom: 4, textTransform: "uppercase", letterSpacing: ".05em" }}>Restaurants</h4>
+              {halalResources?.restaurants ? (
+                <a
+                  href={halalResources.restaurants.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, color: ICH.primary, textDecoration: "underline", transition: "color .15s", lineHeight: 1.55 }}
+                >
+                  <span style={{ flexShrink: 0, marginTop: 1, color: ICH.gold, textDecoration: "none" }}>↓</span>
+                  {halalResources.restaurants.filename}
+                </a>
+              ) : (
+                <span style={{ fontSize: 13, color: ICH.textMuted }}>No list uploaded yet.</span>
+              )}
+            </div>
+
+            {/* Meat Supply */}
+            <div>
+              <h4 style={{ fontSize: 13, fontWeight: 700, color: ICH.text, marginBottom: 4, textTransform: "uppercase", letterSpacing: ".05em" }}>Meat Supply</h4>
+              {halalResources?.meatSupply ? (
+                <a
+                  href={halalResources.meatSupply.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, color: ICH.primary, textDecoration: "underline", transition: "color .15s", lineHeight: 1.55 }}
+                >
+                  <span style={{ flexShrink: 0, marginTop: 1, color: ICH.gold, textDecoration: "none" }}>↓</span>
+                  {halalResources.meatSupply.filename}
+                </a>
+              ) : (
+                <span style={{ fontSize: 13, color: ICH.textMuted }}>No list uploaded yet.</span>
+              )}
+            </div>
+          </div>
+        </Card>
       </div>
 
       <div style={{ padding: 24, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6 }}>

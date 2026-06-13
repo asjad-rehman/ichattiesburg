@@ -7,14 +7,14 @@ import { ICH, Btn, Card } from "./ui-primitives";
 import { parseLocalDate } from "@/lib/utils";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
-  const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board">("announcements");
+  const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board" | "resources">("announcements");
 
   const logout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     window.location.href = "/admin/login";
   };
 
-  const tabButtonStyle = (tab: "announcements" | "events" | "prayer" | "board") => ({
+  const tabButtonStyle = (tab: "announcements" | "events" | "prayer" | "board" | "resources") => ({
     padding: "8px 20px",
     borderRadius: 4,
     fontSize: 13,
@@ -43,7 +43,7 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
 
       {/* Tabs Row */}
       <div style={{ display: "flex", gap: 8, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6, padding: 6, marginBottom: 36, width: "fit-content" }}>
-        {(["announcements", "events", "prayer", "board"] as const).map((tab) => (
+        {(["announcements", "events", "prayer", "board", "resources"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -59,6 +59,7 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
       {activeTab === "events" && <EventsTab />}
       {activeTab === "prayer" && <PrayerTimesTab />}
       {activeTab === "board" && <BoardTab />}
+      {activeTab === "resources" && <ResourcesTab />}
     </div>
   );
 }
@@ -645,6 +646,127 @@ function BoardTab() {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function ResourcesTab() {
+  const [resources, setResources] = useState<any>({ restaurants: null, meatSupply: null });
+  const [uploading, setUploading] = useState<string | null>(null);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    fetch("/api/admin/resources")
+      .then(r => r.json())
+      .then(d => setResources(d.resources || { restaurants: null, meatSupply: null }));
+  }, []);
+
+  const handleUpload = async (type: "restaurants" | "meatSupply", file: File | null) => {
+    if (!file) return;
+    setUploading(type);
+    setMessage("");
+
+    const formData = new FormData();
+    formData.append("type", type);
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/resources", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setResources(data.resources);
+        setMessage(`${type === "restaurants" ? "Restaurants" : "Meat Supply"} file uploaded successfully!`);
+      } else {
+        setMessage(`Error: ${data.error}`);
+      }
+    } catch (err: any) {
+      setMessage(`Error: ${err.message}`);
+    } finally {
+      setUploading(null);
+      setTimeout(() => setMessage(""), 4000);
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <span style={{ fontSize: 24 }}>🍽️</span>
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Halal Resources</h2>
+      </div>
+      <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 20 }}>
+        Upload PDF or Image files to share Halal Restaurants and Meat Supply lists with the community.
+      </p>
+
+      {message && (
+        <div style={{ marginBottom: 16, padding: "10px 14px", background: "#e8f5e9", color: "#2e7d32", borderRadius: 6, fontSize: 13, border: "1px solid #c8e6c9" }}>
+          {message}
+        </div>
+      )}
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+        
+        {/* Restaurants Form */}
+        <div style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20 }}>
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary }}>
+            Halal Restaurants
+          </h3>
+          
+          {resources.restaurants && (
+            <div style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 10 }}>
+              Current file: <a href={resources.restaurants.url} target="_blank" rel="noreferrer" style={{ color: ICH.primary, textDecoration: "underline" }}>{resources.restaurants.filename}</a>
+            </div>
+          )}
+
+          <div>
+            <label style={labelStyle}>Upload New File</label>
+            <input 
+              type="file" 
+              accept="image/*,application/pdf"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleUpload("restaurants", e.target.files[0]);
+                }
+              }}
+              style={{ ...inputStyle, padding: "8px" }}
+              disabled={uploading === "restaurants"}
+            />
+          </div>
+          {uploading === "restaurants" && <span style={{ fontSize: 12, color: ICH.gold }}>Uploading...</span>}
+        </div>
+
+        {/* Meat Supply Form */}
+        <div style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20 }}>
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.primary }}>
+            Halal Meat Supply
+          </h3>
+          
+          {resources.meatSupply && (
+            <div style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 10 }}>
+              Current file: <a href={resources.meatSupply.url} target="_blank" rel="noreferrer" style={{ color: ICH.primary, textDecoration: "underline" }}>{resources.meatSupply.filename}</a>
+            </div>
+          )}
+
+          <div>
+            <label style={labelStyle}>Upload New File</label>
+            <input 
+              type="file" 
+              accept="image/*,application/pdf"
+              onChange={(e) => {
+                if (e.target.files && e.target.files[0]) {
+                  handleUpload("meatSupply", e.target.files[0]);
+                }
+              }}
+              style={{ ...inputStyle, padding: "8px" }}
+              disabled={uploading === "meatSupply"}
+            />
+          </div>
+          {uploading === "meatSupply" && <span style={{ fontSize: 12, color: ICH.gold }}>Uploading...</span>}
+        </div>
+
       </div>
     </div>
   );
