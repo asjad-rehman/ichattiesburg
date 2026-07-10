@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { ICH, Btn, GoldLabel, SectionHead, ScrollReveal } from "./ui-primitives";
 import { PrayerTimes } from "@/lib/prayer-times";
 import { JamaatTimes } from "@/lib/jamaat";
+import { SiteSettings } from "@/lib/store";
 import { fmt12From24 } from "@/lib/time";
 
 // ── Mosque Hero SVG ───────────────────────────────────────────────────────────
@@ -174,6 +175,7 @@ function usePrayerCountdown(prayers: PrayerData[]) {
 interface HomeClientProps {
   prayerTimes: PrayerTimes;
   jamaatTimes: JamaatTimes;
+  settings: SiteSettings;
 }
 
 // Parse a 24h "HH:MM" string → { h, m }
@@ -183,7 +185,7 @@ function parse24(timeStr: string) {
   return { h: isNaN(h) ? 0 : h, m: isNaN(m) ? 0 : m };
 }
 
-export default function HomeClient({ prayerTimes, jamaatTimes }: HomeClientProps) {
+export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeClientProps) {
   // prayerTimes are already formatted 12h strings (from server)
   // jamaatTimes are 24h "HH:MM" strings from storage
   // For countdown we need numeric h/m from the ADHAN times (prayerTimes)
@@ -220,7 +222,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes }: HomeClientProps
     fajr:    fmt12From24(jamaatTimes.fajr),
     dhuhr:   fmt12From24(jamaatTimes.dhuhr),
     asr:     fmt12From24(jamaatTimes.asr),
-    maghrib: "After Adhan",
+    maghrib: settings.maghribDisplay || "After Adhan",
     isha:    fmt12From24(jamaatTimes.isha),
   }), [jamaatTimes]);
 
@@ -234,7 +236,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes }: HomeClientProps
   }));
   const jumuahDisplay = [
     ...jumuahItems,
-    { label: "Location", time: "211 N 25th Ave" },
+    { label: "Location", time: settings.jumuahLocation || "211 N 25th Ave" },
   ];
 
   return (

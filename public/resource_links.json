@@ -1,0 +1,98 @@
+[
+  {
+    "id": "r1",
+    "category": "Quran & Hadith",
+    "categoryIcon": "📖",
+    "label": "Quran.com — Quran with Translation",
+    "url": "https://quran.com",
+    "order": 1
+  },
+  {
+    "id": "r2",
+    "category": "Quran & Hadith",
+    "categoryIcon": "📖",
+    "label": "Sunnah.com — Hadith Collections",
+    "url": "https://sunnah.com",
+    "order": 2
+  },
+  {
+    "id": "r3",
+    "category": "Quran & Hadith",
+    "categoryIcon": "📖",
+    "label": "IslamQA.org — Islamic Q&A",
+    "url": "https://islamqa.org",
+    "order": 3
+  },
+  {
+    "id": "r4",
+    "category": "Islamic Media",
+    "categoryIcon": "🎙️",
+    "label": "SeekersGuidance — Free Islamic Courses",
+    "url": "https://seekersguidance.org",
+    "order": 1
+  },
+  {
+    "id": "r5",
+    "category": "Islamic Media",
+    "categoryIcon": "🎙️",
+    "label": "Yaqeen Institute — Islamic Research",
+    "url": "https://yaqeeninstitute.org",
+    "order": 2
+  },
+  {
+    "id": "r6",
+    "category": "Islamic Media",
+    "categoryIcon": "🎙️",
+    "label": "MuslimMatters.org — Articles & Essays",
+    "url": "https://muslimmatters.org",
+    "order": 3
+  },
+  {
+    "id": "r7",
+    "category": "Prayer & Zakat Tools",
+    "categoryIcon": "🤲",
+    "label": "ISNA — Islamic Society of North America",
+    "url": "https://isna.net",
+    "order": 1
+  },
+  {
+    "id": "r8",
+    "category": "Prayer & Zakat Tools",
+    "categoryIcon": "🤲",
+    "label": "National Zakat Foundation",
+    "url": "https://nzf.org.uk",
+    "order": 2
+  },
+  {
+    "id": "r9",
+    "category": "Prayer & Zakat Tools",
+    "categoryIcon": "🤲",
+    "label": "Islamic Relief — Zakat Calculator",
+    "url": "https://www.islamicrelief.org/zakat/calculator/",
+    "order": 3
+  },
+  {
+    "id": "r10",
+    "category": "Community & Organizations",
+    "categoryIcon": "🌐",
+    "label": "Islamic Society of North America (ISNA)",
+    "url": "https://isna.net",
+    "order": 1
+  },
+  {
+    "id": "r11",
+    "category": "Community & Organizations",
+    "categoryIcon": "🌐",
+    "label": "Muslim American Society (MAS)",
+    "url": "https://mas-icna.org",
+    "order": 2
+  },
+  {
+    "id": "r12",
+    "category": "Community & Organizations",
+    "categoryIcon": "🌐",
+    "label": "CAIR — Council on American-Islamic Relations",
+    "url": "https://www.cair.com",
+    "order": 3
+  }
+]

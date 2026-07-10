@@ -1,20 +1,20 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users } from "lucide-react";
+import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users, Settings, BookOpen, Link2 } from "lucide-react";
 import { AdminUser } from "@/lib/auth";
 import { ICH, Btn, Card } from "./ui-primitives";
 import { parseLocalDate } from "@/lib/utils";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
-  const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board" | "resources">("announcements");
+  const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board" | "resources" | "impact" | "programs" | "settings">("announcements");
 
   const logout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
     window.location.href = "/admin/login";
   };
 
-  const tabButtonStyle = (tab: "announcements" | "events" | "prayer" | "board" | "resources") => ({
+  const tabButtonStyle = (tab: "announcements" | "events" | "prayer" | "board" | "resources" | "impact" | "programs" | "settings") => ({
     padding: "8px 20px",
     borderRadius: 4,
     fontSize: 13,
@@ -42,8 +42,8 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
       </div>
 
       {/* Tabs Row */}
-      <div style={{ display: "flex", gap: 8, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6, padding: 6, marginBottom: 36, width: "fit-content" }}>
-        {(["announcements", "events", "prayer", "board", "resources"] as const).map((tab) => (
+      <div style={{ display: "flex", gap: 8, background: ICH.bgCard, border: `1px solid ${ICH.border}`, borderRadius: 6, padding: 6, marginBottom: 36, width: "fit-content", flexWrap: "wrap" }}>
+        {(["announcements", "events", "prayer", "board", "resources", "impact", "programs", "settings"] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -60,6 +60,9 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
       {activeTab === "prayer" && <PrayerTimesTab />}
       {activeTab === "board" && <BoardTab />}
       {activeTab === "resources" && <ResourcesTab />}
+      {activeTab === "impact" && <ImpactTab />}
+      {activeTab === "programs" && <ProgramsTab />}
+      {activeTab === "settings" && <SettingsTab />}
     </div>
   );
 }
@@ -761,6 +764,566 @@ function ResourcesTab() {
           </Btn>
         </div>
 
+      </div>
+    </div>
+  );
+}
+
+function ImpactTab() {
+  const [impact, setImpact] = useState<any[]>([]);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [count, setCount] = useState("");
+  const [image, setImage] = useState("");
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/impact")
+      .then(r => r.json())
+      .then(d => setImpact(d.impact || []));
+  }, []);
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const res = await fetch("/api/admin/upload", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        setImage(data.url);
+      } else {
+        alert("Upload failed: " + (data.error || "Unknown error"));
+      }
+    } catch (err) {
+      alert("Upload failed.");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const isEdit = !!editingId;
+    const res = await fetch("/api/admin/impact", {
+      method: isEdit ? "PUT" : "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(isEdit ? { id: editingId, title, description, count, image } : { title, description, count, image }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (isEdit) {
+        setImpact(prev => prev.map(item => item.id === editingId ? data.item : item));
+      } else {
+        setImpact(prev => [data.item, ...prev]);
+      }
+      setTitle(""); setDescription(""); setCount(""); setImage(""); setEditingId(null);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 3000);
+    }
+  };
+
+  const handleEdit = (item: any) => {
+    setEditingId(item.id);
+    setTitle(item.title);
+    setDescription(item.description);
+    setCount(item.count || "");
+    setImage(item.image || "");
+  };
+
+  const cancelEdit = () => {
+    setEditingId(null);
+    setTitle(""); setDescription(""); setCount(""); setImage("");
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Delete impact item?")) return;
+    const res = await fetch(`/api/admin/impact?id=${id}`, { method: "DELETE" });
+    if (res.ok) {
+      setImpact(prev => prev.filter(item => item.id !== id));
+    }
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <span style={{ fontSize: 24 }}>📈</span>
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600 }}>Our Impact Stories</h2>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32 }}>
+        {/* Form */}
+        <form onSubmit={handleSave} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 8, padding: "32px 36px", display: "flex", flexDirection: "column", gap: 20, height: "fit-content" }}>
+          <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, display: "flex", alignItems: "center", gap: 6, color: ICH.primary }}>
+            {editingId ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />} {editingId ? "Edit Impact Item" : "New Impact Item"}
+          </h3>
+          
+          <div>
+            <label style={labelStyle}>Title</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+              style={inputStyle}
+              placeholder="e.g. Sunday Islamic School"
+            />
+          </div>
+          
+          <div>
+            <label style={labelStyle}>Description</label>
+            <textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              required
+              rows={4}
+              style={{ ...inputStyle, resize: "vertical" }}
+              placeholder="Describe the impact or story..."
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Metric / Stat (Optional)</label>
+            <input
+              type="text"
+              value={count}
+              onChange={(e) => setCount(e.target.value)}
+              style={inputStyle}
+              placeholder="e.g. 100+ or 75%"
+            />
+          </div>
+
+          <div>
+            <label style={labelStyle}>Image (Optional)</label>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              <input
+                type="text"
+                value={image}
+                onChange={(e) => setImage(e.target.value)}
+                style={inputStyle}
+                placeholder="Image path or upload below"
+              />
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileUpload}
+                  style={{ fontSize: 13, fontFamily: "Inter,sans-serif" }}
+                />
+                {uploading && <span style={{ fontSize: 12, color: ICH.textMuted }}>Uploading...</span>}
+              </div>
+              {image && (
+                <div style={{ width: 120, height: 80, border: `1px solid ${ICH.border}`, borderRadius: 4, overflow: "hidden", position: "relative" }}>
+                  <img src={image} alt="Preview" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 12 }}>
+            <Btn type="submit" variant="primary" style={{ width: "fit-content" }} disabled={uploading}>
+              {saved ? "Saved!" : (editingId ? "Update Item" : "Save Item")}
+            </Btn>
+            {editingId && (
+              <Btn variant="outline" onClick={cancelEdit} style={{ width: "fit-content" }}>
+                Cancel Edit
+              </Btn>
+            )}
+          </div>
+        </form>
+
+        {/* List */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <h3 style={{ fontFamily: "Inter,sans-serif", fontSize: 13, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.textMuted, marginBottom: 8 }}>
+            Current Impact Items
+          </h3>
+          {impact.length === 0 ? (
+            <div style={{ padding: 24, textAlign: "center", color: ICH.textMuted, border: `1px dashed ${ICH.border}`, borderRadius: 8 }}>
+              No impact items
+            </div>
+          ) : impact.map(item => (
+            <div key={item.id} style={{ background: "#fff", border: `1px solid ${ICH.border}`, borderRadius: 6, padding: "16px 20px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12 }}>
+                <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  {item.image && (
+                    <div style={{ width: 60, height: 60, borderRadius: 4, overflow: "hidden", flexShrink: 0, border: `1px solid ${ICH.border}` }}>
+                      <img src={item.image} alt={item.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                  )}
+                  <div>
+                    <h4 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600, color: ICH.text, marginBottom: 2 }}>
+                      {item.title}
+                    </h4>
+                    {item.count && <div style={{ fontSize: 14, fontWeight: 700, color: ICH.gold, marginBottom: 4 }}>{item.count}</div>}
+                    <p style={{ fontSize: 13, color: ICH.textMuted, lineHeight: 1.6 }}>{item.description}</p>
+                  </div>
+                </div>
+                <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+                  <button type="button" onClick={() => handleEdit(item)} style={{ background: "none", border: "none", color: ICH.primary, cursor: "pointer", padding: 4 }}>
+                    <Edit2 className="h-4 w-4" />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(item.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Programs / Initiatives Tab ────────────────────────────────────────────────
+function ProgramsTab() {
+  const [programs, setPrograms] = useState<any[]>([]);
+  const [icon, setIcon] = useState("📌");
+  const [title, setTitle] = useState("");
+  const [schedule, setSchedule] = useState("");
+  const [note, setNote] = useState("");
+  const [description, setDescription] = useState("");
+  const [active, setActive] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  const load = () => fetch("/api/admin/programs").then(r => r.json()).then(d => setPrograms(d.programs || []));
+  useEffect(() => { load(); }, []);
+
+  const resetForm = () => { setIcon("📌"); setTitle(""); setSchedule(""); setNote(""); setDescription(""); setActive(true); setEditingId(null); };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = { icon, title, schedule, note, description, active };
+    if (editingId) {
+      await fetch("/api/admin/programs", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editingId, ...payload }) });
+    } else {
+      await fetch("/api/admin/programs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+    resetForm();
+    load();
+  };
+
+  const handleEdit = (p: any) => { setEditingId(p.id); setIcon(p.icon); setTitle(p.title); setSchedule(p.schedule); setNote(p.note); setDescription(p.description); setActive(p.active); };
+  const handleDelete = async (id: string) => { await fetch(`/api/admin/programs?id=${id}`, { method: "DELETE" }); load(); };
+  const handleToggleActive = async (p: any) => {
+    await fetch("/api/admin/programs", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: p.id, active: !p.active }) });
+    load();
+  };
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+        <BookOpen className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600 }}>Programs &amp; Initiatives</h2>
+      </div>
+      <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 24 }}>These programs appear on the About page. Toggle visibility with the eye icon without deleting.</p>
+
+      <Card style={{ marginBottom: 28 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>
+          {editingId ? "Edit Program" : "Add New Program"}
+        </h3>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "80px 1fr", gap: 12, marginBottom: 14 }}>
+            <div>
+              <label style={labelStyle}>Icon</label>
+              <input style={inputStyle} value={icon} onChange={e => setIcon(e.target.value)} placeholder="📌" />
+            </div>
+            <div>
+              <label style={labelStyle}>Title *</label>
+              <input style={inputStyle} value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Jumuah Prayers" required />
+            </div>
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>Schedule</label>
+            <input style={inputStyle} value={schedule} onChange={e => setSchedule(e.target.value)} placeholder="e.g. Fridays (Recurring every week)" />
+          </div>
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>Description *</label>
+            <textarea style={{ ...inputStyle, minHeight: 72, resize: "vertical" } as React.CSSProperties} value={description} onChange={e => setDescription(e.target.value)} placeholder="Brief description of the program" required />
+          </div>
+          <div style={{ marginBottom: 20 }}>
+            <label style={labelStyle}>Note (optional star label)</label>
+            <input style={inputStyle} value={note} onChange={e => setNote(e.target.value)} placeholder="e.g. Currently off for summer" />
+          </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, fontWeight: 600, cursor: "pointer" }}>
+              <input type="checkbox" checked={active} onChange={e => setActive(e.target.checked)} style={{ width: 16, height: 16 }} />
+              <span style={{ color: ICH.text }}>Active (visible on About page)</span>
+            </label>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Btn variant="gold" type="submit">{editingId ? "Update Program" : "Add Program"}</Btn>
+            {editingId && <Btn variant="outline" type="button" onClick={resetForm}>Cancel</Btn>}
+            {saved && <span style={{ fontSize: 13, color: "#2e7d32", fontWeight: 600 }}>✓ Saved!</span>}
+          </div>
+        </form>
+      </Card>
+
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        {programs.map((p) => (
+          <div key={p.id} style={{ border: `1px solid ${ICH.border}`, borderRadius: 6, padding: "16px 20px", background: "#fff", display: "flex", gap: 12, alignItems: "flex-start", justifyContent: "space-between", opacity: p.active ? 1 : 0.55 }}>
+            <div style={{ display: "flex", gap: 12, alignItems: "flex-start", flex: 1 }}>
+              <span style={{ fontSize: 24 }}>{p.icon}</span>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 2 }}>
+                  <h4 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 18, fontWeight: 600 }}>{p.title}</h4>
+                  {!p.active && <span style={{ fontSize: 10, color: ICH.textMuted, fontWeight: 700, background: ICH.bgCard, padding: "2px 8px", borderRadius: 10 }}>HIDDEN</span>}
+                </div>
+                {p.schedule && <div style={{ fontSize: 12, color: ICH.primary, fontWeight: 600 }}>{p.schedule}</div>}
+                <p style={{ fontSize: 13, color: ICH.textMuted, marginTop: 4 }}>{p.description}</p>
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 8, flexShrink: 0 }}>
+              <button type="button" onClick={() => handleToggleActive(p)} title={p.active ? "Hide" : "Show"} style={{ background: "none", border: "none", color: ICH.textMuted, cursor: "pointer", padding: 4, fontSize: 14 }}>
+                {p.active ? "👁" : "🙈"}
+              </button>
+              <button type="button" onClick={() => handleEdit(p)} style={{ background: "none", border: "none", color: ICH.primary, cursor: "pointer", padding: 4 }}>
+                <Edit2 className="h-4 w-4" />
+              </button>
+              <button type="button" onClick={() => handleDelete(p.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 4 }}>
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+        {programs.length === 0 && <p style={{ color: ICH.textMuted, fontSize: 13 }}>No programs yet. Add one above.</p>}
+      </div>
+
+      {/* Resource Links Section */}
+      <ResourceLinksSection />
+    </div>
+  );
+}
+
+// ── Resource Links Section (embedded in Programs tab) ────────────────────────
+function ResourceLinksSection() {
+  const [links, setLinks] = useState<any[]>([]);
+  const [category, setCategory] = useState("");
+  const [categoryIcon, setCategoryIcon] = useState("🔗");
+  const [label, setLabel] = useState("");
+  const [url, setUrl] = useState("");
+  const [order, setOrder] = useState(99);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [saved, setSaved] = useState(false);
+
+  const load = () => fetch("/api/admin/resource-links").then(r => r.json()).then(d => setLinks(d.links || []));
+  useEffect(() => { load(); }, []);
+
+  const resetForm = () => { setCategory(""); setCategoryIcon("🔗"); setLabel(""); setUrl(""); setOrder(99); setEditingId(null); };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const payload = { category, categoryIcon, label, url, order };
+    if (editingId) {
+      await fetch("/api/admin/resource-links", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editingId, ...payload }) });
+    } else {
+      await fetch("/api/admin/resource-links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+    resetForm();
+    load();
+  };
+
+  const handleEdit = (l: any) => { setEditingId(l.id); setCategory(l.category); setCategoryIcon(l.categoryIcon); setLabel(l.label); setUrl(l.url); setOrder(l.order); };
+  const handleDelete = async (id: string) => { await fetch(`/api/admin/resource-links?id=${id}`, { method: "DELETE" }); load(); };
+
+  const grouped = links.reduce<Record<string, any[]>>((acc, l) => {
+    if (!acc[l.category]) acc[l.category] = [];
+    acc[l.category].push(l);
+    return acc;
+  }, {});
+
+  return (
+    <div style={{ marginTop: 40, paddingTop: 36, borderTop: `2px solid ${ICH.border}` }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+        <Link2 className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 22, fontWeight: 600 }}>Islamic Resource Links</h3>
+      </div>
+      <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 24 }}>Manage the links shown on the Resources page. Group by category using consistent category names.</p>
+
+      <Card style={{ marginBottom: 24 }}>
+        <h4 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 17, fontWeight: 600, marginBottom: 16 }}>{editingId ? "Edit Link" : "Add New Link"}</h4>
+        <form onSubmit={handleSubmit}>
+          <div style={{ display: "grid", gridTemplateColumns: "60px 1fr", gap: 10, marginBottom: 12 }}>
+            <div>
+              <label style={labelStyle}>Icon</label>
+              <input style={inputStyle} value={categoryIcon} onChange={e => setCategoryIcon(e.target.value)} placeholder="🔗" />
+            </div>
+            <div>
+              <label style={labelStyle}>Category *</label>
+              <input style={inputStyle} value={category} onChange={e => setCategory(e.target.value)} placeholder="e.g. Quran & Hadith" required list="cats-dl" />
+              <datalist id="cats-dl">{[...new Set(links.map(l => l.category))].map(c => <option key={c} value={c} />)}</datalist>
+            </div>
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <label style={labelStyle}>Link Label *</label>
+            <input style={inputStyle} value={label} onChange={e => setLabel(e.target.value)} placeholder="e.g. Quran.com — Quran with Translation" required />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 80px", gap: 10, marginBottom: 16 }}>
+            <div>
+              <label style={labelStyle}>URL *</label>
+              <input style={inputStyle} value={url} onChange={e => setUrl(e.target.value)} placeholder="https://..." required type="url" />
+            </div>
+            <div>
+              <label style={labelStyle}>Sort Order</label>
+              <input style={inputStyle} value={order} onChange={e => setOrder(Number(e.target.value))} type="number" min={1} max={99} />
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Btn variant="gold" type="submit" style={{ fontSize: 13 }}>{editingId ? "Update" : "Add Link"}</Btn>
+            {editingId && <Btn variant="outline" type="button" onClick={resetForm} style={{ fontSize: 13 }}>Cancel</Btn>}
+            {saved && <span style={{ fontSize: 13, color: "#2e7d32", fontWeight: 600 }}>✓ Saved!</span>}
+          </div>
+        </form>
+      </Card>
+
+      {Object.entries(grouped).map(([cat, catLinks]) => (
+        <div key={cat} style={{ marginBottom: 20 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, marginBottom: 8 }}>{cat}</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {(catLinks as any[]).sort((a, b) => a.order - b.order).map((l) => (
+              <div key={l.id} style={{ border: `1px solid ${ICH.border}`, borderRadius: 5, padding: "10px 14px", background: "#fff", display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between" }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: ICH.text }}>{l.label}</div>
+                  <div style={{ fontSize: 11, color: ICH.textMuted }}>{l.url}</div>
+                </div>
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button type="button" onClick={() => handleEdit(l)} style={{ background: "none", border: "none", color: ICH.primary, cursor: "pointer", padding: 3 }}>
+                    <Edit2 className="h-3.5 w-3.5" />
+                  </button>
+                  <button type="button" onClick={() => handleDelete(l.id)} style={{ background: "none", border: "none", color: "#e53935", cursor: "pointer", padding: 3 }}>
+                    <Trash2 className="h-3.5 w-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+      {links.length === 0 && <p style={{ color: ICH.textMuted, fontSize: 13 }}>No resource links yet. Add one above.</p>}
+    </div>
+  );
+}
+
+// ── Site Settings Tab ─────────────────────────────────────────────────────────
+function SettingsTab() {
+  const [settings, setSettings] = useState<any>(null);
+  const [saved, setSaved] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then(r => r.json())
+      .then(d => setSettings(d.settings || {}));
+  }, []);
+
+  const set = (key: string, value: string) => setSettings((s: any) => ({ ...s, [key]: value }));
+
+  const handleSave = async () => {
+    setSaving(true);
+    await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(settings) });
+    setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  if (!settings) return <div style={{ color: ICH.textMuted, padding: 24 }}>Loading settings…</div>;
+
+  const Field = ({ label: lbl, name, placeholder, textarea }: { label: string; name: string; placeholder?: string; textarea?: boolean }) => (
+    <div style={{ marginBottom: 16 }}>
+      <label style={labelStyle}>{lbl}</label>
+      {textarea ? (
+        <textarea
+          style={{ ...inputStyle, minHeight: 90, resize: "vertical" } as React.CSSProperties}
+          value={settings[name] ?? ""}
+          onChange={e => set(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      ) : (
+        <input
+          style={inputStyle}
+          value={settings[name] ?? ""}
+          onChange={e => set(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      )}
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 24 }}>
+        <Settings className="h-5 w-5" style={{ color: ICH.primary }} />
+        <h2 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, fontWeight: 600 }}>Site Settings</h2>
+      </div>
+      <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 28 }}>Changes here update live across the website. Click &ldquo;Save All Settings&rdquo; when done.</p>
+
+      {/* Contact Info */}
+      <Card style={{ marginBottom: 24 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Contact &amp; Location</h3>
+        <Field label="Physical Address" name="address" placeholder="211 N 25th Avenue, Hattiesburg, MS 39401" />
+        <Field label="Google Maps URL" name="addressUrl" placeholder="https://www.google.com/maps/search/?api=1&query=..." />
+        <Field label="Phone Number (optional)" name="phone" placeholder="+1 (601) 555-0000" />
+        <Field label="Contact Email" name="email" placeholder="ichattiesburg@gmail.com" />
+        <Field label='Jumuah Location Label (shown on home page "Jumuah" card)' name="jumuahLocation" placeholder="211 N 25th Ave" />
+      </Card>
+
+      {/* Branding & Socials */}
+      <Card style={{ marginBottom: 24 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Masjid Branding &amp; Socials</h3>
+        <Field label="Masjid Short Name / Acronym" name="masjidShortName" placeholder="ICH" />
+        <Field label="Footer Short Description" name="footerDescription" placeholder="Serving the Muslim community with prayer, education, and community programs." />
+        <Field label="Facebook Page URL" name="facebookUrl" placeholder="https://www.facebook.com/..." />
+        <Field label="Instagram Profile URL" name="instagramUrl" placeholder="https://www.instagram.com/..." />
+      </Card>
+
+      {/* Mission */}
+      <Card style={{ marginBottom: 24 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Mission Statement</h3>
+        <Field label="Mission Text (shown on About page)" name="missionText" textarea placeholder="The Islamic Center of Hattiesburg stands as a beacon of faith…" />
+      </Card>
+
+      {/* Oak Grove */}
+      <Card style={{ marginBottom: 24 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Oak Grove / New Masjid Project</h3>
+        <Field label="Project Title" name="oakGroveTitle" placeholder="New Masjid Project" />
+        <Field label="Project Description" name="oakGroveDescription" textarea placeholder="As a growing community our current facility…" />
+        <Field label="Fundraiser URL (LaunchGood or other)" name="oakGroveUrl" placeholder="https://www.launchgood.com/v4/campaign/..." />
+      </Card>
+
+      {/* Donation */}
+      <Card style={{ marginBottom: 24 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 8 }}>Donation Page (Zeffy)</h3>
+        <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 16 }}>Find these UUIDs in your Zeffy dashboard URLs: <code style={{ background: "#f3f4f6", padding: "1px 5px", borderRadius: 3, fontSize: 11 }}>zeffy.com/donation-form/&#123;UUID&#125;</code></p>
+        <Field label="One-Time Donation Form UUID" name="zeffyOneTimeId" placeholder="ba0c6cb0-70a2-41db-95c6-9ff75a30b42c" />
+        <Field label="Monthly / Recurring Donation Form UUID" name="zeffyMonthlyId" placeholder="e4338258-eef5-489e-ae60-75017200e9bc" />
+      </Card>
+
+      {/* Prayer Display */}
+      <Card style={{ marginBottom: 28 }}>
+        <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 8 }}>Prayer Time Display</h3>
+        <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 16 }}>Controls how Maghrib iqama appears on the home page prayer strip. Typical values: &ldquo;After Adhan&rdquo; or a time like &ldquo;7:45 PM&rdquo;.</p>
+        <Field label="Maghrib Iqama Display" name="maghribDisplay" placeholder="After Adhan" />
+      </Card>
+
+      <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <Btn variant="gold" onClick={handleSave}>
+          {saving ? "Saving…" : "Save All Settings"}
+        </Btn>
+        {saved && <span style={{ fontSize: 13, color: "#2e7d32", fontWeight: 600 }}>✓ All settings saved!</span>}
       </div>
     </div>
   );

@@ -1,9 +1,13 @@
 import { getJamaatTimes, saveJamaatTimes, isValidJamaatTimes } from "@/lib/jamaat";
 import { NextRequest } from "next/server";
+import { getAdminUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
+  const admin = getAdminUser(req);
+  if (!admin) return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+
   try {
     const body = await req.json();
     const candidate = body.data ?? body;

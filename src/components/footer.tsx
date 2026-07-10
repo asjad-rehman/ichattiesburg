@@ -1,10 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { ICH } from "./ui-primitives";
 
 export default function Footer() {
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d.settings) setSettings(d.settings);
+      })
+      .catch(() => {});
+  }, []);
+
+  const address = settings?.address || "211 N 25th Avenue, Hattiesburg, MS 39401";
+  const addressUrl = settings?.addressUrl || "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401";
+  const email = settings?.email || "ichattiesburg@protonmail.com";
+  const shortName = settings?.masjidShortName || "ICH";
+  const description = settings?.footerDescription || "Serving the Muslim community of Hattiesburg, Mississippi with prayer, education, and community programs.";
+  
+  const socialLinks = [];
+  if (settings?.facebookUrl) socialLinks.push({ name: "Facebook", url: settings.facebookUrl });
+  else socialLinks.push({ name: "Facebook", url: "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr" });
+
+  if (settings?.instagramUrl) socialLinks.push({ name: "Instagram", url: settings.instagramUrl });
+  else socialLinks.push({ name: "Instagram", url: "https://www.instagram.com/ichattiesburg" });
+
   const col = {
     label: {
       fontSize: 10,
@@ -59,7 +83,7 @@ export default function Footer() {
           <div>
             <img
               src="/uploads/logo.png"
-              alt="ICH"
+              alt={shortName}
               style={{
                 height: 52,
                 filter: "brightness(0) invert(1)",
@@ -74,8 +98,7 @@ export default function Footer() {
                 marginBottom: 18,
               }}
             >
-              Serving the Muslim community of Hattiesburg, Mississippi with
-              prayer, education, and community programs.
+              {description}
             </p>
             <div className="arabic-text" style={{ fontSize: 19, color: ICH.accent, lineHeight: 2 }}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
@@ -89,7 +112,8 @@ export default function Footer() {
               ["/prayer-times", "Prayer Times"],
               ["/events", "Events Calendar"],
               ["/donate", "Donate"],
-              ["/about", "About ICH"],
+              [`/about`, `About ${shortName}`],
+              ["/impact", "Our Impact"],
               ["/resources", "Islamic Resources"],
               ["/contact", "Contact"],
             ].map(([href, label]) => (
@@ -110,8 +134,8 @@ export default function Footer() {
             <div style={col.label}>Contact</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
               {[
-                { icon: "📍", text: "211 N 25th Avenue\nHattiesburg, MS 39401", href: "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401" },
-                { icon: "✉️", text: "ICHattiesburg@protonmail.com", href: "mailto:ICHattiesburg@protonmail.com" },
+                { icon: "📍", text: address, href: addressUrl },
+                { icon: "✉️", text: email, href: `mailto:${email}` },
               ].map(({ icon, text, href }) => (
                 <div key={icon} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <span style={{ fontSize: 13, flexShrink: 0, marginTop: 2 }}>{icon}</span>
@@ -138,10 +162,7 @@ export default function Footer() {
           <div>
             <div style={col.label}>Follow Us</div>
             <div style={{ display: "flex", gap: 8, marginBottom: 24 }}>
-              {[
-                { name: "Facebook", url: "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr" },
-                { name: "Instagram", url: "https://www.instagram.com/ichattiesburg" }
-              ].map((s) => (
+              {socialLinks.map((s) => (
                 <a
                   key={s.name}
                   href={s.url}
@@ -199,7 +220,7 @@ export default function Footer() {
           }}
         >
           <p style={{ fontSize: 12, color: "rgba(255,255,255,.35)", fontFamily: "Inter,sans-serif", lineHeight: 1.6 }}>
-            © {new Date().getFullYear()} Islamic Center of Hattiesburg. All rights reserved.{" "}
+            © {new Date().getFullYear()} {settings?.masjidShortName === "ICH" ? "Islamic Center of Hattiesburg" : (settings?.missionText ? settings.missionText.split(" ").slice(0, 4).join(" ") : "Masjid")}. All rights reserved.{" "}
             <span style={{ margin: "0 6px" }}>|</span>{" "}
             Developed by{" "}
             <a
@@ -244,3 +265,4 @@ export default function Footer() {
     </footer>
   );
 }
+

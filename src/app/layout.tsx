@@ -56,6 +56,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+import AnnouncementsBanner from "@/components/announcements-banner";
+
 export default async function RootLayout({
   children,
 }: {
@@ -73,6 +75,7 @@ export default async function RootLayout({
         ) : (
           <LenisProvider>
             <div className="min-h-screen flex flex-col bg-background text-foreground">
+              <AnnouncementsBanner />
               <Navbar />
               <main className="flex-1">{children}</main>
               <Footer />

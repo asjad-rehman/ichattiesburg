@@ -13,7 +13,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Username and password required" }, { status: 400 });
     }
 
-    if (username !== "ichattiesburg" || password !== "3223") {
+    const envEmail = process.env.ADMIN_EMAIL;
+    const envPasswordHash = process.env.ADMIN_PASSWORD_HASH;
+
+    let authenticated = false;
+
+    if (envEmail && envPasswordHash) {
+      const { comparePassword } = await import("@/lib/auth");
+      authenticated = username === envEmail.toLowerCase() && await comparePassword(password, envPasswordHash);
+    } else {
+      authenticated = username === "ichattiesburg" && password === "3223";
+      if (authenticated) {
+        console.warn("[admin-login] WARNING: Using fallback credentials. Please configure ADMIN_EMAIL and ADMIN_PASSWORD_HASH in production.");
+      }
+    }
+
+    if (!authenticated) {
       return NextResponse.json({ error: `Invalid credentials` }, { status: 401 });
     }
 

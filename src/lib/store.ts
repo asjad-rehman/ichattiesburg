@@ -36,6 +36,53 @@ export interface HalalResourcesItem {
   meatSupply: string | null;
 }
 
+export interface ImpactItem {
+  id: string;
+  title: string;
+  description: string;
+  count?: string;
+  image?: string;
+}
+
+export interface SiteSettings {
+  id: "main";
+  address: string;
+  addressUrl: string;
+  phone: string;
+  email: string;
+  missionText: string;
+  jumuahLocation: string;
+  oakGroveTitle: string;
+  oakGroveDescription: string;
+  oakGroveUrl: string;
+  zeffyOneTimeId: string;
+  zeffyMonthlyId: string;
+  maghribDisplay: string;
+  masjidShortName: string;
+  footerDescription: string;
+  facebookUrl: string;
+  instagramUrl: string;
+}
+
+export interface Program {
+  id: string;
+  icon: string;
+  title: string;
+  schedule: string;
+  note: string;
+  description: string;
+  active: boolean;
+}
+
+export interface ResourceLink {
+  id: string;
+  category: string;
+  categoryIcon: string;
+  label: string;
+  url: string;
+  order: number;
+}
+
 
 // ── Collection factory ────────────────────────────────────────────────────────
 function makeCollection<T extends { id: string }>(name: string, seed: T[]) {
@@ -65,6 +112,45 @@ const _board         = makeCollection<BoardMember>("board", []);
 const _announcements = makeCollection<Announcement>("announcements", []);
 const _events        = makeCollection<EventItem>("events", []);
 const _halal         = makeCollection<HalalResourcesItem>("halal_resources", [{ id: "main", restaurants: null, meatSupply: null }]);
+const _impact        = makeCollection<ImpactItem>("impact", []);
+const _settings      = makeCollection<SiteSettings>("settings", [{
+  id: "main",
+  address: "211 N 25th Avenue, Hattiesburg, MS 39401",
+  addressUrl: "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401",
+  phone: "",
+  email: "ichattiesburg@gmail.com",
+  missionText: "The Islamic Center of Hattiesburg stands as a beacon of faith and community. Our mission is to foster a vibrant and inclusive environment where Muslims of all backgrounds can come together to worship, learn, and serve. We strive to promote the principles of Islam, advance education, and provide essential services that enhance the quality of life for our community members.",
+  jumuahLocation: "211 N 25th Ave",
+  oakGroveTitle: "New Masjid Project",
+  oakGroveDescription: "As a growing community our current facility continues to be a challenge. We are planning to address this concern by building a new masjid that will offer a large prayer hall, an Islamic school, and a community center, insha'Allah. Please spread the word and donate wholeheartedly.",
+  oakGroveUrl: "https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove",
+  zeffyOneTimeId: "ba0c6cb0-70a2-41db-95c6-9ff75a30b42c",
+  zeffyMonthlyId: "e4338258-eef5-489e-ae60-75017200e9bc",
+  maghribDisplay: "After Adhan",
+  masjidShortName: "ICH",
+  footerDescription: "Serving the Muslim community of Hattiesburg, Mississippi with prayer, education, and community programs.",
+  facebookUrl: "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr",
+  instagramUrl: "https://www.instagram.com/ichattiesburg",
+}]);
+const _programs      = makeCollection<Program>("programs", [
+  { id: "p1", icon: "🕌", title: "Jumuah Prayers",  schedule: "Fridays (Recurring every week)",            note: "",                                        description: "Weekly Friday congregational prayer and khutbah.", active: true },
+  { id: "p2", icon: "📖", title: "Friday Halaqah",  schedule: "Fridays Maghrib to Isha",                  note: "Recurring every week",                     description: "Weekly gathering and discussion.", active: true },
+  { id: "p3", icon: "📚", title: "Sunday School",   schedule: "Sundays 10 AM – 1 PM",                     note: "Recurring every week (Currently off for summer)", description: "Islamic education for the youth.", active: true },
+]);
+const _resourceLinks = makeCollection<ResourceLink>("resource_links", [
+  { id: "r1",  category: "Quran & Hadith",             categoryIcon: "📖", label: "Quran.com — Quran with Translation",       url: "https://quran.com",                                               order: 1 },
+  { id: "r2",  category: "Quran & Hadith",             categoryIcon: "📖", label: "Sunnah.com — Hadith Collections",           url: "https://sunnah.com",                                              order: 2 },
+  { id: "r3",  category: "Quran & Hadith",             categoryIcon: "📖", label: "IslamQA.org — Islamic Q&A",                url: "https://islamqa.org",                                             order: 3 },
+  { id: "r4",  category: "Islamic Media",              categoryIcon: "🎙️", label: "SeekersGuidance — Free Islamic Courses",  url: "https://seekersguidance.org",                                     order: 1 },
+  { id: "r5",  category: "Islamic Media",              categoryIcon: "🎙️", label: "Yaqeen Institute — Islamic Research",      url: "https://yaqeeninstitute.org",                                     order: 2 },
+  { id: "r6",  category: "Islamic Media",              categoryIcon: "🎙️", label: "MuslimMatters.org — Articles & Essays",    url: "https://muslimmatters.org",                                       order: 3 },
+  { id: "r7",  category: "Prayer & Zakat Tools",       categoryIcon: "🤲", label: "ISNA — Islamic Society of North America",   url: "https://isna.net",                                               order: 1 },
+  { id: "r8",  category: "Prayer & Zakat Tools",       categoryIcon: "🤲", label: "National Zakat Foundation",                url: "https://nzf.org.uk",                                              order: 2 },
+  { id: "r9",  category: "Prayer & Zakat Tools",       categoryIcon: "🤲", label: "Islamic Relief — Zakat Calculator",        url: "https://www.islamicrelief.org/zakat/calculator/",                 order: 3 },
+  { id: "r10", category: "Community & Organizations",  categoryIcon: "🌐", label: "Islamic Society of North America (ISNA)",  url: "https://isna.net",                                               order: 1 },
+  { id: "r11", category: "Community & Organizations",  categoryIcon: "🌐", label: "Muslim American Society (MAS)",            url: "https://mas-icna.org",                                            order: 2 },
+  { id: "r12", category: "Community & Organizations",  categoryIcon: "🌐", label: "CAIR — Council on American-Islamic Relations", url: "https://www.cair.com",                                        order: 3 },
+]);
 
 // ── Public store API ──────────────────────────────────────────────────────────
 export const store = {
@@ -138,11 +224,86 @@ export const store = {
     await _halal.save([updated]);
     return updated;
   },
+
+  // Impact Stories / Stats
+  getImpact: async (bypassCache = false) => _impact.get(bypassCache),
+  addImpactItem: async (data: Omit<ImpactItem, "id">) => {
+    const current = await _impact.get(true);
+    const item = { ...data, id: randomUUID() };
+    const items = [item, ...current];
+    await _impact.save(items);
+    return item;
+  },
+  updateImpactItem: async (id: string, data: Partial<ImpactItem>) => {
+    const current = await _impact.get(true);
+    const items = current.map(x => x.id === id ? { ...x, ...data } : x);
+    await _impact.save(items);
+    return items.find(x => x.id === id) ?? null;
+  },
+  deleteImpactItem: async (id: string) => {
+    const current = await _impact.get(true);
+    await _impact.save(current.filter(x => x.id !== id));
+  },
+
+  // Site Settings (singleton)
+  getSettings: async (bypassCache = false): Promise<SiteSettings> => {
+    const list = await _settings.get(bypassCache);
+    return list[0];
+  },
+  updateSettings: async (data: Partial<Omit<SiteSettings, "id">>) => {
+    const current = (await _settings.get(true))[0];
+    const updated = { ...current, ...data };
+    await _settings.save([updated]);
+    return updated;
+  },
+
+  // Programs / Initiatives
+  getPrograms: async (bypassCache = false) => _programs.get(bypassCache),
+  addProgram: async (data: Omit<Program, "id">) => {
+    const current = await _programs.get(true);
+    const item = { ...data, id: randomUUID() };
+    await _programs.save([...current, item]);
+    return item;
+  },
+  updateProgram: async (id: string, data: Partial<Program>) => {
+    const current = await _programs.get(true);
+    const items = current.map(x => x.id === id ? { ...x, ...data } : x);
+    await _programs.save(items);
+    return items.find(x => x.id === id) ?? null;
+  },
+  deleteProgram: async (id: string) => {
+    const current = await _programs.get(true);
+    await _programs.save(current.filter(x => x.id !== id));
+  },
+
+  // Resource Links
+  getResourceLinks: async (bypassCache = false) => _resourceLinks.get(bypassCache),
+  addResourceLink: async (data: Omit<ResourceLink, "id">) => {
+    const current = await _resourceLinks.get(true);
+    const item = { ...data, id: randomUUID() };
+    await _resourceLinks.save([...current, item]);
+    return item;
+  },
+  updateResourceLink: async (id: string, data: Partial<ResourceLink>) => {
+    const current = await _resourceLinks.get(true);
+    const items = current.map(x => x.id === id ? { ...x, ...data } : x);
+    await _resourceLinks.save(items);
+    return items.find(x => x.id === id) ?? null;
+  },
+  deleteResourceLink: async (id: string) => {
+    const current = await _resourceLinks.get(true);
+    await _resourceLinks.save(current.filter(x => x.id !== id));
+  },
 };
 
 export const memoryStore = {
-  get board()         { return store.getBoard(); },
-  get announcements() { return store.getAnnouncements(); },
-  get events()        { return store.getEvents(); },
+  get board()          { return store.getBoard(); },
+  get announcements()  { return store.getAnnouncements(); },
+  get events()         { return store.getEvents(); },
   get halalResources() { return store.getHalalResources(); },
+  get impact()         { return store.getImpact(); },
+  get settings()       { return store.getSettings(); },
+  get programs()       { return store.getPrograms(); },
+  get resourceLinks()  { return store.getResourceLinks(); },
 };
+

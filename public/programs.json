@@ -1,0 +1,29 @@
+[
+  {
+    "id": "p1",
+    "icon": "🕌",
+    "title": "Jumuah Prayers",
+    "schedule": "Fridays (Recurring every week)",
+    "note": "",
+    "description": "Weekly Friday congregational prayer and khutbah.",
+    "active": true
+  },
+  {
+    "id": "p2",
+    "icon": "📖",
+    "title": "Friday Halaqah",
+    "schedule": "Fridays Maghrib to Isha",
+    "note": "Recurring every week",
+    "description": "Weekly gathering and discussion.",
+    "active": true
+  },
+  {
+    "id": "p3",
+    "icon": "📚",
+    "title": "Sunday School",
+    "schedule": "Sundays 10 AM – 1 PM",
+    "note": "Recurring every week (Currently off for summer)",
+    "description": "Islamic education for the youth.",
+    "active": true
+  }
+]

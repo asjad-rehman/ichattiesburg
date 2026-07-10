@@ -21,6 +21,7 @@ export default function Navbar() {
     { id: "/prayer-times", label: "Prayer Times" },
     { id: "/events", label: "Events" },
     { id: "/about", label: "About" },
+    { id: "/impact", label: "Our Impact" },
     { id: "/resources", label: "Resources" },
     { id: "/contact", label: "Contact" },
   ];

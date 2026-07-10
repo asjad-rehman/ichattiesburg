@@ -1,7 +1,8 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import { NextRequest } from "next/server";
 
-const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-change-in-prod";
+const JWT_SECRET = process.env.JWT_SECRET || "fallback-secret-change-in-prod-123456";
 
 export interface AdminUser {
   id: string;
@@ -10,18 +11,23 @@ export interface AdminUser {
 }
 
 export function signToken(user: AdminUser): string {
-  // Simple bulletproof token using standard web APIs
-  return btoa(JSON.stringify(user));
+  return jwt.sign(user, JWT_SECRET, { expiresIn: "7d" });
 }
 
 export function verifyToken(token: string): AdminUser | null {
   try {
-    const decoded = atob(token);
-    return JSON.parse(decoded) as AdminUser;
+    return jwt.verify(token, JWT_SECRET) as AdminUser;
   } catch {
     return null;
   }
 }
+
+export function getAdminUser(req: NextRequest): AdminUser | null {
+  const token = req.cookies.get("admin_token")?.value;
+  if (!token) return null;
+  return verifyToken(token);
+}
+
 
 export async function hashPassword(password: string): Promise<string> {
   return bcrypt.hash(password, 12);

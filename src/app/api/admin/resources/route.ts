@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { store } from "@/lib/store";
 import { remoteWriteFile } from "@/lib/remote-storage";
+import { getAdminUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const admin = getAdminUser(req);
+  if (!admin) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
   try {
     const { restaurants, meatSupply } = await req.json();
 
