@@ -226,7 +226,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
     isha:    fmt12From24(jamaatTimes.isha),
   }), [jamaatTimes]);
 
-  const prayers5 = prayersAll.filter(p => p.key !== "sunrise");
+  const prayers5 = React.useMemo(() => prayersAll.filter(p => p.key !== "sunrise"), [prayersAll]);
   const { countdown, nextName, nextIdx, curIdx } = usePrayerCountdown(prayersAll);
 
   // Formatted Jumuah schedule – from jamaatTimes
