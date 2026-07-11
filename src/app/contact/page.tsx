@@ -116,7 +116,7 @@ export default function ContactPage() {
 
           <Card>
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 12 }}>Social Media</div>
-            <div style={{ display: "flex", gap: 10 }}>
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <a
                 href={facebookUrl}
                 target="_blank"
@@ -171,7 +171,7 @@ export default function ContactPage() {
               />
 
               <div style={{ display: "flex", flexDirection: "column", gap: 18 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 14 }}>
                   <div>
                     <label style={labelStyle}>Name *</label>
                     <input

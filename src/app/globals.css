@@ -78,7 +78,11 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  overflow-x: hidden;
 }
+
+/* Never let a stray wide element create a horizontal scrollbar on mobile */
+img, svg, video, iframe { max-width: 100%; }
 
 h1, h2, h3, h4, h5 {
   font-family: var(--font-serif), serif;
@@ -137,3 +141,23 @@ p {
   .mobile-btn   { display: none !important; }
   .mobile-menu  { display: none !important; }
 }
+
+/* Impact story cards: alternate left/right on desktop, always image-on-top on mobile */
+@media (max-width: 640px) {
+  .impact-card {
+    flex-direction: column !important;
+  }
+  .impact-card .impact-media {
+    flex-basis: auto !important;
+    width: 100% !important;
+    min-height: 200px !important;
+  }
+}
+
+/* Horizontally scrollable tab bar on narrow screens (admin, filters) */
+.scroll-tabs {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.scroll-tabs::-webkit-scrollbar { display: none; }

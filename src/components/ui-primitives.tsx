@@ -122,12 +122,14 @@ interface CardProps {
   children: React.ReactNode;
   style?: React.CSSProperties;
   hover?: boolean;
+  className?: string;
 }
 
-export function Card({ children, style = {}, hover = false }: CardProps) {
+export function Card({ children, style = {}, hover = false, className }: CardProps) {
   const [hov, setHov] = useState(false);
   return (
     <div
+      className={className}
       style={{
         background: ICH.bgCard,
         border: `1px solid ${hov && hover ? ICH.primary+'55' : ICH.border}`,

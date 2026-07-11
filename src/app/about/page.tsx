@@ -132,7 +132,7 @@ export default async function AboutPage() {
               <p style={{ fontSize: 15, color: ICH.textMuted, lineHeight: 1.8, marginBottom: 24 }}>
                 {settings.oakGroveDescription}
               </p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 24 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(96px,1fr))", gap: 12, marginBottom: 24 }}>
                 {[
                   ["Status", "In Progress"],
                   ["Location", "Hattiesburg, MS"],
