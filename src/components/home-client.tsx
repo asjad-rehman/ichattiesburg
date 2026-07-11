@@ -290,7 +290,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
           </div>
 
           {/* Prayer cards */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(5,1fr)", gap: 8 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(92px,1fr))", gap: 8 }}>
             {prayers5.map((p, i) => {
               const prayers5Idxs = [0, 2, 3, 4, 5];
               const realIdx = prayers5Idxs[i];

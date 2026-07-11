@@ -53,9 +53,9 @@ export default async function ImpactPage() {
                 </div>
               ) : (
                 impactItems.map((item, idx) => (
-                  <Card key={item.id} style={{ padding: 0, overflow: "hidden", display: "flex", flexWrap: "wrap", flexDirection: idx % 2 === 0 ? "row" : "row-reverse" }}>
+                  <Card key={item.id} hover className="impact-card" style={{ padding: 0, overflow: "hidden", display: "flex", flexWrap: "wrap", flexDirection: idx % 2 === 0 ? "row" : "row-reverse" }}>
                     {item.image && (
-                      <div style={{ flex: "1 1 300px", minHeight: 240, position: "relative", background: "#f0f0f0" }}>
+                      <div className="impact-media" style={{ flex: "1 1 300px", minHeight: 240, position: "relative", background: ICH.bgCard2 }}>
                         <img
                           src={item.image}
                           alt={item.title}
@@ -63,16 +63,17 @@ export default async function ImpactPage() {
                         />
                       </div>
                     )}
-                    <div style={{ flex: "1 1 350px", padding: 32, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                    <div style={{ flex: "1 1 340px", padding: "32px 36px", display: "flex", flexDirection: "column", justifyContent: "center" }}>
                       {item.count && (
-                        <div style={{ fontSize: 44, fontWeight: 700, color: ICH.gold, fontFamily: "Cormorant Garamond,serif", lineHeight: 1, marginBottom: 10 }}>
+                        <div style={{ fontSize: 46, fontWeight: 700, color: ICH.gold, fontFamily: "Cormorant Garamond,serif", lineHeight: 1, marginBottom: 12 }}>
                           {item.count}
                         </div>
                       )}
-                      <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 24, fontWeight: 600, color: ICH.text, marginBottom: 12 }}>
+                      <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 25, fontWeight: 600, color: ICH.text, marginBottom: 12 }}>
                         {item.title}
                       </h3>
-                      <p style={{ fontSize: 14, color: ICH.textMuted, lineHeight: 1.7 }}>
+                      <div style={{ width: 34, height: 2, background: `${ICH.gold}66`, marginBottom: 14 }} />
+                      <p style={{ fontSize: 14.5, color: ICH.textMuted, lineHeight: 1.75 }}>
                         {item.description}
                       </p>
                     </div>
