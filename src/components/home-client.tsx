@@ -408,7 +408,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
             </div>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
               <Btn variant="primary" href="/about">Learn More</Btn>
-              <Btn variant="outline" href="https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove">Oak Grove Project</Btn>
+              <Btn variant="outline" href={settings.oakGroveUrl || "https://www.launchgood.com/v4/campaign/help_build_the_islamic_center_of_oak_grove"}>Oak Grove Project</Btn>
             </div>
           </ScrollReveal>
         </div>

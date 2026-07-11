@@ -1,12 +1,27 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ICH, Btn, GoldLabel, Card } from "@/components/ui-primitives";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "", hp: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
+  const [settings, setSettings] = useState<any>(null);
+
+  useEffect(() => {
+    fetch("/api/admin/settings")
+      .then((r) => r.json())
+      .then((d) => { if (d.settings) setSettings(d.settings); })
+      .catch(() => {});
+  }, []);
+
+  const address = settings?.address || "211 N 25th Avenue, Hattiesburg, MS 39401";
+  const addressUrl = settings?.addressUrl || "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401";
+  const email = settings?.email || "ichattiesburg@gmail.com";
+  const phone = settings?.phone || "";
+  const facebookUrl = settings?.facebookUrl || "https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr";
+  const instagramUrl = settings?.instagramUrl || "https://www.instagram.com/ichattiesburg";
 
   const set = (k: string, v: string) => setForm((f) => ({ ...f, [k]: v }));
 
@@ -82,8 +97,9 @@ export default function ContactPage() {
         <div>
           <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 24 }}>
             {[
-              { icon: "📍", label: "Address",      content: "211 N 25th Avenue\nHattiesburg, MS 39401", href: "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401" },
-              { icon: "✉️", label: "Email",         content: "ICHattiesburg@protonmail.com", href: "mailto:ICHattiesburg@protonmail.com" },
+              { icon: "📍", label: "Address",      content: address, href: addressUrl },
+              { icon: "✉️", label: "Email",         content: email, href: `mailto:${email}` },
+              ...(phone ? [{ icon: "📞", label: "Phone", content: phone, href: `tel:${phone.replace(/[^+\d]/g, "")}` }] : []),
               { icon: "🕌", label: "Prayer Times", content: "Open for all five daily prayers.\nSee prayer times page for schedule.", href: "/prayer-times" },
             ].map((item) => (
               <Card key={item.label} style={{ display: "flex", gap: 14, alignItems: "flex-start", padding: "16px 18px" }}>
@@ -108,7 +124,7 @@ export default function ContactPage() {
             <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, fontFamily: "Inter,sans-serif", marginBottom: 12 }}>Social Media</div>
             <div style={{ display: "flex", gap: 10 }}>
               <a
-                href="https://www.facebook.com/share/1EJ8ZYq7nT/?mibextid=wwXIfr"
+                href={facebookUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ padding: "8px 16px", background: "#1877F2", color: "#fff", borderRadius: 4, fontSize: 13, fontWeight: 500, textDecoration: "none", fontFamily: "Inter,sans-serif" }}
@@ -116,7 +132,7 @@ export default function ContactPage() {
                 Facebook
               </a>
               <a
-                href="https://www.instagram.com/ichattiesburg"
+                href={instagramUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{ padding: "8px 16px", background: "linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)", color: "#fff", borderRadius: 4, fontSize: 13, fontWeight: 500, textDecoration: "none", fontFamily: "Inter,sans-serif" }}

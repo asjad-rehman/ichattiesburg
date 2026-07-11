@@ -1219,6 +1219,47 @@ function ResourceLinksSection() {
 }
 
 // ── Site Settings Tab ─────────────────────────────────────────────────────────
+// NOTE: Field is defined at module scope (not inside SettingsTab). Defining a
+// component inside another component's render creates a brand-new component type
+// on every keystroke, which forces React to unmount/remount the input and drop
+// focus — making the settings form nearly impossible to type into.
+function SettingField({
+  label: lbl,
+  name,
+  value,
+  onChange,
+  placeholder,
+  textarea,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (name: string, value: string) => void;
+  placeholder?: string;
+  textarea?: boolean;
+}) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={labelStyle}>{lbl}</label>
+      {textarea ? (
+        <textarea
+          style={{ ...inputStyle, minHeight: 90, resize: "vertical" } as React.CSSProperties}
+          value={value ?? ""}
+          onChange={e => onChange(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      ) : (
+        <input
+          style={inputStyle}
+          value={value ?? ""}
+          onChange={e => onChange(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      )}
+    </div>
+  );
+}
+
 function SettingsTab() {
   const [settings, setSettings] = useState<any>(null);
   const [saved, setSaved] = useState(false);
@@ -1242,25 +1283,8 @@ function SettingsTab() {
 
   if (!settings) return <div style={{ color: ICH.textMuted, padding: 24 }}>Loading settings…</div>;
 
-  const Field = ({ label: lbl, name, placeholder, textarea }: { label: string; name: string; placeholder?: string; textarea?: boolean }) => (
-    <div style={{ marginBottom: 16 }}>
-      <label style={labelStyle}>{lbl}</label>
-      {textarea ? (
-        <textarea
-          style={{ ...inputStyle, minHeight: 90, resize: "vertical" } as React.CSSProperties}
-          value={settings[name] ?? ""}
-          onChange={e => set(name, e.target.value)}
-          placeholder={placeholder}
-        />
-      ) : (
-        <input
-          style={inputStyle}
-          value={settings[name] ?? ""}
-          onChange={e => set(name, e.target.value)}
-          placeholder={placeholder}
-        />
-      )}
-    </div>
+  const Field = (props: { label: string; name: string; placeholder?: string; textarea?: boolean }) => (
+    <SettingField {...props} value={settings[props.name] ?? ""} onChange={set} />
   );
 
   return (
@@ -1274,49 +1298,49 @@ function SettingsTab() {
       {/* Contact Info */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Contact &amp; Location</h3>
-        <Field label="Physical Address" name="address" placeholder="211 N 25th Avenue, Hattiesburg, MS 39401" />
-        <Field label="Google Maps URL" name="addressUrl" placeholder="https://www.google.com/maps/search/?api=1&query=..." />
-        <Field label="Phone Number (optional)" name="phone" placeholder="+1 (601) 555-0000" />
-        <Field label="Contact Email" name="email" placeholder="ichattiesburg@gmail.com" />
-        <Field label='Jumuah Location Label (shown on home page "Jumuah" card)' name="jumuahLocation" placeholder="211 N 25th Ave" />
+        {Field({ label: "Physical Address", name: "address", placeholder: "211 N 25th Avenue, Hattiesburg, MS 39401" })}
+        {Field({ label: "Google Maps URL", name: "addressUrl", placeholder: "https://www.google.com/maps/search/?api=1&query=..." })}
+        {Field({ label: "Phone Number (optional)", name: "phone", placeholder: "+1 (601) 555-0000" })}
+        {Field({ label: "Contact Email", name: "email", placeholder: "ichattiesburg@gmail.com" })}
+        {Field({ label: 'Jumuah Location Label (shown on home page "Jumuah" card)', name: "jumuahLocation", placeholder: "211 N 25th Ave" })}
       </Card>
 
       {/* Branding & Socials */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Masjid Branding &amp; Socials</h3>
-        <Field label="Masjid Short Name / Acronym" name="masjidShortName" placeholder="ICH" />
-        <Field label="Footer Short Description" name="footerDescription" placeholder="Serving the Muslim community with prayer, education, and community programs." />
-        <Field label="Facebook Page URL" name="facebookUrl" placeholder="https://www.facebook.com/..." />
-        <Field label="Instagram Profile URL" name="instagramUrl" placeholder="https://www.instagram.com/..." />
+        {Field({ label: "Masjid Short Name / Acronym", name: "masjidShortName", placeholder: "ICH" })}
+        {Field({ label: "Footer Short Description", name: "footerDescription", placeholder: "Serving the Muslim community with prayer, education, and community programs." })}
+        {Field({ label: "Facebook Page URL", name: "facebookUrl", placeholder: "https://www.facebook.com/..." })}
+        {Field({ label: "Instagram Profile URL", name: "instagramUrl", placeholder: "https://www.instagram.com/..." })}
       </Card>
 
       {/* Mission */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Mission Statement</h3>
-        <Field label="Mission Text (shown on About page)" name="missionText" textarea placeholder="The Islamic Center of Hattiesburg stands as a beacon of faith…" />
+        {Field({ label: "Mission Text (shown on About page)", name: "missionText", textarea: true, placeholder: "The Islamic Center of Hattiesburg stands as a beacon of faith…" })}
       </Card>
 
       {/* Oak Grove */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Oak Grove / New Masjid Project</h3>
-        <Field label="Project Title" name="oakGroveTitle" placeholder="New Masjid Project" />
-        <Field label="Project Description" name="oakGroveDescription" textarea placeholder="As a growing community our current facility…" />
-        <Field label="Fundraiser URL (LaunchGood or other)" name="oakGroveUrl" placeholder="https://www.launchgood.com/v4/campaign/..." />
+        {Field({ label: "Project Title", name: "oakGroveTitle", placeholder: "New Masjid Project" })}
+        {Field({ label: "Project Description", name: "oakGroveDescription", textarea: true, placeholder: "As a growing community our current facility…" })}
+        {Field({ label: "Fundraiser URL (LaunchGood or other)", name: "oakGroveUrl", placeholder: "https://www.launchgood.com/v4/campaign/..." })}
       </Card>
 
       {/* Donation */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 8 }}>Donation Page (Zeffy)</h3>
         <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 16 }}>Find these UUIDs in your Zeffy dashboard URLs: <code style={{ background: "#f3f4f6", padding: "1px 5px", borderRadius: 3, fontSize: 11 }}>zeffy.com/donation-form/&#123;UUID&#125;</code></p>
-        <Field label="One-Time Donation Form UUID" name="zeffyOneTimeId" placeholder="ba0c6cb0-70a2-41db-95c6-9ff75a30b42c" />
-        <Field label="Monthly / Recurring Donation Form UUID" name="zeffyMonthlyId" placeholder="e4338258-eef5-489e-ae60-75017200e9bc" />
+        {Field({ label: "One-Time Donation Form UUID", name: "zeffyOneTimeId", placeholder: "ba0c6cb0-70a2-41db-95c6-9ff75a30b42c" })}
+        {Field({ label: "Monthly / Recurring Donation Form UUID", name: "zeffyMonthlyId", placeholder: "e4338258-eef5-489e-ae60-75017200e9bc" })}
       </Card>
 
       {/* Prayer Display */}
       <Card style={{ marginBottom: 28 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 8 }}>Prayer Time Display</h3>
         <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 16 }}>Controls how Maghrib iqama appears on the home page prayer strip. Typical values: &ldquo;After Adhan&rdquo; or a time like &ldquo;7:45 PM&rdquo;.</p>
-        <Field label="Maghrib Iqama Display" name="maghribDisplay" placeholder="After Adhan" />
+        {Field({ label: "Maghrib Iqama Display", name: "maghribDisplay", placeholder: "After Adhan" })}
       </Card>
 
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
