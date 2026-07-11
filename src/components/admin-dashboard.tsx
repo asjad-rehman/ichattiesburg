@@ -5,6 +5,7 @@ import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users, Settings, Bo
 import { AdminUser } from "@/lib/auth";
 import { ICH, Btn, Card } from "./ui-primitives";
 import { parseLocalDate } from "@/lib/utils";
+import type { Announcement, BoardMember, EventItem, ImpactItem, Program, ResourceLink, SiteSettings } from "@/lib/store";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
   const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board" | "resources" | "impact" | "programs" | "settings">("announcements");
@@ -91,7 +92,7 @@ const labelStyle = {
 };
 
 function AnnouncementsTab() {
-  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [priority, setPriority] = useState<"normal" | "urgent">("normal");
@@ -125,7 +126,7 @@ function AnnouncementsTab() {
     }
   };
 
-  const handleEdit = (a: any) => {
+  const handleEdit = (a: Announcement) => {
     setEditingId(a.id);
     setTitle(a.title);
     setBody(a.body);
@@ -250,7 +251,7 @@ function AnnouncementsTab() {
 }
 
 function EventsTab() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [saved, setSaved] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -285,7 +286,7 @@ function EventsTab() {
     }
   };
 
-  const handleEdit = (a: any) => {
+  const handleEdit = (a: EventItem) => {
     setEditingId(a.id);
     setForm({ title: a.title, description: a.description, date: a.date, time: a.time || "", location: a.location || "", category: a.category || "community", recurring: a.recurring || false });
   };
@@ -532,7 +533,7 @@ function PrayerTimesTab() {
 }
 
 function BoardTab() {
-  const [board, setBoard] = useState<any[]>([]);
+  const [board, setBoard] = useState<BoardMember[]>([]);
   const [saved, setSaved] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", role: "" });
@@ -565,7 +566,7 @@ function BoardTab() {
     }
   };
 
-  const handleEdit = (b: any) => {
+  const handleEdit = (b: BoardMember) => {
     setEditingId(b.id);
     setForm({ name: b.name, role: b.role });
   };
@@ -655,7 +656,7 @@ function BoardTab() {
 }
 
 function ResourcesTab() {
-  const [resources, setResources] = useState<any>({ restaurants: "", meatSupply: "" });
+  const [resources, setResources] = useState<{ restaurants: string | null; meatSupply: string | null }>({ restaurants: "", meatSupply: "" });
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
@@ -682,8 +683,8 @@ function ResourcesTab() {
       } else {
         setMessage(`Error: ${data.error}`);
       }
-    } catch (err: any) {
-      setMessage(`Error: ${err.message}`);
+    } catch (err) {
+      setMessage(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
       setSaving(null);
       setTimeout(() => setMessage(""), 4000);
@@ -770,7 +771,7 @@ function ResourcesTab() {
 }
 
 function ImpactTab() {
-  const [impact, setImpact] = useState<any[]>([]);
+  const [impact, setImpact] = useState<ImpactItem[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [count, setCount] = useState("");
@@ -804,7 +805,7 @@ function ImpactTab() {
       } else {
         alert("Upload failed: " + (data.error || "Unknown error"));
       }
-    } catch (err) {
+    } catch {
       alert("Upload failed.");
     } finally {
       setUploading(false);
@@ -832,7 +833,7 @@ function ImpactTab() {
     }
   };
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: ImpactItem) => {
     setEditingId(item.id);
     setTitle(item.title);
     setDescription(item.description);
@@ -986,7 +987,7 @@ function ImpactTab() {
 
 // ── Programs / Initiatives Tab ────────────────────────────────────────────────
 function ProgramsTab() {
-  const [programs, setPrograms] = useState<any[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [icon, setIcon] = useState("📌");
   const [title, setTitle] = useState("");
   const [schedule, setSchedule] = useState("");
@@ -1015,9 +1016,9 @@ function ProgramsTab() {
     load();
   };
 
-  const handleEdit = (p: any) => { setEditingId(p.id); setIcon(p.icon); setTitle(p.title); setSchedule(p.schedule); setNote(p.note); setDescription(p.description); setActive(p.active); };
+  const handleEdit = (p: Program) => { setEditingId(p.id); setIcon(p.icon); setTitle(p.title); setSchedule(p.schedule); setNote(p.note); setDescription(p.description); setActive(p.active); };
   const handleDelete = async (id: string) => { await fetch(`/api/admin/programs?id=${id}`, { method: "DELETE" }); load(); };
-  const handleToggleActive = async (p: any) => {
+  const handleToggleActive = async (p: Program) => {
     await fetch("/api/admin/programs", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: p.id, active: !p.active }) });
     load();
   };
@@ -1109,7 +1110,7 @@ function ProgramsTab() {
 
 // ── Resource Links Section (embedded in Programs tab) ────────────────────────
 function ResourceLinksSection() {
-  const [links, setLinks] = useState<any[]>([]);
+  const [links, setLinks] = useState<ResourceLink[]>([]);
   const [category, setCategory] = useState("");
   const [categoryIcon, setCategoryIcon] = useState("🔗");
   const [label, setLabel] = useState("");
@@ -1137,10 +1138,10 @@ function ResourceLinksSection() {
     load();
   };
 
-  const handleEdit = (l: any) => { setEditingId(l.id); setCategory(l.category); setCategoryIcon(l.categoryIcon); setLabel(l.label); setUrl(l.url); setOrder(l.order); };
+  const handleEdit = (l: ResourceLink) => { setEditingId(l.id); setCategory(l.category); setCategoryIcon(l.categoryIcon); setLabel(l.label); setUrl(l.url); setOrder(l.order); };
   const handleDelete = async (id: string) => { await fetch(`/api/admin/resource-links?id=${id}`, { method: "DELETE" }); load(); };
 
-  const grouped = links.reduce<Record<string, any[]>>((acc, l) => {
+  const grouped = links.reduce<Record<string, ResourceLink[]>>((acc, l) => {
     if (!acc[l.category]) acc[l.category] = [];
     acc[l.category].push(l);
     return acc;
@@ -1194,7 +1195,7 @@ function ResourceLinksSection() {
         <div key={cat} style={{ marginBottom: 20 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, marginBottom: 8 }}>{cat}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {(catLinks as any[]).sort((a, b) => a.order - b.order).map((l) => (
+            {(catLinks as ResourceLink[]).sort((a, b) => a.order - b.order).map((l) => (
               <div key={l.id} style={{ border: `1px solid ${ICH.border}`, borderRadius: 5, padding: "10px 14px", background: "#fff", display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: ICH.text }}>{l.label}</div>
@@ -1261,17 +1262,18 @@ function SettingField({
 }
 
 function SettingsTab() {
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings")
       .then(r => r.json())
-      .then(d => setSettings(d.settings || {}));
+      .then(d => setSettings(d.settings || null));
   }, []);
 
-  const set = (key: string, value: string) => setSettings((s: any) => ({ ...s, [key]: value }));
+  const set = (key: string, value: string) =>
+    setSettings((s) => ({ ...(s ?? ({} as SiteSettings)), [key]: value } as SiteSettings));
 
   const handleSave = async () => {
     setSaving(true);
@@ -1284,7 +1286,7 @@ function SettingsTab() {
   if (!settings) return <div style={{ color: ICH.textMuted, padding: 24 }}>Loading settings…</div>;
 
   const Field = (props: { label: string; name: string; placeholder?: string; textarea?: boolean }) => (
-    <SettingField {...props} value={settings[props.name] ?? ""} onChange={set} />
+    <SettingField {...props} value={String(settings[props.name as keyof SiteSettings] ?? "")} onChange={set} />
   );
 
   return (

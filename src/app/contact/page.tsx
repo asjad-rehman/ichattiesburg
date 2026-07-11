@@ -1,20 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ICH, Btn, GoldLabel, Card } from "@/components/ui-primitives";
+import { useSettings } from "@/lib/use-settings";
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "", hp: "" });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("");
-  const [settings, setSettings] = useState<any>(null);
-
-  useEffect(() => {
-    fetch("/api/admin/settings")
-      .then((r) => r.json())
-      .then((d) => { if (d.settings) setSettings(d.settings); })
-      .catch(() => {});
-  }, []);
+  const settings = useSettings();
 
   const address = settings?.address || "211 N 25th Avenue, Hattiesburg, MS 39401";
   const addressUrl = settings?.addressUrl || "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401";
@@ -89,7 +83,7 @@ export default function ContactPage() {
       <div style={{ marginBottom: 44 }}>
         <GoldLabel>Get in Touch</GoldLabel>
         <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: "clamp(32px,5vw,52px)", fontWeight: 600, marginBottom: 10 }}>Contact Us</h1>
-        <p style={{ fontSize: 16, color: ICH.textMuted }}>We'd love to hear from you. Reach out with any questions or comments.</p>
+        <p style={{ fontSize: 16, color: ICH.textMuted }}>We&rsquo;d love to hear from you. Reach out with any questions or comments.</p>
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 40 }}>
@@ -157,7 +151,7 @@ export default function ContactPage() {
             <div style={{ textAlign: "center", padding: "60px 24px", background: ICH.bgCard, borderRadius: 8, border: `1px solid ${ICH.primary}33` }}>
               <div style={{ fontSize: 48, marginBottom: 16 }}>✅</div>
               <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 26, marginBottom: 10 }}>Message Sent</h3>
-              <p style={{ fontSize: 14, color: ICH.textMuted, lineHeight: 1.7 }}>JazakAllah Khayran! We'll be in touch soon, insha'Allah.</p>
+              <p style={{ fontSize: 14, color: ICH.textMuted, lineHeight: 1.7 }}>JazakAllah Khayran! We&rsquo;ll be in touch soon, insha&rsquo;Allah.</p>
               <div style={{ marginTop: 20 }}>
                 <Btn variant="outline" onClick={() => { setForm({ name: "", email: "", subject: "", message: "", hp: "" }); setStatus("idle"); }} size="sm">Send Another</Btn>
               </div>

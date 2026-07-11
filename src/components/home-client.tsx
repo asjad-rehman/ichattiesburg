@@ -144,7 +144,7 @@ function usePrayerCountdown(prayers: PrayerData[]) {
       const nextIdx = curIdx === prayers.length - 1 ? 0 : curIdx + 1;
       const next = prayers[nextIdx];
 
-      let target = new Date();
+      const target = new Date();
       target.setHours(next.h, next.m, 0, 0);
       if (target <= now) {
         target.setDate(target.getDate() + 1);
@@ -176,13 +176,6 @@ interface HomeClientProps {
   prayerTimes: PrayerTimes;
   jamaatTimes: JamaatTimes;
   settings: SiteSettings;
-}
-
-// Parse a 24h "HH:MM" string → { h, m }
-function parse24(timeStr: string) {
-  if (!timeStr || !timeStr.includes(":")) return { h: 0, m: 0 };
-  const [h, m] = timeStr.split(":").map(Number);
-  return { h: isNaN(h) ? 0 : h, m: isNaN(m) ? 0 : m };
 }
 
 export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeClientProps) {
@@ -278,7 +271,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
           {/* Countdown bar */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14, flexWrap: "wrap", gap: 8 }}>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".12em", textTransform: "uppercase", color: ICH.accent, fontFamily: "Inter,sans-serif" }}>
-              Today's Prayer Times
+              Today&rsquo;s Prayer Times
             </div>
             {nextName && (
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
