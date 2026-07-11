@@ -1,234 +1,357 @@
 # Mosque Website Template (Next.js 16)
 
-A modern, high-performance, and fully responsive website template designed for masajid (mosques) and Islamic community centers. 
+A modern, responsive website + admin dashboard for a masjid / Islamic community
+center. Originally built for the **Islamic Center of Hattiesburg (ICH)** and
+structured so any masjid can fork it and rebrand with its own colours, prayer
+configuration, content, and donation forms — **no SQL database to run**.
 
-Originally built for the **Islamic Center of Hattiesburg (ICH)**, this codebase has been refactored so that any mosque in the world can copy/clone it and customize it with their own branding, prayer calculation configurations, donation forms, styling, and content.
+It ships with a public marketing site, a self-service admin dashboard, live
+prayer-time calculation, and a full-screen **TV display** board for the prayer
+hall.
 
 ---
 
 ## Table of Contents
 
-- [Core Tech Stack](#core-tech-stack)
-- [How to Clone and Brand Your Masjid](#how-to-clone-and-brand-your-masjid)
-  - [Step 1: Core Configuration (Coordinates & Timezone)](#step-1-core-configuration-coordinates--timezone)
-  - [Step 2: Brand Styling & Colors](#step-2-brand-styling--colors)
-  - [Step 3: Logo & Graphic Assets](#step-3-logo--graphic-assets)
-  - [Step 4: Meta SEO Branding](#step-4-meta-seo-branding)
-- [Quick Start for Development](#quick-start-for-development)
+- [Tech Stack](#tech-stack)
+- [How It Works (Architecture)](#how-it-works-architecture)
+  - [Rendering & routing](#rendering--routing)
+  - [Content storage](#content-storage-srclibremote-storagets)
+  - [Prayer times](#prayer-times)
+  - [Admin authentication](#admin-authentication)
+  - [Donations](#donations)
+  - [Styling & fonts](#styling--fonts)
+- [Pages](#pages)
+- [Project Structure](#project-structure)
+- [Rebranding for Your Masjid](#rebranding-for-your-masjid)
+- [Local Development](#local-development)
 - [Environment Variables](#environment-variables)
-- [Data Storage Architecture](#data-storage-architecture)
-- [Admin Dashboard Features](#admin-dashboard-features)
+- [Seed Data Files](#seed-data-files)
 - [API Reference](#api-reference)
-- [Deployment Instructions](#deployment-instructions)
+- [Deployment (Vercel)](#deployment-vercel)
+- [Legacy / Unused Code](#legacy--unused-code)
 
 ---
 
-## Core Tech Stack
+## Tech Stack
 
-- **Framework**: Next.js 16 (App Router)
-- **Language**: TypeScript
-- **Styling**: Inline styles + global CSS (highly performant, zero dependencies)
-- **Calculations**: [ADHAN.js](https://github.com/batoulapps/adhan-js) for dynamic prayer time calculations based on coordinates
-- **Database / Storage**: Multi-tier engine (Upstash Redis + GitHub Commits + local backup JSON files) — **no PostgreSQL or MySQL required**
-- **Hosting**: Vercel-optimized
+| Area | Choice |
+|---|---|
+| Framework | **Next.js 16.2** (App Router, React 19, TypeScript) |
+| Styling | Inline styles driven by a shared theme object (`src/lib/theme.ts`) **+** Tailwind CSS v4 (`@import "tailwindcss"` in `globals.css`) for a few components |
+| Animation | `framer-motion` (scroll reveals) and `lenis` (smooth scroll) |
+| Icons | `lucide-react` |
+| Prayer times | Main pages: **AlAdhan REST API** (`api.aladhan.com`); `/display` board: **`adhan`** npm library locally — both configured from `src/config/masjid.ts` |
+| Content storage | Tiered `remote-storage` layer: Upstash Redis / Vercel KV **or** GitHub Contents API, with bundled `public/*.json` seeds as the fallback — **no PostgreSQL/MySQL required** |
+| Auth | Stateless JWT in an httpOnly cookie (`jsonwebtoken` + `bcryptjs`) |
+| Donations | **Zeffy** embedded forms + a **LaunchGood** link (Stripe checkout exists but is dormant) |
+| Hosting | Vercel-optimized |
+
+> Several packages in `package.json` are **not used by the running app** — see
+> [Legacy / Unused Code](#legacy--unused-code).
 
 ---
 
-## How to Clone and Brand Your Masjid
+## How It Works (Architecture)
 
-Follow these 4 simple steps to brand this template for your own masjid.
+### Rendering & routing
 
-### Step 1: Core Configuration (Coordinates & Timezone)
+- App Router. Most content pages are **server components** with
+  `export const dynamic = "force-dynamic"` so they always read the latest
+  content, then hand data to a `"use client"` component for interactivity.
+- `src/middleware.ts` sets an `x-pathname` response header on every request.
+  `src/app/layout.tsx` reads it and, for `/display`, renders the page **without**
+  the navbar/announcements/footer (so the TV board is chrome-free). All other
+  routes get the shared shell (`AnnouncementsBanner` → `Navbar` → page →
+  `Footer`, wrapped in `LenisProvider`).
 
-Open `src/config/masjid.ts` and set your mosque's name, timezone, coordinates (latitude/longitude), and prayer calculation method.
+### Content storage (`src/lib/remote-storage.ts`)
 
-```typescript
-// src/config/masjid.ts
+There is **no relational database**. Editable content lives in small JSON
+documents, each addressed by a name (e.g. `impact`, `events`, `settings`).
+`src/lib/store.ts` wraps each document in a collection with a 10-second
+in-process cache; `src/lib/jamaat.ts` does the same for congregation times.
 
-type CalcMethod = "NORTH_AMERICA" | "MUSLIM_WORLD_LEAGUE" | "EGYPTIAN" | "KARACHI" | "UMM_AL_QURA";
-type MadhabType = "HANAFI" | "SHAFI";
+**Reads** (`remoteRead`) try, in order:
+1. Upstash Redis / Vercel KV (if configured)
+2. GitHub Contents API (if a token is configured — bypasses CDN caching)
+3. `/tmp/ichattiesburg-<name>.json` (per-instance scratch)
+4. Bundled seed `public/<name>.json`
+5. Hard-coded defaults in code
 
-export const masjid = {
-  name: "Your Masjid Name",
-  timezone: "America/New_York",                  // IANA Timezone identifier
-  coordinates: { lat: 40.7128, lon: -74.0060 },  // Used for Adhan time calculations
-  calc: {
-    method: "NORTH_AMERICA",                     // Calculation method
-    fajrAngle: 15,                               // Custom Fajr angle (optional)
-    ishaAngle: 15,                               // Custom Isha angle (optional)
-    madhab: "SHAFI",                             // HANAFI (later Asr) or SHAFI (earlier Asr)
-  },
-};
+**Writes** (`remoteWrite`) fan out to every configured backend (Redis/KV, `/tmp`,
+and GitHub). A write only reports failure when a **durable** backend (Redis/KV or
+GitHub) was configured and *all* of them failed — so, e.g., a stale GitHub token
+no longer breaks a save that Redis already persisted. With no durable backend
+configured, writes fall back to `/tmp` (dev/local mode) and resolve silently.
+
+> ⚠️ **Serverless persistence:** `/tmp` is per-instance and ephemeral. For admin
+> edits to persist across requests on Vercel you **must** configure Redis/KV or a
+> valid GitHub token (see [Environment Variables](#environment-variables)). The
+> GitHub target repo/branch are hard-coded as `GH_OWNER` / `GH_REPO` /
+> `GH_BRANCH` in `remote-storage.ts` and must be changed when you fork.
+
+### Prayer times
+
+`src/lib/prayer-times.ts` fetches daily adhan times from the **AlAdhan API**
+(`https://api.aladhan.com/v1/timings`, cached for 1 hour) using the coordinates,
+calculation method, and madhab from `src/config/masjid.ts`. If the API call
+fails it falls back to sane hard-coded times.
+
+**Jamaat (iqama) and Jumuah times are separate** and admin-controlled — stored
+under the `jamaat` document (`src/lib/jamaat.ts`). The site shows the calculated
+adhan time alongside the admin-set jamaat time for each prayer.
+
+There are **two** adhan-calculation paths:
+- The main pages (`/`, `/prayer-times`) fetch from the **AlAdhan API**
+  server-side via `prayer-times.ts`.
+- The `/display` TV board computes times **client-side using the `adhan` npm
+  library** (`Coordinates`/`CalculationMethod`/`Madhab`/`PrayerTimes`) so it
+  updates live every second without hitting the network, and polls `/api/jamaat`
+  every 10s for the admin-set jamaat times.
+
+Both paths read the same `src/config/masjid.ts` settings, so keep them consistent.
+
+### Admin authentication
+
+- `POST /api/admin/login` compares the submitted username against `ADMIN_EMAIL`
+  and the password against `ADMIN_PASSWORD_HASH` (bcrypt). On success it sets a
+  signed JWT (`jsonwebtoken`, 7-day expiry) in an httpOnly `admin_token` cookie.
+- If `ADMIN_EMAIL` / `ADMIN_PASSWORD_HASH` are **unset**, it falls back to a
+  hard-coded dev login (`ichattiesburg` / `3223`). **Set the env vars in prod.**
+- Write endpoints call `getAdminUser(req)` and 401 without a valid cookie.
+  Read (`GET`) endpoints are intentionally public so client components (footer,
+  contact, resources) can fetch settings/content.
+
+### Donations
+
+The shipped `/donate` page (`src/app/donate/donate-client.tsx`) renders **Zeffy**
+donation forms in an iframe (one-time / monthly, IDs from site settings) plus a
+**LaunchGood** button for the Oak Grove building campaign. It requires no payment
+keys. A Stripe Checkout route exists at `/api/donate` with a `/donate/success`
+page, but it is **not wired into the UI** and is off unless `STRIPE_SECRET_KEY`
+is set.
+
+### Styling & fonts
+
+- Colours come from the `ICH` object in `src/lib/theme.ts`, applied mostly via
+  inline styles and re-exported through `src/components/ui-primitives.tsx`
+  (`Btn`, `Card`, `SectionHead`, `GoldLabel`, `Tag`, `ScrollReveal`).
+  > Because `ui-primitives.tsx` is a `"use client"` module, **server components
+  > must import `ICH` from `@/lib/theme` directly** — importing the value through
+  > the client module yields `undefined` at render time.
+- Tailwind v4 is also enabled and used by a few components (e.g. the
+  announcements banner, the `/display` board) and the root layout.
+- Fonts: **Inter** (sans) and **Cormorant Garamond** (serif headings) via
+  `next/font/google`, plus a bundled **Madina/Uthmanic** Arabic webfont
+  (`public/fonts/UthmanicHafs.woff2`, used via the `.arabic-text` class).
+
+---
+
+## Pages
+
+| Route | Description |
+|---|---|
+| `/` | Home — hero, live prayer strip with countdown, Jumuah card, about, donate CTA |
+| `/prayer-times` | Full daily schedule (adhan + jamaat), live countdown, Jumuah details |
+| `/events` | Category-filterable events / calendar |
+| `/about` | Mission, board members, programs, Oak Grove project, location map |
+| `/impact` | Impact stories and metrics |
+| `/resources` | Local halal listings + curated Islamic link grid |
+| `/contact` | Contact form (submits to Web3Forms) + address/socials |
+| `/donate` | Zeffy embedded forms + LaunchGood link |
+| `/display` | **Full-screen TV board** for the prayer hall (no site chrome; not mobile-oriented) |
+| `/admin`, `/admin/login` | Admin dashboard + login |
+| `/privacy`, `/robots.txt`, `/sitemap.xml` | Legal + SEO |
+
+---
+
+## Project Structure
+
+```
+src/
+├─ app/
+│  ├─ layout.tsx            # Root shell; hides chrome on /display via x-pathname
+│  ├─ page.tsx              # Home (server) → components/home-client.tsx
+│  ├─ <route>/page.tsx      # about, events, impact, resources, contact, donate, …
+│  ├─ display/              # TV board (own layout, no navbar/footer)
+│  └─ api/
+│     ├─ announcements/     # public GET
+│     ├─ jamaat/            # public GET + jamaat/update (admin POST)
+│     ├─ donate/            # dormant Stripe checkout
+│     └─ admin/             # login/logout, settings, events, board, impact,
+│                           # programs, resources, resource-links, prayer-times, upload
+├─ components/              # navbar, footer, *-client pages, ui-primitives, …
+├─ config/masjid.ts         # coordinates, timezone, calc method, madhab
+├─ lib/
+│  ├─ theme.ts              # ICH colour tokens
+│  ├─ store.ts              # content collections (board, events, impact, …)
+│  ├─ jamaat.ts             # congregation/Jumuah times
+│  ├─ remote-storage.ts     # tiered read/write (Redis/KV · GitHub · /tmp · seed)
+│  ├─ prayer-times.ts       # AlAdhan API fetch + formatting
+│  ├─ auth.ts               # JWT sign/verify, bcrypt, getAdminUser
+│  ├─ use-settings.ts       # client hook for site settings
+│  └─ time.ts, utils.ts
+├─ middleware.ts            # sets x-pathname header
+└─ types/index.ts
+
+public/                     # seed *.json, fonts, uploads/, images
 ```
 
-### Step 2: Brand Styling & Colors
+---
 
-Open `src/lib/theme.ts` to customize the primary theme colors to match your brand logo.
+## Rebranding for Your Masjid
 
-```typescript
-// src/lib/theme.ts
-
-export const ICH = {
-  primary:      '#145c70',  // Main brand color (e.g. Navbar, headers)
-  primaryDark:  '#0d3d4a',  // Dark accent / Hero backgrounds
-  primaryMid:   '#104b5c',  
-  primaryLight: '#1f7a95',
-  gold:         '#247c6c',  // Secondary brand color (e.g. buttons, borders)
-  goldLight:    '#3ba491',
-  goldDark:     '#18574a',
-  accent:       '#5ce1cb',  // Bright contrast color for dark mode elements
-  bg:           '#f4f8f9',  // Base page background
-  bgCard:       '#e6f0f2',  // Card background
-  bgCard2:      '#d3e3e8',
-  text:         '#121d21',  // Default text color
-  textMuted:    '#50676e',  // Muted subtitles/descriptions
-  border:       '#c3d7dc',  
-  footerBg:     '#08171c',  // Footer background color
-};
-```
-
-### Step 3: Logo & Graphic Assets
-
-Replace the following files in the `/public` directory:
-1. **Logo**: Save your transparent logo PNG file as `/public/uploads/logo.png`. (It will automatically render in the navbar and footer).
-2. **Favicon**: Place your browser shortcut icon at `/public/icon.png`.
-3. **Hero Mosque Graphic**: The home page uses a custom hero Mosque outline SVG inside `/src/components/home-client.tsx` (function `MosqueHero`). If needed, replace or style the colors/paths of this SVG.
-
-### Step 4: Meta SEO Branding
-
-Open `src/app/layout.tsx` and configure your website domain and SEO meta tags:
-
-- Change `https://ichattiesburg.org` to your own website domain.
-- Update description, keywords, OpenGraph site name, and OG image references.
+1. **Prayer config** — `src/config/masjid.ts`: name, IANA `timezone`,
+   `coordinates`, `calc.method`, and `madhab` (`HANAFI` = later Asr,
+   `SHAFI` = earlier Asr).
+2. **Colours** — `src/lib/theme.ts`: edit the `ICH` tokens to match your brand.
+   (Optional: the `/display` board uses its own palette in
+   `src/app/display/page.tsx`.)
+3. **Logo & assets** — replace `public/uploads/logo.png` (navbar/footer),
+   `src/app/icon.png` (favicon), and the home hero image `public/ich.jpeg`. The
+   home hero also draws a mosque silhouette SVG in the `MosqueHero` function of
+   `src/components/home-client.tsx`.
+4. **SEO / domain** — `src/app/layout.tsx`: `metadataBase`, title/description,
+   keywords, and OpenGraph. Update image `remotePatterns` in `next.config.ts`.
+5. **GitHub persistence target** — if you use the GitHub storage backend, set
+   `GH_OWNER` / `GH_REPO` / `GH_BRANCH` in `src/lib/remote-storage.ts`.
+6. **Seed content** — edit the JSON files in `public/` (see
+   [Seed Data Files](#seed-data-files)) or just manage everything from `/admin`
+   once a durable backend is configured.
+7. **Contact form** — the contact page posts to Web3Forms; replace the
+   `access_key` in `src/app/contact/page.tsx`.
+8. **Donations** — set your Zeffy form UUIDs and LaunchGood URL from
+   **Admin → Site Settings** (or in `public/settings.json`).
 
 ---
 
-## Quick Start for Development
+## Local Development
 
 ```bash
-# Clone the repository
 git clone https://github.com/asjad-rehman/ichattiesburg.git your-masjid-web
 cd your-masjid-web
-
-# Install dependencies
 npm install
-
-# Create environment configuration
-cp .env.example .env.local
-
-# Run development server
-npm run dev
+cp .env.example .env.local     # then fill in values (or leave blank for dev login)
+npm run dev                    # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to view your site. Access the Admin Dashboard at [http://localhost:3000/admin](http://localhost:3000/admin).
+Scripts: `npm run dev` · `npm run build` · `npm run start` · `npm run lint`.
+
+Without any env vars the site runs with seed content and the dev admin login
+(`ichattiesburg` / `3223`); edits persist only to `/tmp` locally.
+
+Admin dashboard: `http://localhost:3000/admin`.
 
 ---
 
 ## Environment Variables
 
-Your `.env.local` contains all server-side settings:
+See [`.env.example`](./.env.example) for the annotated template.
 
-### Required
+| Variable | Required? | Purpose |
+|---|---|---|
+| `JWT_SECRET` | Prod | Signs the admin session cookie |
+| `ADMIN_EMAIL` | Prod | Admin login username (falls back to dev login if unset) |
+| `ADMIN_PASSWORD_HASH` | Prod | bcrypt hash of the admin password |
+| `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | One backend | Upstash Redis persistence |
+| `KV_REST_API_URL` / `KV_REST_API_TOKEN` | One backend | Vercel KV aliases for the above |
+| `GITHUB_TOKEN` (or `GH_TOKEN` / `GITHUB_PAT`) | One backend | GitHub Contents API persistence — PAT with **Contents: Read and write** |
+| `STRIPE_SECRET_KEY` | Optional | Enables the dormant `/api/donate` Stripe route |
+| `DATABASE_URL` | Legacy | Only for the unused `src/lib/db.ts` (Postgres) |
 
-| Variable | Description |
-|---|---|
-| `JWT_SECRET` | Secret key for admin session tokens (make this long and secure) |
-| `ADMIN_EMAIL` | The admin email used to log in |
-| `ADMIN_PASSWORD_HASH` | A bcrypt hash of the admin password |
+Generate secrets:
 
-*To generate a password hash, run:*
 ```bash
-node -e "const b=require('bcryptjs'); b.hash('YourSecurePassword', 12).then(console.log)"
+# JWT secret
+node -e "console.log(require('crypto').randomBytes(48).toString('base64'))"
+# Admin password hash
+node -e "require('bcryptjs').hash('YourSecurePassword', 12).then(console.log)"
 ```
 
-### Dynamic Storage Configuration (Highly Recommended)
-
-This template uses a hybrid cache layer to prevent data loss on serverless cold starts. **For production, configure at least one of the following:**
-
-1. **GitHub Commits (File-based Persistence)**:
-   - Provide a `GITHUB_TOKEN` (Personal Access Token with `repo` scope).
-   - Whenever an admin saves settings, announcements, or events, the server will commit the updated JSON file directly back to your GitHub repository in the `public/` directory!
-   - Required variable: `GITHUB_TOKEN`
-
-2. **Upstash Redis (High-speed Key-Value Cache)**:
-   - Connect an Upstash Redis database to store settings.
-   - Required variables: `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` (or Vercel KV aliases `KV_REST_API_URL` and `KV_REST_API_TOKEN`).
+**For production you must configure at least one durable backend** (Redis/KV or a
+GitHub token with `Contents: Read and write`) or admin edits will not persist.
 
 ---
 
-## Data Storage Architecture
+## Seed Data Files
 
-All customizable website sections are backed by local JSON files inside the `/public` folder. These files act as seed databases:
+Bundled JSON in `public/` provides the initial content and the read fallback when
+no durable backend is set. Each maps to a `remote-storage` document of the same
+name:
 
 | File | Content |
 |---|---|
-| `public/settings.json` | Site settings (address, phone, email, Zeffy UUIDs, socials, mission) |
-| `public/programs.json` | Pinned initiatives/classes shown on the About page |
-| `public/resource_links.json` | Pinned link grid shown on the Resources page |
-| `public/announcements.json` | Alerts banner displayed at the top of the site |
-| `public/events.json` | Upcoming events and calendar items |
-| `public/board.json` | Leadership board members |
-| `public/halal_resources.json` | Text descriptions of local Halal dining and groceries |
-| `public/impact.json` | Metrics and stories shown on the Impact page |
-| `public/jamaat.json` | Iqama/congregation prayer times override |
-
----
-
-## Admin Dashboard Features
-
-Once logged in at `/admin`, you can manage all aspects of the site:
-
-### ⚙️ Site Settings
-Manage address, contact email, phone number, Facebook/Instagram links, about-page mission text, Oak Grove masjid project details, Zeffy donation form IDs, and the home-page Maghrib display text without writing any code.
-
-### 📚 Programs & Initiatives
-Add, edit, or delete programs/classes (e.g. Sunday School, Halaqahs). Each program supports:
-- Emoji Icon (e.g., 🕌, 📚, 📖)
-- Title & Schedule
-- Full description
-- Active toggle (instantly hide/show the program on your site)
-
-### 🔗 Resource Links
-Manage categorized links on your resources page (e.g. Quran.com, Hadith sites, prayer apps, local organizations). Easily sort links with custom display orders.
-
-### 🕐 Prayer Times Override
-While adhan calculations are automated, you can manually update the exact Congregation (Iqama) time offsets:
-- Set congregation times for Fajr, Dhuhr, Asr, Maghrib, and Isha.
-- Configure up to two Jumuah slots with individual khutbah and salah times.
+| `settings.json` | Address, email, phone, socials, mission, Oak Grove copy, Zeffy UUIDs, Maghrib display |
+| `announcements.json` | Site-wide banner alerts |
+| `events.json` | Events / calendar items |
+| `board.json` | Leadership board members |
+| `programs.json` | Programs/classes shown on About |
+| `resource_links.json` | Categorized link grid on Resources |
+| `halal_resources.json` | Local halal dining/grocery text |
+| `impact.json` | Impact metrics and stories |
+| `jamaat.json` | Congregation (iqama) + Jumuah times |
 
 ---
 
 ## API Reference
 
-### Public API Endpoints
-- `GET /api/announcements` — Get active announcements banners.
-- `GET /api/jamaat` — Get congregation/Jumuah overrides.
-- `GET /api/admin/settings` — Read site settings configuration.
-- `GET /api/admin/programs` — Read initiatives list.
-- `GET /api/admin/resource-links` — Read Islamic links list.
+Read (`GET`) endpoints are public; all write verbs require the admin cookie.
 
-### Auth & Write Endpoints (Admin Token Cookie Required)
-- `POST /api/admin/login` / `POST /api/admin/logout`
-- `GET/POST/PUT/DELETE /api/admin/announcements`
-- `GET/POST/PUT/DELETE /api/admin/events`
-- `GET/POST/PUT/DELETE /api/admin/board`
-- `GET/POST/PUT/DELETE /api/admin/impact`
-- `GET/POST/PUT/DELETE /api/admin/programs`
-- `GET/POST/PUT/DELETE /api/admin/resource-links`
+**Public reads**
+- `GET /api/announcements`
+- `GET /api/jamaat` — congregation/Jumuah times
+- `GET /api/admin/{settings,programs,resource-links,resources,impact,events,board}`
+
+**Admin (cookie required)**
+- `POST /api/admin/login`, `POST /api/admin/logout`
+- `GET/POST/PUT/DELETE /api/admin/{announcements,events,board,impact,programs,resource-links}`
 - `POST /api/admin/settings`
-- `POST /api/admin/upload` (Upload image attachments)
+- `POST /api/admin/upload` — multipart image upload → returns `/uploads/<uuid>.<ext>`
+- `POST /api/jamaat/update` (and the parallel `GET/POST /api/admin/prayer-times`)
+
+**Dormant**
+- `POST /api/donate` — Stripe Checkout (off unless `STRIPE_SECRET_KEY` is set)
+
+Admin write handlers surface the underlying failure reason in their JSON error
+(e.g. a GitHub `Bad credentials` / `Resource not accessible` response), which the
+dashboard renders inline so misconfiguration is visible.
 
 ---
 
-## Deployment Instructions
+## Deployment (Vercel)
 
-### Deploy to Vercel (Fastest)
+1. Push your fork to GitHub.
+2. Vercel → **Add New Project** → import the repo.
+3. Add environment variables (**Settings → Environment Variables**):
+   `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and **one** durable
+   storage backend (Vercel KV / Upstash, or a `GITHUB_TOKEN` with
+   `Contents: Read and write`). Add `STRIPE_SECRET_KEY` only if using the Stripe
+   route.
+4. **Deploy.** After changing env vars, redeploy so the new values take effect.
 
-1. Push your rebranded codebase to a GitHub repository.
-2. Go to [Vercel](https://vercel.com) and click **Add New Project**.
-3. Import your GitHub repository.
-4. Open **Environment Variables** and enter:
-   - `JWT_SECRET` (Base64 random string)
-   - `ADMIN_EMAIL` & `ADMIN_PASSWORD_HASH`
-   - `GITHUB_TOKEN` (To allow the admin dashboard to commit data directly to your repo)
-5. Click **Deploy**. Vercel will build and launch your site in under 2 minutes!
+Tip: **Vercel KV / Upstash is recommended** over the GitHub backend — it persists
+instantly, whereas the GitHub backend commits a file on every save (which also
+triggers a redeploy).
+
+---
+
+## Legacy / Unused Code
+
+Present in the repo but **not used by the running app** (safe to remove when
+adapting the template):
+
+- `src/lib/db.ts` and `schema.sql` — Postgres scaffolding; the app uses
+  `remote-storage`, not SQL.
+- `src/app/api/donate/route.ts`, `src/app/donate/success/page.tsx` — Stripe
+  checkout path (the live `/donate` uses Zeffy).
+- `src/components/contact-form.tsx` — posts to a non-existent `/api/contact`;
+  the real form is inline in `src/app/contact/page.tsx`.
+- `src/components/donate-client.tsx`, `src/components/prayer-times-widget.tsx`,
+  `src/components/theme-provider.tsx` — no imports reference them.
+- Unused dependencies include `pg`, `nodemailer`, `@radix-ui/*`, `date-fns`,
+  `get-image-colors`, and `@stripe/stripe-js`. `next-themes` is referenced only
+  by the unused `theme-provider.tsx`. (`adhan` **is** used by `/display`;
+  `clsx`/`tailwind-merge` are used by `src/lib/utils.ts`.)
+- Root helper scripts `check_errors.js`, `get_colors.js`, `update_colors.js` are
+  one-off dev utilities, not part of the build.
