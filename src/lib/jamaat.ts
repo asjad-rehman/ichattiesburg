@@ -1,6 +1,7 @@
 import { remoteRead, remoteWrite } from "./remote-storage";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// Congregation (iqama) and Jumuah times. These are set by the masjid admin and
+// stored as a single JSON document, separate from the calculated adhan times.
 export type JummahSlot = { khutbah: string; salah: string };
 
 export type JamaatTimes = {
@@ -13,7 +14,8 @@ export type JamaatTimes = {
   updatedAt?: string;
 };
 
-// ── Validation ────────────────────────────────────────────────────────────────
+// Guards against a malformed stored document (or a bad admin payload) before we
+// trust it — the five daily times must be strings and jummah must be an array.
 export function isValidJamaatTimes(x: unknown): x is JamaatTimes {
   if (!x || typeof x !== "object") return false;
   const v = x as Record<string, unknown>;
@@ -27,7 +29,7 @@ export function isValidJamaatTimes(x: unknown): x is JamaatTimes {
   );
 }
 
-// ── Defaults ──────────────────────────────────────────────────────────────────
+// Used when nothing has been saved yet (fresh install / empty storage).
 const DEFAULTS: JamaatTimes = {
   fajr:    "05:30",
   dhuhr:   "13:15",
@@ -40,23 +42,20 @@ const DEFAULTS: JamaatTimes = {
   ],
 };
 
-// ── In-process TTL cache ──────────────────────────────────────────────────────
+// Short-lived cache so repeated reads within a request don't all hit storage.
 let _mem: JamaatTimes | null = null;
 let _memExpiry = 0;
 
-// ── Public API ────────────────────────────────────────────────────────────────
 export async function getJamaatTimes(bypassCache = false): Promise<JamaatTimes> {
   const now = Date.now();
-  
-  // 1. In-process cache check (only if not bypassed and within TTL)
+
   if (!bypassCache && _mem && isValidJamaatTimes(_mem) && now < _memExpiry) {
     return { ..._mem };
   }
 
-  // 2. Fetch from remote/fallback storage
   const times = await remoteRead<JamaatTimes>("jamaat", DEFAULTS);
   _mem = times;
-  _memExpiry = now + 10000; // Cache for 10 seconds
+  _memExpiry = now + 10000; // 10s TTL
   return { ..._mem };
 }
 
@@ -64,10 +63,8 @@ export async function saveJamaatTimes(data: JamaatTimes): Promise<void> {
   if (!isValidJamaatTimes(data)) throw new Error("Invalid jamaat payload");
   const payload: JamaatTimes = { ...data, updatedAt: new Date().toISOString() };
 
-  // 1. Update memory cache and push expiry forward
+  // Update the cache optimistically, then persist.
   _mem = payload;
   _memExpiry = Date.now() + 10000;
-
-  // 2. Write to storage
   await remoteWrite<JamaatTimes>("jamaat", payload);
 }

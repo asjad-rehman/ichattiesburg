@@ -7,7 +7,7 @@ import { JamaatTimes } from "@/lib/jamaat";
 import { SiteSettings } from "@/lib/store";
 import { fmt12From24 } from "@/lib/time";
 
-// ── Mosque Hero SVG ───────────────────────────────────────────────────────────
+// Mosque Hero SVG
 function MosqueHero() {
   const dark = '#061217';
   return (
@@ -112,7 +112,7 @@ function MosqueHero() {
   );
 }
 
-// ── Prayer countdown hook ─────────────────────────────────────────────────────
+// Prayer countdown hook
 interface PrayerData {
   name: string;
   key: string;
@@ -234,7 +234,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
 
   return (
     <div className="page-enter">
-      {/* ── Hero ── */}
+      {/* Hero */}
       <section style={{ position: "relative", minHeight: "78vh", overflow: "hidden", display: "flex", alignItems: "center" }}>
         {/* Dark gradient overlay */}
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,#0d2b36 0%,#154d60 55%,#1f7a95cc 100%)" }} />
@@ -265,7 +265,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
         </div>
       </section>
 
-      {/* ── Prayer Times Strip ── */}
+      {/* Prayer Times Strip */}
       <section style={{ background: ICH.primaryDark, borderTop: `2px solid ${ICH.accent}33`, borderBottom: `1px solid ${ICH.accent}22` }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "20px 24px" }}>
           {/* Countdown bar */}
@@ -322,7 +322,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
         <style>{`@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.3} }`}</style>
       </section>
 
-      {/* ── About Section ── */}
+      {/* About Section */}
       <section style={{ padding: "100px 24px", background: ICH.bg }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 60, alignItems: "center" }}>
           <ScrollReveal delay={0.1}>
@@ -356,7 +356,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
         </div>
       </section>
 
-      {/* ── Jumuah + About ── */}
+      {/* Jumuah + About */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 24px" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(300px,1fr))", gap: 48, alignItems: "start" }}>
 
@@ -407,7 +407,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
         </div>
       </section>
 
-      {/* ── Support the Masjid ── */}
+      {/* Support the Masjid */}
       <section style={{ padding: "100px 24px", background: "#f8fcfb", borderTop: `1px solid ${ICH.border}` }}>
         <ScrollReveal delay={0.1} y={30} className="max-w-[1200px] mx-auto text-center">
           <SectionHead label="Support Us" title="Donate & Sustain" />
@@ -421,7 +421,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
         </ScrollReveal>
       </section>
 
-      {/* ── Donate CTA ── */}
+      {/* Donate CTA */}
       <section style={{ background: ICH.bgCard, borderTop: `1px solid ${ICH.border}`, borderBottom: `1px solid ${ICH.border}` }}>
         <div style={{ maxWidth: 1200, margin: "0 auto", padding: "64px 24px", textAlign: "center" }}>
           <GoldLabel>Support ICH</GoldLabel>
@@ -440,7 +440,7 @@ export default function HomeClient({ prayerTimes, jamaatTimes, settings }: HomeC
         </div>
       </section>
 
-      {/* ── Full Prayer Times Widget ── */}
+      {/* Full Prayer Times Widget */}
       <section style={{ maxWidth: 1200, margin: "0 auto", padding: "72px 24px" }}>
         <SectionHead label="Prayer Times" title="Daily Prayer Schedule" sub="Hattiesburg, Mississippi — times updated regularly" center />
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(140px,1fr))", gap: 12 }}>

@@ -45,7 +45,7 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
   const tmpPath = `/tmp/ichattiesburg-${name}.json`;
   const bundlePath = join(process.cwd(), "public", `${name}.json`);
 
-  // 1. Try Redis
+  // Fast path: the shared Redis/KV cache.
   const redis = getRedis();
   if (redis) {
     try {
@@ -56,7 +56,8 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
     }
   }
 
-  // 2. Try GitHub API Contents (bypasses raw.githubusercontent.com caching)
+  // The Contents API (not raw.githubusercontent.com) so we don't get a stale,
+  // CDN-cached file right after an admin edit. Backfill Redis on the way out.
   const token = getGitHubToken();
   if (token) {
     const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/public/${name}.json`;
@@ -73,8 +74,7 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
         const json = await res.json() as { content: string };
         const decoded = Buffer.from(json.content, "base64").toString("utf-8");
         const parsed = JSON.parse(decoded) as T;
-        
-        // Write to Redis/tmp for faster subsequent reads
+
         if (redis) {
           await redis.set(`ichattiesburg:${name}`, parsed).catch(() => {});
         }
@@ -85,7 +85,7 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
     }
   }
 
-  // 3. Try /tmp
+  // Scratch file left by an earlier save on this same instance.
   try {
     if (existsSync(tmpPath)) {
       const data = JSON.parse(readFileSync(tmpPath, "utf-8"));
@@ -93,7 +93,7 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
     }
   } catch { /* ignore */ }
 
-  // 4. Try public/
+  // Seed content bundled with the build.
   try {
     if (existsSync(bundlePath)) {
       const data = JSON.parse(readFileSync(bundlePath, "utf-8"));

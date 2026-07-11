@@ -1030,7 +1030,7 @@ function ImpactTab() {
   );
 }
 
-// ── Programs / Initiatives Tab ────────────────────────────────────────────────
+// Programs / Initiatives Tab
 function ProgramsTab() {
   const [programs, setPrograms] = useState<Program[]>([]);
   const [icon, setIcon] = useState("📌");
@@ -1161,7 +1161,7 @@ function ProgramsTab() {
   );
 }
 
-// ── Resource Links Section (embedded in Programs tab) ────────────────────────
+// Resource Links Section (embedded in Programs tab)
 function ResourceLinksSection() {
   const [links, setLinks] = useState<ResourceLink[]>([]);
   const [category, setCategory] = useState("");
@@ -1279,7 +1279,7 @@ function ResourceLinksSection() {
   );
 }
 
-// ── Site Settings Tab ─────────────────────────────────────────────────────────
+// Site Settings Tab
 // NOTE: Field is defined at module scope (not inside SettingsTab). Defining a
 // component inside another component's render creates a brand-new component type
 // on every keystroke, which forces React to unmount/remount the input and drop

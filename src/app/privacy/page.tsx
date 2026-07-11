@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 export default function PrivacyPolicyPage() {
   return (
     <div className="page-enter" style={{ minHeight: "80vh", background: "#fdfdfd" }}>
-      {/* ── Page Header ── */}
+      {/* Page Header */}
       <div
         style={{
           background: `linear-gradient(135deg,${ICH.primaryDark},${ICH.primary})`,
@@ -47,7 +47,7 @@ export default function PrivacyPolicyPage() {
         </div>
       </div>
 
-      {/* ── Content ── */}
+      {/* Content */}
       <div style={{ maxWidth: 840, margin: "0 auto", padding: "64px 24px" }}>
         <div
           style={{
