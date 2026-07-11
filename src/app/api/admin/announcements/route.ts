@@ -8,8 +8,8 @@ export async function GET() {
   try {
     const announcements = await store.getAnnouncements(true);
     return NextResponse.json({ announcements });
-  } catch {
-    return NextResponse.json({ error: "Failed to fetch announcements" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to fetch announcements${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
     if (!title || !body) return NextResponse.json({ error: "title and body required" }, { status: 400 });
     const announcement = await store.addAnnouncement({ title, body, priority });
     return NextResponse.json({ success: true, announcement });
-  } catch {
-    return NextResponse.json({ error: "Failed to add announcement" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to add announcement${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -37,8 +37,8 @@ export async function PUT(req: NextRequest) {
     const announcement = await store.updateAnnouncement(id, updates);
     if (!announcement) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true, announcement });
-  } catch {
-    return NextResponse.json({ error: "Failed to update announcement" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to update announcement${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -51,7 +51,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await store.deleteAnnouncement(id);
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to delete announcement" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to delete announcement${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }

@@ -1,6 +1,6 @@
 import React from "react";
 import { Metadata } from "next";
-import { ICH } from "@/components/ui-primitives";
+import { ICH } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",

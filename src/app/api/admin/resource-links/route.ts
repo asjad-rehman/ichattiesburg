@@ -8,8 +8,8 @@ export async function GET() {
   try {
     const links = await store.getResourceLinks(true);
     return NextResponse.json({ links });
-  } catch {
-    return NextResponse.json({ error: "Failed to fetch resource links" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to fetch resource links${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
     }
     const item = await store.addResourceLink({ category, categoryIcon, label, url, order });
     return NextResponse.json({ success: true, item });
-  } catch {
-    return NextResponse.json({ error: "Failed to add resource link" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to add resource link${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -39,8 +39,8 @@ export async function PUT(req: NextRequest) {
     const item = await store.updateResourceLink(id, updates);
     if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true, item });
-  } catch {
-    return NextResponse.json({ error: "Failed to update resource link" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to update resource link${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -53,7 +53,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await store.deleteResourceLink(id);
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to delete resource link" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to delete resource link${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }

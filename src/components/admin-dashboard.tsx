@@ -93,6 +93,31 @@ const labelStyle = {
   marginBottom: 6,
 };
 
+// Shared fetch helper: throws with the server's error message so callers can
+// surface it instead of silently swallowing a failed save.
+async function saveRequest(url: string, method: string, body?: unknown) {
+  const res = await fetch(url, {
+    method,
+    headers: body !== undefined ? { "Content-Type": "application/json" } : undefined,
+    body: body !== undefined ? JSON.stringify(body) : undefined,
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data?.error || `Request failed (${res.status})`);
+  }
+  return data;
+}
+
+// Small inline banner for surfacing a save/delete error to the admin.
+function ErrorNote({ msg }: { msg: string }) {
+  if (!msg) return null;
+  return (
+    <div style={{ fontSize: 13, color: "#c62828", background: "#fdf3f3", border: "1px solid #f5caca", padding: "9px 13px", borderRadius: 4, fontFamily: "Inter,sans-serif", lineHeight: 1.5 }}>
+      ⚠ {msg}
+    </div>
+  );
+}
+
 function AnnouncementsTab() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [title, setTitle] = useState("");
@@ -100,6 +125,7 @@ function AnnouncementsTab() {
   const [priority, setPriority] = useState<"normal" | "urgent">("normal");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/announcements")
@@ -109,14 +135,11 @@ function AnnouncementsTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const isEdit = !!editingId;
-    const res = await fetch("/api/admin/announcements", {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isEdit ? { id: editingId, title, body, priority } : { title, body, priority }),
-    });
-    if (res.ok) {
-      const data = await res.json();
+    try {
+      const data = await saveRequest("/api/admin/announcements", isEdit ? "PUT" : "POST",
+        isEdit ? { id: editingId, title, body, priority } : { title, body, priority });
       if (isEdit) {
         setAnnouncements(prev => prev.map(a => a.id === editingId ? data.announcement : a));
       } else {
@@ -125,6 +148,8 @@ function AnnouncementsTab() {
       setTitle(""); setBody(""); setPriority("normal"); setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save announcement");
     }
   };
 
@@ -142,9 +167,12 @@ function AnnouncementsTab() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete announcement?")) return;
-    const res = await fetch(`/api/admin/announcements?id=${id}`, { method: "DELETE" });
-    if (res.ok) {
+    setError("");
+    try {
+      await saveRequest(`/api/admin/announcements?id=${id}`, "DELETE");
       setAnnouncements(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete announcement");
     }
   };
 
@@ -205,6 +233,8 @@ function AnnouncementsTab() {
             </div>
           </div>
 
+          <ErrorNote msg={error} />
+
           <div style={{ display: "flex", gap: 12 }}>
             <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
               {saved ? "Saved!" : (editingId ? "Update Announcement" : "Save Announcement")}
@@ -255,6 +285,7 @@ function AnnouncementsTab() {
 function EventsTab() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
     title: "", description: "", date: "", time: "", location: "", category: "community", recurring: false,
@@ -268,14 +299,10 @@ function EventsTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const isEdit = !!editingId;
-    const res = await fetch("/api/admin/events", {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, id: editingId, featured: false }),
-    });
-    if (res.ok) {
-      const data = await res.json();
+    try {
+      const data = await saveRequest("/api/admin/events", isEdit ? "PUT" : "POST", { ...form, id: editingId, featured: false });
       if (isEdit) {
         setEvents(prev => prev.map(ev => ev.id === editingId ? data.event : ev).sort((a, b) => parseLocalDate(a.date).getTime() - parseLocalDate(b.date).getTime()));
       } else {
@@ -285,6 +312,8 @@ function EventsTab() {
       setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save event");
     }
   };
 
@@ -300,9 +329,12 @@ function EventsTab() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete event?")) return;
-    const res = await fetch(`/api/admin/events?id=${id}`, { method: "DELETE" });
-    if (res.ok) {
+    setError("");
+    try {
+      await saveRequest(`/api/admin/events?id=${id}`, "DELETE");
       setEvents(prev => prev.filter(a => a.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete event");
     }
   };
 
@@ -361,6 +393,8 @@ function EventsTab() {
             <label style={labelStyle}>Description</label>
             <textarea value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} rows={3} required style={{ ...inputStyle, resize: "vertical" }} />
           </div>
+
+          <ErrorNote msg={error} />
 
           <div style={{ display: "flex", gap: 12 }}>
             <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
@@ -537,6 +571,7 @@ function PrayerTimesTab() {
 function BoardTab() {
   const [board, setBoard] = useState<BoardMember[]>([]);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", role: "" });
 
@@ -548,14 +583,10 @@ function BoardTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const isEdit = !!editingId;
-    const res = await fetch("/api/admin/board", {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...form, id: editingId }),
-    });
-    if (res.ok) {
-      const data = await res.json();
+    try {
+      const data = await saveRequest("/api/admin/board", isEdit ? "PUT" : "POST", { ...form, id: editingId });
       if (isEdit) {
         setBoard(prev => prev.map(b => b.id === editingId ? data.member : b));
       } else {
@@ -565,6 +596,8 @@ function BoardTab() {
       setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save board member");
     }
   };
 
@@ -580,9 +613,12 @@ function BoardTab() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete board member?")) return;
-    const res = await fetch(`/api/admin/board?id=${id}`, { method: "DELETE" });
-    if (res.ok) {
+    setError("");
+    try {
+      await saveRequest(`/api/admin/board?id=${id}`, "DELETE");
       setBoard(prev => prev.filter(b => b.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete board member");
     }
   };
 
@@ -609,6 +645,8 @@ function BoardTab() {
             <label style={labelStyle}>Role</label>
             <input type="text" value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })} required style={inputStyle} placeholder="President" />
           </div>
+
+          <ErrorNote msg={error} />
 
           <div style={{ display: "flex", gap: 12 }}>
             <Btn type="submit" variant="primary" style={{ width: "fit-content" }}>
@@ -780,6 +818,7 @@ function ImpactTab() {
   const [image, setImage] = useState("");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
   const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
@@ -816,14 +855,11 @@ function ImpactTab() {
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const isEdit = !!editingId;
-    const res = await fetch("/api/admin/impact", {
-      method: isEdit ? "PUT" : "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(isEdit ? { id: editingId, title, description, count, image } : { title, description, count, image }),
-    });
-    if (res.ok) {
-      const data = await res.json();
+    try {
+      const data = await saveRequest("/api/admin/impact", isEdit ? "PUT" : "POST",
+        isEdit ? { id: editingId, title, description, count, image } : { title, description, count, image });
       if (isEdit) {
         setImpact(prev => prev.map(item => item.id === editingId ? data.item : item));
       } else {
@@ -832,6 +868,8 @@ function ImpactTab() {
       setTitle(""); setDescription(""); setCount(""); setImage(""); setEditingId(null);
       setSaved(true);
       setTimeout(() => setSaved(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save impact item");
     }
   };
 
@@ -850,9 +888,12 @@ function ImpactTab() {
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete impact item?")) return;
-    const res = await fetch(`/api/admin/impact?id=${id}`, { method: "DELETE" });
-    if (res.ok) {
+    setError("");
+    try {
+      await saveRequest(`/api/admin/impact?id=${id}`, "DELETE");
       setImpact(prev => prev.filter(item => item.id !== id));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete impact item");
     }
   };
 
@@ -932,6 +973,8 @@ function ImpactTab() {
             </div>
           </div>
 
+          <ErrorNote msg={error} />
+
           <div style={{ display: "flex", gap: 12 }}>
             <Btn type="submit" variant="primary" style={{ width: "fit-content" }} disabled={uploading}>
               {saved ? "Saved!" : (editingId ? "Update Item" : "Save Item")}
@@ -998,6 +1041,7 @@ function ProgramsTab() {
   const [active, setActive] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   const load = () => fetch("/api/admin/programs").then(r => r.json()).then(d => setPrograms(d.programs || []));
   useEffect(() => { load(); }, []);
@@ -1006,23 +1050,29 @@ function ProgramsTab() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const payload = { icon, title, schedule, note, description, active };
-    if (editingId) {
-      await fetch("/api/admin/programs", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editingId, ...payload }) });
-    } else {
-      await fetch("/api/admin/programs", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    try {
+      await saveRequest("/api/admin/programs", editingId ? "PUT" : "POST", editingId ? { id: editingId, ...payload } : payload);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+      resetForm();
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save program");
     }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-    resetForm();
-    load();
   };
 
   const handleEdit = (p: Program) => { setEditingId(p.id); setIcon(p.icon); setTitle(p.title); setSchedule(p.schedule); setNote(p.note); setDescription(p.description); setActive(p.active); };
-  const handleDelete = async (id: string) => { await fetch(`/api/admin/programs?id=${id}`, { method: "DELETE" }); load(); };
+  const handleDelete = async (id: string) => {
+    setError("");
+    try { await saveRequest(`/api/admin/programs?id=${id}`, "DELETE"); load(); }
+    catch (err) { setError(err instanceof Error ? err.message : "Failed to delete program"); }
+  };
   const handleToggleActive = async (p: Program) => {
-    await fetch("/api/admin/programs", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: p.id, active: !p.active }) });
-    load();
+    setError("");
+    try { await saveRequest("/api/admin/programs", "PUT", { id: p.id, active: !p.active }); load(); }
+    catch (err) { setError(err instanceof Error ? err.message : "Failed to update program"); }
   };
 
   return (
@@ -1066,6 +1116,7 @@ function ProgramsTab() {
               <span style={{ color: ICH.text }}>Active (visible on About page)</span>
             </label>
           </div>
+          <div style={{ marginBottom: error ? 14 : 0 }}><ErrorNote msg={error} /></div>
           <div style={{ display: "flex", gap: 10 }}>
             <Btn variant="gold" type="submit">{editingId ? "Update Program" : "Add Program"}</Btn>
             {editingId && <Btn variant="outline" type="button" onClick={resetForm}>Cancel</Btn>}
@@ -1120,6 +1171,7 @@ function ResourceLinksSection() {
   const [order, setOrder] = useState(99);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState("");
 
   const load = () => fetch("/api/admin/resource-links").then(r => r.json()).then(d => setLinks(d.links || []));
   useEffect(() => { load(); }, []);
@@ -1128,20 +1180,25 @@ function ResourceLinksSection() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
     const payload = { category, categoryIcon, label, url, order };
-    if (editingId) {
-      await fetch("/api/admin/resource-links", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: editingId, ...payload }) });
-    } else {
-      await fetch("/api/admin/resource-links", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
+    try {
+      await saveRequest("/api/admin/resource-links", editingId ? "PUT" : "POST", editingId ? { id: editingId, ...payload } : payload);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+      resetForm();
+      load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save link");
     }
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-    resetForm();
-    load();
   };
 
   const handleEdit = (l: ResourceLink) => { setEditingId(l.id); setCategory(l.category); setCategoryIcon(l.categoryIcon); setLabel(l.label); setUrl(l.url); setOrder(l.order); };
-  const handleDelete = async (id: string) => { await fetch(`/api/admin/resource-links?id=${id}`, { method: "DELETE" }); load(); };
+  const handleDelete = async (id: string) => {
+    setError("");
+    try { await saveRequest(`/api/admin/resource-links?id=${id}`, "DELETE"); load(); }
+    catch (err) { setError(err instanceof Error ? err.message : "Failed to delete link"); }
+  };
 
   const grouped = links.reduce<Record<string, ResourceLink[]>>((acc, l) => {
     if (!acc[l.category]) acc[l.category] = [];
@@ -1185,6 +1242,7 @@ function ResourceLinksSection() {
               <input style={inputStyle} value={order} onChange={e => setOrder(Number(e.target.value))} type="number" min={1} max={99} />
             </div>
           </div>
+          <div style={{ marginBottom: error ? 14 : 0 }}><ErrorNote msg={error} /></div>
           <div style={{ display: "flex", gap: 10 }}>
             <Btn variant="gold" type="submit" style={{ fontSize: 13 }}>{editingId ? "Update" : "Add Link"}</Btn>
             {editingId && <Btn variant="outline" type="button" onClick={resetForm} style={{ fontSize: 13 }}>Cancel</Btn>}
@@ -1267,6 +1325,7 @@ function SettingsTab() {
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/settings")
@@ -1279,10 +1338,16 @@ function SettingsTab() {
 
   const handleSave = async () => {
     setSaving(true);
-    await fetch("/api/admin/settings", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(settings) });
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setError("");
+    try {
+      await saveRequest("/api/admin/settings", "POST", settings);
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save settings");
+    } finally {
+      setSaving(false);
+    }
   };
 
   if (!settings) return <div style={{ color: ICH.textMuted, padding: 24 }}>Loading settings…</div>;
@@ -1347,6 +1412,7 @@ function SettingsTab() {
         {Field({ label: "Maghrib Iqama Display", name: "maghribDisplay", placeholder: "After Adhan" })}
       </Card>
 
+      <div style={{ marginBottom: error ? 16 : 0 }}><ErrorNote msg={error} /></div>
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <Btn variant="gold" onClick={handleSave}>
           {saving ? "Saving…" : "Save All Settings"}

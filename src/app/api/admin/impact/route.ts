@@ -8,8 +8,8 @@ export async function GET() {
   try {
     const impact = await store.getImpact(true);
     return NextResponse.json({ impact });
-  } catch {
-    return NextResponse.json({ error: "Failed to fetch impact" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to fetch impact${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -24,8 +24,8 @@ export async function POST(req: NextRequest) {
     }
     const item = await store.addImpactItem({ title, description, count, image });
     return NextResponse.json({ success: true, item });
-  } catch {
-    return NextResponse.json({ error: "Failed to add impact item" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to add impact item${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -39,8 +39,8 @@ export async function PUT(req: NextRequest) {
     const item = await store.updateImpactItem(id, updates);
     if (!item) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true, item });
-  } catch {
-    return NextResponse.json({ error: "Failed to update impact item" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to update impact item${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -53,7 +53,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await store.deleteImpactItem(id);
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to delete impact item" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to delete impact item${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
