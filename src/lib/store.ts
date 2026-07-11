@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { remoteRead, remoteWrite } from "./remote-storage";
 import { parseLocalDate } from "./utils";
 
-// ── Types ─────────────────────────────────────────────────────────────────────
+// Types
 export interface EventItem {
   id: string;
   title: string;
@@ -84,7 +84,10 @@ export interface ResourceLink {
 }
 
 
-// ── Collection factory ────────────────────────────────────────────────────────
+// Each editable content type (events, board, impact, …) is a JSON document in
+// remote storage. This factory gives every one the same read-through cache and
+// write-through save so the store below stays declarative. `seed` is the initial
+// content used when nothing has been persisted yet.
 function makeCollection<T extends { id: string }>(name: string, seed: T[]) {
   let _mem: T[] | null = null;
   let _memExpiry = 0;
@@ -92,9 +95,9 @@ function makeCollection<T extends { id: string }>(name: string, seed: T[]) {
   async function get(bypassCache = false): Promise<T[]> {
     const now = Date.now();
     if (!bypassCache && _mem !== null && now < _memExpiry) return _mem;
-    
+
     _mem = await remoteRead<T[]>(name, seed);
-    _memExpiry = now + 10000; // Cache for 10 seconds
+    _memExpiry = now + 10000; // 10s TTL
     return _mem;
   }
 
@@ -107,7 +110,7 @@ function makeCollection<T extends { id: string }>(name: string, seed: T[]) {
   return { get, save };
 }
 
-// ── Collections ───────────────────────────────────────────────────────────────
+// Collections
 const _board         = makeCollection<BoardMember>("board", []);
 const _announcements = makeCollection<Announcement>("announcements", []);
 const _events        = makeCollection<EventItem>("events", []);
@@ -152,7 +155,7 @@ const _resourceLinks = makeCollection<ResourceLink>("resource_links", [
   { id: "r12", category: "Community & Organizations",  categoryIcon: "🌐", label: "CAIR — Council on American-Islamic Relations", url: "https://www.cair.com",                                        order: 3 },
 ]);
 
-// ── Public store API ──────────────────────────────────────────────────────────
+// Public store API
 export const store = {
   // Board
   getBoard: async (bypassCache = false) => _board.get(bypassCache),
