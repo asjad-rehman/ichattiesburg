@@ -8,8 +8,8 @@ export async function GET() {
   try {
     const events = await store.getEvents(true);
     return NextResponse.json({ events });
-  } catch {
-    return NextResponse.json({ error: "Failed to fetch events" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to fetch events${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
     if (!data.title || !data.date) return NextResponse.json({ error: "title and date required" }, { status: 400 });
     const event = await store.addEvent({ featured: false, category: "community", ...data });
     return NextResponse.json({ success: true, event });
-  } catch {
-    return NextResponse.json({ error: "Failed to add event" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to add event${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -37,8 +37,8 @@ export async function PUT(req: NextRequest) {
     const event = await store.updateEvent(id, updates);
     if (!event) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json({ success: true, event });
-  } catch {
-    return NextResponse.json({ error: "Failed to update event" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to update event${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }
 
@@ -51,7 +51,7 @@ export async function DELETE(req: NextRequest) {
     if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
     await store.deleteEvent(id);
     return NextResponse.json({ success: true });
-  } catch {
-    return NextResponse.json({ error: "Failed to delete event" }, { status: 500 });
+  } catch (e) {
+    return NextResponse.json({ error: `Failed to delete event${e instanceof Error && e.message ? ": " + e.message : ""}` }, { status: 500 });
   }
 }

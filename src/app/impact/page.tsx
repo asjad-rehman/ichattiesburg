@@ -1,7 +1,8 @@
 import React from "react";
 import { Metadata } from "next";
 import { store } from "@/lib/store";
-import { ICH, GoldLabel, SectionHead, Card, ScrollReveal } from "@/components/ui-primitives";
+import { GoldLabel, SectionHead, Card, ScrollReveal } from "@/components/ui-primitives";
+import { ICH } from "@/lib/theme";
 
 export const metadata: Metadata = {
   title: "Our Impact",
