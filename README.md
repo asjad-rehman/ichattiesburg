@@ -29,7 +29,7 @@ hall.
 - [Seed Data Files](#seed-data-files)
 - [API Reference](#api-reference)
 - [Deployment (Vercel)](#deployment-vercel)
-- [Legacy / Unused Code](#legacy--unused-code)
+- [Author](#author)
 
 ---
 
@@ -44,11 +44,8 @@ hall.
 | Prayer times | Main pages: **AlAdhan REST API** (`api.aladhan.com`); `/display` board: **`adhan`** npm library locally — both configured from `src/config/masjid.ts` |
 | Content storage | Tiered `remote-storage` layer: Upstash Redis / Vercel KV **or** GitHub Contents API, with bundled `public/*.json` seeds as the fallback — **no PostgreSQL/MySQL required** |
 | Auth | Stateless JWT in an httpOnly cookie (`jsonwebtoken` + `bcryptjs`) |
-| Donations | **Zeffy** embedded forms + a **LaunchGood** link (Stripe checkout exists but is dormant) |
+| Donations | **Zeffy** embedded forms + a **LaunchGood** link (no payment keys needed) |
 | Hosting | Vercel-optimized |
-
-> Several packages in `package.json` are **not used by the running app** — see
-> [Legacy / Unused Code](#legacy--unused-code).
 
 ---
 
@@ -125,12 +122,10 @@ Both paths read the same `src/config/masjid.ts` settings, so keep them consisten
 
 ### Donations
 
-The shipped `/donate` page (`src/app/donate/donate-client.tsx`) renders **Zeffy**
+The `/donate` page (`src/app/donate/donate-client.tsx`) renders **Zeffy**
 donation forms in an iframe (one-time / monthly, IDs from site settings) plus a
-**LaunchGood** button for the Oak Grove building campaign. It requires no payment
-keys. A Stripe Checkout route exists at `/api/donate` with a `/donate/success`
-page, but it is **not wired into the UI** and is off unless `STRIPE_SECRET_KEY`
-is set.
+**LaunchGood** button for the Oak Grove building campaign. It needs no payment
+keys — Zeffy hosts the checkout.
 
 ### Styling & fonts
 
@@ -178,9 +173,8 @@ src/
 │  └─ api/
 │     ├─ announcements/     # public GET
 │     ├─ jamaat/            # public GET + jamaat/update (admin POST)
-│     ├─ donate/            # dormant Stripe checkout
 │     └─ admin/             # login/logout, settings, events, board, impact,
-│                           # programs, resources, resource-links, prayer-times, upload
+│                           # programs, resources, resource-links, upload
 ├─ components/              # navbar, footer, *-client pages, ui-primitives, …
 ├─ config/masjid.ts         # coordinates, timezone, calc method, madhab
 ├─ lib/
@@ -257,8 +251,6 @@ See [`.env.example`](./.env.example) for the annotated template.
 | `UPSTASH_REDIS_REST_URL` / `UPSTASH_REDIS_REST_TOKEN` | One backend | Upstash Redis persistence |
 | `KV_REST_API_URL` / `KV_REST_API_TOKEN` | One backend | Vercel KV aliases for the above |
 | `GITHUB_TOKEN` (or `GH_TOKEN` / `GITHUB_PAT`) | One backend | GitHub Contents API persistence — PAT with **Contents: Read and write** |
-| `STRIPE_SECRET_KEY` | Optional | Enables the dormant `/api/donate` Stripe route |
-| `DATABASE_URL` | Legacy | Only for the unused `src/lib/db.ts` (Postgres) |
 
 Generate secrets:
 
@@ -308,10 +300,7 @@ Read (`GET`) endpoints are public; all write verbs require the admin cookie.
 - `GET/POST/PUT/DELETE /api/admin/{announcements,events,board,impact,programs,resource-links}`
 - `POST /api/admin/settings`
 - `POST /api/admin/upload` — multipart image upload → returns `/uploads/<uuid>.<ext>`
-- `POST /api/jamaat/update` (and the parallel `GET/POST /api/admin/prayer-times`)
-
-**Dormant**
-- `POST /api/donate` — Stripe Checkout (off unless `STRIPE_SECRET_KEY` is set)
+- `POST /api/jamaat/update` — congregation/Jumuah times
 
 Admin write handlers surface the underlying failure reason in their JSON error
 (e.g. a GitHub `Bad credentials` / `Resource not accessible` response), which the
@@ -326,8 +315,7 @@ dashboard renders inline so misconfiguration is visible.
 3. Add environment variables (**Settings → Environment Variables**):
    `JWT_SECRET`, `ADMIN_EMAIL`, `ADMIN_PASSWORD_HASH`, and **one** durable
    storage backend (Vercel KV / Upstash, or a `GITHUB_TOKEN` with
-   `Contents: Read and write`). Add `STRIPE_SECRET_KEY` only if using the Stripe
-   route.
+   `Contents: Read and write`).
 4. **Deploy.** After changing env vars, redeploy so the new values take effect.
 
 Tip: **Vercel KV / Upstash is recommended** over the GitHub backend — it persists
@@ -336,22 +324,10 @@ triggers a redeploy).
 
 ---
 
-## Legacy / Unused Code
+## Author
 
-Present in the repo but **not used by the running app** (safe to remove when
-adapting the template):
+Built and maintained by **Muhammad Asjad Rehman Hashmi** —
+[asjadrehman.com](https://asjadrehman.com).
 
-- `src/lib/db.ts` and `schema.sql` — Postgres scaffolding; the app uses
-  `remote-storage`, not SQL.
-- `src/app/api/donate/route.ts`, `src/app/donate/success/page.tsx` — Stripe
-  checkout path (the live `/donate` uses Zeffy).
-- `src/components/contact-form.tsx` — posts to a non-existent `/api/contact`;
-  the real form is inline in `src/app/contact/page.tsx`.
-- `src/components/donate-client.tsx`, `src/components/prayer-times-widget.tsx`,
-  `src/components/theme-provider.tsx` — no imports reference them.
-- Unused dependencies include `pg`, `nodemailer`, `@radix-ui/*`, `date-fns`,
-  `get-image-colors`, and `@stripe/stripe-js`. `next-themes` is referenced only
-  by the unused `theme-provider.tsx`. (`adhan` **is** used by `/display`;
-  `clsx`/`tailwind-merge` are used by `src/lib/utils.ts`.)
-- Root helper scripts `check_errors.js`, `get_colors.js`, `update_colors.js` are
-  one-off dev utilities, not part of the build.
+Originally developed for the Islamic Center of Hattiesburg and released as a
+reusable template for other masajid. Contributions and forks are welcome.
