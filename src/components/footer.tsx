@@ -1,24 +1,17 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Link from "next/link";
 import { ICH } from "./ui-primitives";
+import { useSettings } from "@/lib/use-settings";
 
 export default function Footer() {
-  const [settings, setSettings] = useState<any>(null);
-
-  useEffect(() => {
-    fetch("/api/admin/settings")
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.settings) setSettings(d.settings);
-      })
-      .catch(() => {});
-  }, []);
+  const settings = useSettings();
 
   const address = settings?.address || "211 N 25th Avenue, Hattiesburg, MS 39401";
   const addressUrl = settings?.addressUrl || "https://www.google.com/maps/search/?api=1&query=211+N+25th+Avenue,+Hattiesburg,+MS+39401";
-  const email = settings?.email || "ichattiesburg@protonmail.com";
+  const email = settings?.email || "ichattiesburg@gmail.com";
+  const phone = settings?.phone || "";
   const shortName = settings?.masjidShortName || "ICH";
   const description = settings?.footerDescription || "Serving the Muslim community of Hattiesburg, Mississippi with prayer, education, and community programs.";
   
@@ -136,6 +129,7 @@ export default function Footer() {
               {[
                 { icon: "📍", text: address, href: addressUrl },
                 { icon: "✉️", text: email, href: `mailto:${email}` },
+                ...(phone ? [{ icon: "📞", text: phone, href: `tel:${phone.replace(/[^+\d]/g, "")}` }] : []),
               ].map(({ icon, text, href }) => (
                 <div key={icon} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
                   <span style={{ fontSize: 13, flexShrink: 0, marginTop: 2 }}>{icon}</span>

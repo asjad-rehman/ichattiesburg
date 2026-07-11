@@ -5,6 +5,7 @@ import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users, Settings, Bo
 import { AdminUser } from "@/lib/auth";
 import { ICH, Btn, Card } from "./ui-primitives";
 import { parseLocalDate } from "@/lib/utils";
+import type { Announcement, BoardMember, EventItem, ImpactItem, Program, ResourceLink, SiteSettings } from "@/lib/store";
 
 export default function AdminDashboard({ user }: { user: AdminUser }) {
   const [activeTab, setActiveTab] = useState<"announcements" | "events" | "prayer" | "board" | "resources" | "impact" | "programs" | "settings">("announcements");
@@ -91,7 +92,7 @@ const labelStyle = {
 };
 
 function AnnouncementsTab() {
-  const [announcements, setAnnouncements] = useState<any[]>([]);
+  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [priority, setPriority] = useState<"normal" | "urgent">("normal");
@@ -125,7 +126,7 @@ function AnnouncementsTab() {
     }
   };
 
-  const handleEdit = (a: any) => {
+  const handleEdit = (a: Announcement) => {
     setEditingId(a.id);
     setTitle(a.title);
     setBody(a.body);
@@ -250,7 +251,7 @@ function AnnouncementsTab() {
 }
 
 function EventsTab() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [saved, setSaved] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({
@@ -285,7 +286,7 @@ function EventsTab() {
     }
   };
 
-  const handleEdit = (a: any) => {
+  const handleEdit = (a: EventItem) => {
     setEditingId(a.id);
     setForm({ title: a.title, description: a.description, date: a.date, time: a.time || "", location: a.location || "", category: a.category || "community", recurring: a.recurring || false });
   };
@@ -532,7 +533,7 @@ function PrayerTimesTab() {
 }
 
 function BoardTab() {
-  const [board, setBoard] = useState<any[]>([]);
+  const [board, setBoard] = useState<BoardMember[]>([]);
   const [saved, setSaved] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState({ name: "", role: "" });
@@ -565,7 +566,7 @@ function BoardTab() {
     }
   };
 
-  const handleEdit = (b: any) => {
+  const handleEdit = (b: BoardMember) => {
     setEditingId(b.id);
     setForm({ name: b.name, role: b.role });
   };
@@ -655,7 +656,7 @@ function BoardTab() {
 }
 
 function ResourcesTab() {
-  const [resources, setResources] = useState<any>({ restaurants: "", meatSupply: "" });
+  const [resources, setResources] = useState<{ restaurants: string | null; meatSupply: string | null }>({ restaurants: "", meatSupply: "" });
   const [saving, setSaving] = useState<string | null>(null);
   const [message, setMessage] = useState("");
 
@@ -682,8 +683,8 @@ function ResourcesTab() {
       } else {
         setMessage(`Error: ${data.error}`);
       }
-    } catch (err: any) {
-      setMessage(`Error: ${err.message}`);
+    } catch (err) {
+      setMessage(`Error: ${err instanceof Error ? err.message : "Unknown error"}`);
     } finally {
       setSaving(null);
       setTimeout(() => setMessage(""), 4000);
@@ -770,7 +771,7 @@ function ResourcesTab() {
 }
 
 function ImpactTab() {
-  const [impact, setImpact] = useState<any[]>([]);
+  const [impact, setImpact] = useState<ImpactItem[]>([]);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [count, setCount] = useState("");
@@ -804,7 +805,7 @@ function ImpactTab() {
       } else {
         alert("Upload failed: " + (data.error || "Unknown error"));
       }
-    } catch (err) {
+    } catch {
       alert("Upload failed.");
     } finally {
       setUploading(false);
@@ -832,7 +833,7 @@ function ImpactTab() {
     }
   };
 
-  const handleEdit = (item: any) => {
+  const handleEdit = (item: ImpactItem) => {
     setEditingId(item.id);
     setTitle(item.title);
     setDescription(item.description);
@@ -986,7 +987,7 @@ function ImpactTab() {
 
 // ── Programs / Initiatives Tab ────────────────────────────────────────────────
 function ProgramsTab() {
-  const [programs, setPrograms] = useState<any[]>([]);
+  const [programs, setPrograms] = useState<Program[]>([]);
   const [icon, setIcon] = useState("📌");
   const [title, setTitle] = useState("");
   const [schedule, setSchedule] = useState("");
@@ -1015,9 +1016,9 @@ function ProgramsTab() {
     load();
   };
 
-  const handleEdit = (p: any) => { setEditingId(p.id); setIcon(p.icon); setTitle(p.title); setSchedule(p.schedule); setNote(p.note); setDescription(p.description); setActive(p.active); };
+  const handleEdit = (p: Program) => { setEditingId(p.id); setIcon(p.icon); setTitle(p.title); setSchedule(p.schedule); setNote(p.note); setDescription(p.description); setActive(p.active); };
   const handleDelete = async (id: string) => { await fetch(`/api/admin/programs?id=${id}`, { method: "DELETE" }); load(); };
-  const handleToggleActive = async (p: any) => {
+  const handleToggleActive = async (p: Program) => {
     await fetch("/api/admin/programs", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: p.id, active: !p.active }) });
     load();
   };
@@ -1109,7 +1110,7 @@ function ProgramsTab() {
 
 // ── Resource Links Section (embedded in Programs tab) ────────────────────────
 function ResourceLinksSection() {
-  const [links, setLinks] = useState<any[]>([]);
+  const [links, setLinks] = useState<ResourceLink[]>([]);
   const [category, setCategory] = useState("");
   const [categoryIcon, setCategoryIcon] = useState("🔗");
   const [label, setLabel] = useState("");
@@ -1137,10 +1138,10 @@ function ResourceLinksSection() {
     load();
   };
 
-  const handleEdit = (l: any) => { setEditingId(l.id); setCategory(l.category); setCategoryIcon(l.categoryIcon); setLabel(l.label); setUrl(l.url); setOrder(l.order); };
+  const handleEdit = (l: ResourceLink) => { setEditingId(l.id); setCategory(l.category); setCategoryIcon(l.categoryIcon); setLabel(l.label); setUrl(l.url); setOrder(l.order); };
   const handleDelete = async (id: string) => { await fetch(`/api/admin/resource-links?id=${id}`, { method: "DELETE" }); load(); };
 
-  const grouped = links.reduce<Record<string, any[]>>((acc, l) => {
+  const grouped = links.reduce<Record<string, ResourceLink[]>>((acc, l) => {
     if (!acc[l.category]) acc[l.category] = [];
     acc[l.category].push(l);
     return acc;
@@ -1194,7 +1195,7 @@ function ResourceLinksSection() {
         <div key={cat} style={{ marginBottom: 20 }}>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", color: ICH.primary, marginBottom: 8 }}>{cat}</div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {(catLinks as any[]).sort((a, b) => a.order - b.order).map((l) => (
+            {(catLinks as ResourceLink[]).sort((a, b) => a.order - b.order).map((l) => (
               <div key={l.id} style={{ border: `1px solid ${ICH.border}`, borderRadius: 5, padding: "10px 14px", background: "#fff", display: "flex", gap: 10, alignItems: "center", justifyContent: "space-between" }}>
                 <div>
                   <div style={{ fontSize: 13, fontWeight: 600, color: ICH.text }}>{l.label}</div>
@@ -1219,18 +1220,60 @@ function ResourceLinksSection() {
 }
 
 // ── Site Settings Tab ─────────────────────────────────────────────────────────
+// NOTE: Field is defined at module scope (not inside SettingsTab). Defining a
+// component inside another component's render creates a brand-new component type
+// on every keystroke, which forces React to unmount/remount the input and drop
+// focus — making the settings form nearly impossible to type into.
+function SettingField({
+  label: lbl,
+  name,
+  value,
+  onChange,
+  placeholder,
+  textarea,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (name: string, value: string) => void;
+  placeholder?: string;
+  textarea?: boolean;
+}) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <label style={labelStyle}>{lbl}</label>
+      {textarea ? (
+        <textarea
+          style={{ ...inputStyle, minHeight: 90, resize: "vertical" } as React.CSSProperties}
+          value={value ?? ""}
+          onChange={e => onChange(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      ) : (
+        <input
+          style={inputStyle}
+          value={value ?? ""}
+          onChange={e => onChange(name, e.target.value)}
+          placeholder={placeholder}
+        />
+      )}
+    </div>
+  );
+}
+
 function SettingsTab() {
-  const [settings, setSettings] = useState<any>(null);
+  const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [saved, setSaved] = useState(false);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     fetch("/api/admin/settings")
       .then(r => r.json())
-      .then(d => setSettings(d.settings || {}));
+      .then(d => setSettings(d.settings || null));
   }, []);
 
-  const set = (key: string, value: string) => setSettings((s: any) => ({ ...s, [key]: value }));
+  const set = (key: string, value: string) =>
+    setSettings((s) => ({ ...(s ?? ({} as SiteSettings)), [key]: value } as SiteSettings));
 
   const handleSave = async () => {
     setSaving(true);
@@ -1242,25 +1285,8 @@ function SettingsTab() {
 
   if (!settings) return <div style={{ color: ICH.textMuted, padding: 24 }}>Loading settings…</div>;
 
-  const Field = ({ label: lbl, name, placeholder, textarea }: { label: string; name: string; placeholder?: string; textarea?: boolean }) => (
-    <div style={{ marginBottom: 16 }}>
-      <label style={labelStyle}>{lbl}</label>
-      {textarea ? (
-        <textarea
-          style={{ ...inputStyle, minHeight: 90, resize: "vertical" } as React.CSSProperties}
-          value={settings[name] ?? ""}
-          onChange={e => set(name, e.target.value)}
-          placeholder={placeholder}
-        />
-      ) : (
-        <input
-          style={inputStyle}
-          value={settings[name] ?? ""}
-          onChange={e => set(name, e.target.value)}
-          placeholder={placeholder}
-        />
-      )}
-    </div>
+  const Field = (props: { label: string; name: string; placeholder?: string; textarea?: boolean }) => (
+    <SettingField {...props} value={String(settings[props.name as keyof SiteSettings] ?? "")} onChange={set} />
   );
 
   return (
@@ -1274,49 +1300,49 @@ function SettingsTab() {
       {/* Contact Info */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Contact &amp; Location</h3>
-        <Field label="Physical Address" name="address" placeholder="211 N 25th Avenue, Hattiesburg, MS 39401" />
-        <Field label="Google Maps URL" name="addressUrl" placeholder="https://www.google.com/maps/search/?api=1&query=..." />
-        <Field label="Phone Number (optional)" name="phone" placeholder="+1 (601) 555-0000" />
-        <Field label="Contact Email" name="email" placeholder="ichattiesburg@gmail.com" />
-        <Field label='Jumuah Location Label (shown on home page "Jumuah" card)' name="jumuahLocation" placeholder="211 N 25th Ave" />
+        {Field({ label: "Physical Address", name: "address", placeholder: "211 N 25th Avenue, Hattiesburg, MS 39401" })}
+        {Field({ label: "Google Maps URL", name: "addressUrl", placeholder: "https://www.google.com/maps/search/?api=1&query=..." })}
+        {Field({ label: "Phone Number (optional)", name: "phone", placeholder: "+1 (601) 555-0000" })}
+        {Field({ label: "Contact Email", name: "email", placeholder: "ichattiesburg@gmail.com" })}
+        {Field({ label: 'Jumuah Location Label (shown on home page "Jumuah" card)', name: "jumuahLocation", placeholder: "211 N 25th Ave" })}
       </Card>
 
       {/* Branding & Socials */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Masjid Branding &amp; Socials</h3>
-        <Field label="Masjid Short Name / Acronym" name="masjidShortName" placeholder="ICH" />
-        <Field label="Footer Short Description" name="footerDescription" placeholder="Serving the Muslim community with prayer, education, and community programs." />
-        <Field label="Facebook Page URL" name="facebookUrl" placeholder="https://www.facebook.com/..." />
-        <Field label="Instagram Profile URL" name="instagramUrl" placeholder="https://www.instagram.com/..." />
+        {Field({ label: "Masjid Short Name / Acronym", name: "masjidShortName", placeholder: "ICH" })}
+        {Field({ label: "Footer Short Description", name: "footerDescription", placeholder: "Serving the Muslim community with prayer, education, and community programs." })}
+        {Field({ label: "Facebook Page URL", name: "facebookUrl", placeholder: "https://www.facebook.com/..." })}
+        {Field({ label: "Instagram Profile URL", name: "instagramUrl", placeholder: "https://www.instagram.com/..." })}
       </Card>
 
       {/* Mission */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Mission Statement</h3>
-        <Field label="Mission Text (shown on About page)" name="missionText" textarea placeholder="The Islamic Center of Hattiesburg stands as a beacon of faith…" />
+        {Field({ label: "Mission Text (shown on About page)", name: "missionText", textarea: true, placeholder: "The Islamic Center of Hattiesburg stands as a beacon of faith…" })}
       </Card>
 
       {/* Oak Grove */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 20 }}>Oak Grove / New Masjid Project</h3>
-        <Field label="Project Title" name="oakGroveTitle" placeholder="New Masjid Project" />
-        <Field label="Project Description" name="oakGroveDescription" textarea placeholder="As a growing community our current facility…" />
-        <Field label="Fundraiser URL (LaunchGood or other)" name="oakGroveUrl" placeholder="https://www.launchgood.com/v4/campaign/..." />
+        {Field({ label: "Project Title", name: "oakGroveTitle", placeholder: "New Masjid Project" })}
+        {Field({ label: "Project Description", name: "oakGroveDescription", textarea: true, placeholder: "As a growing community our current facility…" })}
+        {Field({ label: "Fundraiser URL (LaunchGood or other)", name: "oakGroveUrl", placeholder: "https://www.launchgood.com/v4/campaign/..." })}
       </Card>
 
       {/* Donation */}
       <Card style={{ marginBottom: 24 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 8 }}>Donation Page (Zeffy)</h3>
         <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 16 }}>Find these UUIDs in your Zeffy dashboard URLs: <code style={{ background: "#f3f4f6", padding: "1px 5px", borderRadius: 3, fontSize: 11 }}>zeffy.com/donation-form/&#123;UUID&#125;</code></p>
-        <Field label="One-Time Donation Form UUID" name="zeffyOneTimeId" placeholder="ba0c6cb0-70a2-41db-95c6-9ff75a30b42c" />
-        <Field label="Monthly / Recurring Donation Form UUID" name="zeffyMonthlyId" placeholder="e4338258-eef5-489e-ae60-75017200e9bc" />
+        {Field({ label: "One-Time Donation Form UUID", name: "zeffyOneTimeId", placeholder: "ba0c6cb0-70a2-41db-95c6-9ff75a30b42c" })}
+        {Field({ label: "Monthly / Recurring Donation Form UUID", name: "zeffyMonthlyId", placeholder: "e4338258-eef5-489e-ae60-75017200e9bc" })}
       </Card>
 
       {/* Prayer Display */}
       <Card style={{ marginBottom: 28 }}>
         <h3 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 19, fontWeight: 600, marginBottom: 8 }}>Prayer Time Display</h3>
         <p style={{ fontSize: 13, color: ICH.textMuted, marginBottom: 16 }}>Controls how Maghrib iqama appears on the home page prayer strip. Typical values: &ldquo;After Adhan&rdquo; or a time like &ldquo;7:45 PM&rdquo;.</p>
-        <Field label="Maghrib Iqama Display" name="maghribDisplay" placeholder="After Adhan" />
+        {Field({ label: "Maghrib Iqama Display", name: "maghribDisplay", placeholder: "After Adhan" })}
       </Card>
 
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
