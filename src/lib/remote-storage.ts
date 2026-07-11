@@ -105,34 +105,48 @@ export async function remoteRead<T>(name: string, fallback: T): Promise<T> {
 }
 
 /**
- * Writes data to:
- * 1. Redis (if available)
- * 2. Local /tmp/<key>.json
- * 3. GitHub API (if token available)
+ * Writes data to every configured backend:
+ * 1. Redis / KV (if available) — durable, shared across serverless instances
+ * 2. Local /tmp/<key>.json — best-effort, per-instance only
+ * 3. GitHub API (if token available) — durable, shared
+ *
+ * A "durable" backend is Redis/KV or GitHub. The write throws only when at
+ * least one durable backend was configured and *every* configured durable
+ * backend failed — so, e.g., a stale GitHub token no longer breaks saves once
+ * Redis/KV is working. When no durable backend is configured at all, the write
+ * falls back to /tmp only (dev/local mode) and resolves without error.
  */
 export async function remoteWrite<T>(name: string, data: T): Promise<void> {
   const tmpPath = `/tmp/ichattiesburg-${name}.json`;
 
-  // 1. Write to Redis
+  let durableConfigured = false;
+  let durableOk = false;
+  let lastDurableError: unknown = null;
+
+  // 1. Write to Redis / KV
   const redis = getRedis();
   if (redis) {
+    durableConfigured = true;
     try {
       await redis.set(`ichattiesburg:${name}`, data);
+      durableOk = true;
     } catch (e) {
+      lastDurableError = e;
       console.warn(`[remote-storage] Redis write failed for ${name}:`, e);
     }
   }
 
-  // 2. Write to /tmp
+  // 2. Write to /tmp (best-effort, not counted as durable)
   try {
     writeFileSync(tmpPath, JSON.stringify(data, null, 2), "utf-8");
   } catch (e) {
     console.warn(`[remote-storage] /tmp write failed for ${name}:`, e);
   }
 
-  // 3. Commit to GitHub (await so write failures propagate to the UI)
+  // 3. Commit to GitHub
   const token = getGitHubToken();
   if (token) {
+    durableConfigured = true;
     const url = `https://api.github.com/repos/${GH_OWNER}/${GH_REPO}/contents/public/${name}.json`;
     const headers = {
       Authorization: `Bearer ${token}`,
@@ -148,7 +162,7 @@ export async function remoteWrite<T>(name: string, data: T): Promise<void> {
         const body = await shaRes.json() as { sha: string };
         sha = body.sha;
       }
-      
+
       const contentB64 = Buffer.from(JSON.stringify(data, null, 2)).toString("base64");
       const putRes = await fetch(url, {
         method: "PUT",
@@ -160,15 +174,23 @@ export async function remoteWrite<T>(name: string, data: T): Promise<void> {
           branch: GH_BRANCH,
         }),
       });
-      
+
       if (!putRes.ok) {
         const errBody = await putRes.json().catch(() => ({}));
         throw new Error(`GitHub PUT failed for ${name} (${putRes.status}): ${JSON.stringify(errBody)}`);
       }
-    } catch (e: any) {
+      durableOk = true;
+    } catch (e: unknown) {
+      lastDurableError = e;
       console.error(`[remote-storage] GitHub write error for ${name}:`, e);
-      throw e;
     }
+  }
+
+  // Only surface an error if a durable backend was configured and all failed.
+  if (durableConfigured && !durableOk) {
+    throw lastDurableError instanceof Error
+      ? lastDurableError
+      : new Error(`Failed to persist ${name}`);
   }
 }
 
