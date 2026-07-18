@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users, Settings, BookOpen, Link2 } from "lucide-react";
+import { LogOut, Plus, Bell, Calendar, Clock, Trash2, Edit2, Users, Settings, BookOpen, Link2, ImageIcon } from "lucide-react";
 import { AdminUser } from "@/lib/auth";
 import { ICH, Btn, Card } from "./ui-primitives";
 import { parseLocalDate } from "@/lib/utils";
@@ -38,10 +38,16 @@ export default function AdminDashboard({ user }: { user: AdminUser }) {
           <h1 style={{ fontFamily: "Cormorant Garamond,serif", fontSize: 36, fontWeight: 600, color: ICH.text }}>Admin Dashboard</h1>
           <p style={{ fontSize: 13, color: ICH.textMuted }}>Welcome back, <strong style={{ color: ICH.text }}>{user.name}</strong></p>
         </div>
-        <Btn variant="outline" onClick={logout} style={{ fontSize: 13, gap: 5, padding: "8px 16px" }}>
-          <LogOut className="h-4 w-4" />
-          Logout
-        </Btn>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+          <Btn href="/admin/post-designer" variant="gold" style={{ fontSize: 13, gap: 5, padding: "8px 16px" }}>
+            <ImageIcon className="h-4 w-4" />
+            Post Designer
+          </Btn>
+          <Btn variant="outline" onClick={logout} style={{ fontSize: 13, gap: 5, padding: "8px 16px" }}>
+            <LogOut className="h-4 w-4" />
+            Logout
+          </Btn>
+        </div>
       </div>
 
       {/* Tabs Row */}

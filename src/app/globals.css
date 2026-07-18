@@ -154,6 +154,13 @@ p {
   }
 }
 
+/* Post Designer: stack controls above the preview on narrow screens */
+@media (max-width: 900px) {
+  .ig-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
 /* Horizontally scrollable tab bar on narrow screens (admin, filters) */
 .scroll-tabs {
   overflow-x: auto;
