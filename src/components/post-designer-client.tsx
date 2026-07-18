@@ -2,7 +2,7 @@
 
 import React, { useRef, useState } from "react";
 import Link from "next/link";
-import { toPng } from "html-to-image";
+import { toBlob } from "html-to-image";
 import { ArrowLeft } from "lucide-react";
 import { ICH, GoldLabel } from "./ui-primitives";
 
@@ -277,6 +277,154 @@ function IgField({ label, value, onChange, textarea }: { label: string; value: s
   );
 }
 
+// ── Quran verse picker (alquran.cloud) ──────────────────────────────────────────
+// Lets an editor pick a surah + ayah and pull the Arabic + an English translation
+// straight from the Quran API, instead of typing the verse in by hand. The public
+// alquran.cloud API is CORS-enabled, so this runs entirely client-side.
+const QURAN_API = "https://api.alquran.cloud/v1";
+
+// Translation editions offered in the dropdown (identifier → display name).
+const QURAN_TRANSLATIONS: { id: string; label: string }[] = [
+  { id: "en.sahih", label: "Sahih International" },
+  { id: "en.pickthall", label: "Pickthall" },
+  { id: "en.yusufali", label: "Yusuf Ali" },
+  { id: "en.asad", label: "Muhammad Asad" },
+];
+
+interface Surah {
+  number: number;
+  englishName: string;
+  numberOfAyahs: number;
+}
+
+function QuranPicker({ onPick }: { onPick: (v: { arabic: string; translation: string; reference: string }) => void }) {
+  const [surahs, setSurahs] = useState<Surah[]>([]);
+  const [surah, setSurah] = useState(94); // Ash-Sharh, matches the default content
+  const [ayah, setAyah] = useState(6);
+  const [edition, setEdition] = useState("en.sahih");
+  const [loading, setLoading] = useState(false);
+  const [err, setErr] = useState("");
+
+  // Load the list of surahs once, so we can show names and cap the ayah number.
+  React.useEffect(() => {
+    let alive = true;
+    fetch(`${QURAN_API}/surah`)
+      .then((r) => r.json())
+      .then((j) => {
+        if (alive && j?.data) setSurahs(j.data as Surah[]);
+      })
+      .catch(() => {
+        if (alive) setErr("Couldn't load the surah list — check your connection.");
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  const current = surahs.find((s) => s.number === surah);
+  const maxAyah = current?.numberOfAyahs ?? 286;
+  const safeAyah = Math.min(Math.max(1, ayah), maxAyah);
+
+  const fetchVerse = async () => {
+    setLoading(true);
+    setErr("");
+    try {
+      const res = await fetch(`${QURAN_API}/ayah/${surah}:${safeAyah}/editions/quran-uthmani,${edition}`);
+      const json = await res.json();
+      const data = json?.data as Array<{ text: string; numberInSurah: number; surah: { englishName: string } }> | undefined;
+      if (!data || data.length < 2) throw new Error("bad response");
+      const arabic = data[0].text;
+      const translation = data[1].text;
+      const name = data[0].surah?.englishName ?? current?.englishName ?? "";
+      onPick({
+        arabic,
+        translation,
+        reference: `Quran ${surah}:${safeAyah}${name ? ` · ${name}` : ""}`,
+      });
+    } catch {
+      setErr("Couldn't fetch that verse — please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const ctrl: React.CSSProperties = {
+    padding: "9px 11px",
+    border: `1px solid ${ICH.border}`,
+    borderRadius: 5,
+    fontSize: 13,
+    fontFamily: F_SANS,
+    color: ICH.text,
+    background: "#fff",
+    width: "100%",
+  };
+  const lbl: React.CSSProperties = { display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: ".09em", textTransform: "uppercase", color: ICH.textMuted, fontFamily: F_SANS, marginBottom: 5 };
+
+  return (
+    <div style={{ border: `1px solid ${ICH.border}`, borderRadius: 6, padding: 14, background: "#fff", marginBottom: 4 }}>
+      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", color: ICH.gold, fontFamily: F_SANS, marginBottom: 4 }}>
+        Look up a verse
+      </div>
+      <p style={{ fontSize: 12, color: ICH.textMuted, fontFamily: F_SANS, lineHeight: 1.5, margin: "0 0 12px" }}>
+        Pick a surah and ayah to auto-fill the Arabic and translation from the Quran API.
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr", gap: 10, marginBottom: 10 }}>
+        <div>
+          <label style={lbl}>Surah</label>
+          <select value={surah} onChange={(e) => setSurah(Number(e.target.value))} style={ctrl}>
+            {surahs.length === 0 && <option value={surah}>Loading…</option>}
+            {surahs.map((s) => (
+              <option key={s.number} value={s.number}>
+                {s.number}. {s.englishName}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label style={lbl}>Ayah</label>
+          <input
+            type="number"
+            min={1}
+            max={maxAyah}
+            value={ayah}
+            onChange={(e) => setAyah(Number(e.target.value))}
+            style={ctrl}
+          />
+        </div>
+      </div>
+      <div style={{ marginBottom: 12 }}>
+        <label style={lbl}>Translation</label>
+        <select value={edition} onChange={(e) => setEdition(e.target.value)} style={ctrl}>
+          {QURAN_TRANSLATIONS.map((t) => (
+            <option key={t.id} value={t.id}>
+              {t.label}
+            </option>
+          ))}
+        </select>
+      </div>
+      <button
+        onClick={fetchVerse}
+        disabled={loading}
+        style={{
+          width: "100%",
+          padding: "11px",
+          background: loading ? ICH.textMuted : ICH.primary,
+          color: "#fff",
+          border: "none",
+          borderRadius: 5,
+          cursor: loading ? "default" : "pointer",
+          fontFamily: F_SANS,
+          fontSize: 13.5,
+          fontWeight: 600,
+        }}
+      >
+        {loading ? "Fetching…" : "Auto-fill verse"}
+      </button>
+      {err && <div style={{ fontSize: 12, color: "#b3261e", fontFamily: F_SANS, marginTop: 8 }}>{err}</div>}
+    </div>
+  );
+}
+
 const IG_FIELD_LABELS: Record<string, string> = {
   kicker: "Kicker / Label",
   title: "Title",
@@ -309,6 +457,7 @@ export default function PostDesignerClient() {
 
   const fields = allFields[template];
   const setField = (k: string, v: string) => setAllFields((a) => ({ ...a, [template]: { ...a[template], [k]: v } }));
+  const mergeFields = (patch: Fields) => setAllFields((a) => ({ ...a, [template]: { ...a[template], ...patch } }));
   const resetTpl = () => setAllFields((a) => ({ ...a, [template]: JSON.parse(JSON.stringify(IG_DEFAULTS[template])) }));
 
   const dim = IG_FORMATS[format];
@@ -322,11 +471,43 @@ export default function PostDesignerClient() {
     setBusy(true);
     setNote("");
     try {
-      const url = await toPng(nodeRef.current, { width: dim.w, height: dim.h, pixelRatio: 1, cacheBust: true, backgroundColor: "#fff" });
+      // Render to a Blob (not a data URL). Mobile browsers — iOS Safari in
+      // particular — ignore the anchor `download` attribute on giant data URLs,
+      // which is why phones never got the file. A blob URL, and the Web Share
+      // sheet where available, both work on mobile.
+      const blob = await toBlob(nodeRef.current, { width: dim.w, height: dim.h, pixelRatio: 1, cacheBust: true, backgroundColor: "#fff" });
+      if (!blob) throw new Error("render produced no image");
+      const fileName = `ich-${template}-${format}-${dim.w}x${dim.h}.png`;
+
+      // Prefer the native share sheet on phones — it lets the user save the
+      // image straight to Photos / Files, which a download link cannot do on iOS.
+      const file = new File([blob], fileName, { type: "image/png" });
+      const nav = navigator as Navigator & {
+        canShare?: (d: { files: File[] }) => boolean;
+        share?: (d: { files: File[]; title?: string }) => Promise<void>;
+      };
+      if (typeof nav.canShare === "function" && typeof nav.share === "function" && nav.canShare({ files: [file] })) {
+        try {
+          await nav.share({ files: [file], title: fileName });
+          setNote("Shared — choose “Save Image” to keep it.");
+          return;
+        } catch (err) {
+          // User dismissed the sheet — treat as a no-op rather than an error.
+          if (err instanceof Error && err.name === "AbortError") {
+            setNote("");
+            return;
+          }
+          // Any other failure falls through to the blob-download path below.
+        }
+      }
+
+      const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
-      a.download = `ich-${template}-${format}-${dim.w}x${dim.h}.png`;
+      a.download = fileName;
       a.href = url;
+      a.rel = "noopener";
       a.click();
+      setTimeout(() => URL.revokeObjectURL(url), 10000);
       setNote(`Downloaded ${dim.w} × ${dim.h} PNG`);
     } catch {
       setNote("Export failed — please retry.");
@@ -457,6 +638,7 @@ export default function PostDesignerClient() {
               </button>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
+              {template === "verse" && <QuranPicker onPick={mergeFields} />}
               {IG_TEMPLATES[template].fields.map((k) => (
                 <IgField key={k} label={IG_FIELD_LABELS[k] || k} value={fields[k] || ""} onChange={(v) => setField(k, v)} textarea={["body", "subtitle", "translation", "arabic"].includes(k)} />
               ))}
