@@ -1,6 +1,8 @@
 import { masjid } from "@/config/masjid";
-import { fmt12From24 } from "@/lib/time";
+import { fmtDateTime12, todayInMasjidTZ } from "@/lib/time";
 import { getJamaatTimes, type JamaatTimes } from "@/lib/jamaat";
+import { Coordinates, PrayerTimes as AdhanPrayerTimes } from "adhan";
+import { getPrayerCalculationParameters } from "@/lib/prayer-calculation";
 
 export interface PrayerTimes {
   fajr: string;
@@ -27,54 +29,23 @@ export interface MasjidTimes {
 
 export async function fetchPrayerTimes(): Promise<MasjidTimes> {
   const now = new Date();
-  
-  let methodId = 2; // North America (ISNA) default
-  if (masjid.calc.method === "MUSLIM_WORLD_LEAGUE") methodId = 3;
-  else if (masjid.calc.method === "EGYPTIAN") methodId = 5;
-  else if (masjid.calc.method === "KARACHI") methodId = 1;
-  else if (masjid.calc.method === "UMM_AL_QURA") methodId = 4;
 
-  const school = masjid.calc.madhab === "HANAFI" ? 1 : 0;
+  const coordinates = new Coordinates(masjid.coordinates.lat, masjid.coordinates.lon);
+  const params = getPrayerCalculationParameters();
 
-  let apiTimes = {
-    fajr: "04:30",
-    sunrise: "05:50",
-    dhuhr: "13:00",
-    asr: "16:30",
-    maghrib: "20:00",
-    isha: "21:30",
-  };
-
-  try {
-    const res = await fetch(
-      `https://api.aladhan.com/v1/timings?latitude=${masjid.coordinates.lat}&longitude=${masjid.coordinates.lon}&method=${methodId}&school=${school}`,
-      { next: { revalidate: 3600 } }
-    );
-    if (res.ok) {
-      const json = await res.json();
-      if (json?.data?.timings) {
-        const t = json.data.timings;
-        apiTimes = {
-          fajr: t.Fajr || apiTimes.fajr,
-          sunrise: t.Sunrise || apiTimes.sunrise,
-          dhuhr: t.Dhuhr || apiTimes.dhuhr,
-          asr: t.Asr || apiTimes.asr,
-          maghrib: t.Maghrib || apiTimes.maghrib,
-          isha: t.Isha || apiTimes.isha,
-        };
-      }
-    }
-  } catch (e) {
-    console.error("API fetch error:", e);
-  }
+  const adhan = new AdhanPrayerTimes(
+    coordinates,
+    todayInMasjidTZ(now, masjid.timezone),
+    params,
+  );
 
   const prayerTimes: PrayerTimes = {
-    fajr:    fmt12From24(apiTimes.fajr),
-    sunrise: fmt12From24(apiTimes.sunrise),
-    dhuhr:   fmt12From24(apiTimes.dhuhr),
-    asr:     fmt12From24(apiTimes.asr),
-    maghrib: fmt12From24(apiTimes.maghrib),
-    isha:    fmt12From24(apiTimes.isha),
+    fajr:    fmtDateTime12(adhan.fajr, masjid.timezone),
+    sunrise: fmtDateTime12(adhan.sunrise, masjid.timezone),
+    dhuhr:   fmtDateTime12(adhan.dhuhr, masjid.timezone),
+    asr:     fmtDateTime12(adhan.asr, masjid.timezone),
+    maghrib: fmtDateTime12(adhan.maghrib, masjid.timezone),
+    isha:    fmtDateTime12(adhan.isha, masjid.timezone),
   };
 
   const jamaat = await getJamaatTimes();
