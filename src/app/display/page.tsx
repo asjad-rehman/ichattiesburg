@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Coordinates, CalculationMethod, Madhab, PrayerTimes } from "adhan";
+import { Coordinates, PrayerTimes } from "adhan";
 import { masjid } from "@/config/masjid";
+import { getPrayerCalculationParameters } from "@/lib/prayer-calculation";
 import { fmt12From24, fmtDateTime12, zonedParts, todayInMasjidTZ, addDays, msToHMS } from "@/lib/time";
 import Image from "next/image";
 import { JamaatTimes } from "@/lib/jamaat";
@@ -48,22 +49,9 @@ function formatDate(date: Date) {
   }).format(date);
 }
 
-function getCalculationMethod() {
-  switch (masjid.calc.method) {
-    case "MUSLIM_WORLD_LEAGUE": return CalculationMethod.MuslimWorldLeague();
-    case "EGYPTIAN": return CalculationMethod.Egyptian();
-    case "KARACHI": return CalculationMethod.Karachi();
-    case "UMM_AL_QURA": return CalculationMethod.UmmAlQura();
-    default: return CalculationMethod.NorthAmerica();
-  }
-}
-
 function calcAdhan(date: Date) {
   const coords = new Coordinates(masjid.coordinates.lat, masjid.coordinates.lon);
-  const params = getCalculationMethod();
-  if (masjid.calc.fajrAngle !== undefined) params.fajrAngle = masjid.calc.fajrAngle;
-  if (masjid.calc.ishaAngle !== undefined)  params.ishaAngle = masjid.calc.ishaAngle;
-  params.madhab = masjid.calc.madhab === "SHAFI" ? Madhab.Shafi : Madhab.Hanafi;
+  const params = getPrayerCalculationParameters();
   const pt = new PrayerTimes(coords, date, params);
   return { fajr: pt.fajr, sunrise: pt.sunrise, dhuhr: pt.dhuhr, asr: pt.asr, maghrib: pt.maghrib, isha: pt.isha };
 }
